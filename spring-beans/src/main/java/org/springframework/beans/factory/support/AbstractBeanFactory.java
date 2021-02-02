@@ -235,6 +235,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @throws BeansException 如果无法创建该bean
 	 */
 	@SuppressWarnings("unchecked")
+	//真正获取Bean的方法
 	protected <T> T doGetBean(
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
