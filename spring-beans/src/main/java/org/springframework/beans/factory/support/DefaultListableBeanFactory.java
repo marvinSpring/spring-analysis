@@ -840,7 +840,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
-		// beanDefinitionNames是BeanDefinition注册最后的两个容器之一，用于存放所有需要实例化的BeanDefinition的beanName
+
+		// beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
+		// 用于存放所有需要实例化的BeanDefinition的beanName
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
@@ -869,7 +871,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
-					//核心方法
+					//核心方法————getBean
 					getBean(beanName);
 				}
 			}

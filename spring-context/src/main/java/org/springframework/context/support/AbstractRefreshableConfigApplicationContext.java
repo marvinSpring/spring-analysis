@@ -51,10 +51,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	public AbstractRefreshableConfigApplicationContext() {
 	}
 
-	/**
-	 * Create a new AbstractRefreshableConfigApplicationContext with the given parent context.
-	 * @param parent the parent context
-	 */
+	//使用给定的父上下文创建一个新的AbstractRefreshableConfigApplicationContext。
 	public AbstractRefreshableConfigApplicationContext(@Nullable ApplicationContext parent) {
 		super(parent);
 	}

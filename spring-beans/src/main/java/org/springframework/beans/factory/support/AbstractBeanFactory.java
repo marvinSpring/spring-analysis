@@ -226,14 +226,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * Return an instance, which may be shared or independent, of the specified bean.
-	 * @param name the name of the bean to retrieve
-	 * @param requiredType the required type of the bean to retrieve
-	 * @param args arguments to use when creating a bean instance using explicit arguments
-	 * (only applied when creating a new instance as opposed to retrieving an existing one)
-	 * @param typeCheckOnly whether the instance is obtained for a type check,
-	 * not for actual use
-	 * @return an instance of the bean
-	 * @throws BeansException if the bean could not be created
+	 * @param name 要检索的bean的名称
+	 * @param requiredType 检索所需的bean类型
+	 * @param args 使用显式参数创建Bean实例时要使用的参数
+	 * (仅在创建新实例而不是检索现有实例时适用)
+	 * @param typeCheckOnly 是否为实例检查而不是实际使用而获取实例
+	 * @return Bean的一个实例
+	 * @throws BeansException 如果无法创建该bean
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(
@@ -244,7 +243,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
-		// 检查当前BeanName在缓存中是否已经存在实例
+		// 检查当前beanName在缓存中是否已经存在实例
 		Object sharedInstance = getSingleton(beanName);
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
@@ -315,8 +314,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
-				// Create bean instance.
-				// 创建Bean实例，核心方法
+				// 核心方法————创建Bean实例
 				if (mbd.isSingleton()) {
 					//先执行getSingleton
 					sharedInstance = getSingleton(beanName, () -> {

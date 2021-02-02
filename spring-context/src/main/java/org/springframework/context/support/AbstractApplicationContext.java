@@ -160,10 +160,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 
-	/** Logger used by this class. Available to subclasses. */
+	//子类会使用这个日志
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	/** Unique id for this context, if any. */
 	//spring上下文的唯一id
 	private String id = ObjectUtils.identityToString(this);
 
@@ -180,7 +179,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private ConfigurableEnvironment environment;
 
-	/** BeanFactoryPostProcessors to apply on refresh. */
 	//BeanFactory的前置处理器
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
@@ -194,8 +192,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** Flag that indicates whether this context has been closed already. */
 	private final AtomicBoolean closed = new AtomicBoolean();
 
-	/** Synchronization monitor for the "refresh" and "destroy". */
-	//初始化一个监听器（该监听器用来监听spring容器的刷新和销毁）
+	//初始化一个同步监听器（该监听器用来监听spring容器的刷新和销毁）
 	private final Object startupShutdownMonitor = new Object();
 
 	/** Reference to the JVM shutdown hook, if registered. */
@@ -229,17 +226,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
 
-	/**
-	 * Create a new AbstractApplicationContext with no parent.
-	 */
+	//创建一个没有父级的新AbstractApplicationContext。
 	public AbstractApplicationContext() {
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
-	/**
-	 * Create a new AbstractApplicationContext with the given parent context.
-	 * @param parent the parent context
-	 */
+	//使用给定的父上下文创建一个新的AbstractApplicationContext。
 	public AbstractApplicationContext(@Nullable ApplicationContext parent) {
 		this();
 		setParent(parent);
@@ -461,6 +453,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getResources
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
+	//返回用于将路径解析为资源实例的ResourceLoader。
+	// 默认是一个 PathMatchingResourcePatternResolver
+	//支持ant表达式的路径。
 	protected ResourcePatternResolver getResourcePatternResolver() {
 		return new PathMatchingResourcePatternResolver(this);
 	}
@@ -478,6 +473,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * its environment is an instance of {@link ConfigurableEnvironment}.
 	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
 	 */
+	//如果父级不是 null
+	//并且其环境是ConfigurableEnvironment的实例
+	//则设置此ApplicationContext的父级。
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
 		this.parent = parent;
@@ -541,12 +539,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 此钩子方法的修饰符是protected，仅spring内部用
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
-				// 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，可以对BeanDefinition和BeanFactory进行管理
+				// 调用上下文中作为bean注册的工厂处理器
+				// 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，
+				// 可以对BeanDefinition和BeanFactory进行处理和管理
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
-				// 将BeanPostProcessors的实现类实例化后放入BeanFactory容器中
+				// 注册BeanPostProcessor
+				// 将BeanPostProcessors的实现类实例化后
+				// 放入BeanFactory容器中
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -719,12 +719,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
-	 * respecting explicit order if given.
-	 * <p>Must be called before singleton instantiation.
+	 * 实例化并调用所有注册的BeanFactoryPostProcessorBean，
+	 * 如果给定的排序的话就遵循显式顺序
+	 * 该方法在单例实例化之前被调用。
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		//调用所有实现了BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类方法
+		//调用所有实现了[@link BeanDefinitionRegistryPostProcessor]和[@link BeanFactoryPostProcessor]接口的实现类方法
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
@@ -741,6 +741,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before any instantiation of application beans.
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		//注册BeanPostProcessors到BeanFactory中
 		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);
 	}
 
@@ -877,9 +878,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
-		// Register a default embedded value resolver if no bean post-processor
-		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
-		// at this point, primarily for resolution in annotation attribute values.
+		// 不重要
+		// 如果之前没有任何beanPostProcessor进行过注册，
+		// 则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：此时，该解析器主要用于注释属性值的解析。
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
@@ -897,7 +898,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
-		// 核心方法
+		// 核心方法————实例化Bean
 		beanFactory.preInstantiateSingletons();
 	}
 
