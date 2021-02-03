@@ -867,8 +867,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Finish the initialization of this context's bean factory,
-	 * initializing all remaining singleton beans.
+	 * 完成此上下文的bean工厂的初始化，初始化所有剩余的单例bean。
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
@@ -880,7 +879,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// 不重要
 		// 如果之前没有任何beanPostProcessor进行过注册，
-		// 则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：此时，该解析器主要用于注释属性值的解析。
+		// 则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：此时，该解析器主要用于注解属性值的解析。
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
