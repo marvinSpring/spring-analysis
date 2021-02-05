@@ -24,30 +24,24 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
 
 /**
- * Central interface to provide configuration for an application.
- * This is read-only while the application is running, but may be
- * reloaded if the implementation supports this.
+ * 上下文中央接口，为应用程序提供上下文配置。
+ * 一般情况下本接口是只读的，
+ * 但是如果实现本接口就可以重载。
  *
- * <p>An ApplicationContext provides:
+ * <p>ApplicationContext提供：
  * <ul>
- * <li>Bean factory methods for accessing application components.
- * Inherited from {@link org.springframework.beans.factory.ListableBeanFactory}.
- * <li>The ability to load file resources in a generic fashion.
- * Inherited from the {@link org.springframework.core.io.ResourceLoader} interface.
- * <li>The ability to publish events to registered listeners.
- * Inherited from the {@link ApplicationEventPublisher} interface.
- * <li>The ability to resolve messages, supporting internationalization.
- * Inherited from the {@link MessageSource} interface.
- * <li>Inheritance from a parent context. Definitions in a descendant context
- * will always take priority. This means, for example, that a single parent
- * context can be used by an entire web application, while each servlet has
- * its own child context that is independent of that of any other servlet.
+	 * <li>用于访问应用程序组件的BeanFactory。————{@link org.springframework.beans.factory.ListableBeanFactory}.
+	 * <li>以通用方式加载文件资源。————{@link org.springframework.core.io.ResourceLoader} interface.
+	 * <li>将事件发布给注册的Listener。————{@link ApplicationEventPublisher} interface.
+	 * <li>解决消息的能力，支持国际化。————{@link MessageSource} interface.
+	 * <li>从父级Context继承. 在后代Context中的定义将始终优先。
+ 	 * 例如：
+ 		* 这意味着整个Web应用程序都可以使用单个父上下文，而每个servlet都有其自己的子上下文，该子上下文独立于任何其他servlet的子上下文。
  * </ul>
  *
- * <p>In addition to standard {@link org.springframework.beans.factory.BeanFactory}
- * lifecycle capabilities, ApplicationContext implementations detect and invoke
- * {@link ApplicationContextAware} beans as well as {@link ResourceLoaderAware},
- * {@link ApplicationEventPublisherAware} and {@link MessageSourceAware} beans.
+ * <p>除了标准的{@link org.springframework.beans.factory.BeanFactory}生命周期功能之外，
+ * ApplicationContext实现还检测并调用{@link ApplicationContextAware} bean以及{@link ResourceLoaderAware}，
+ * {@link ApplicationEventPublisherAware}和{@link MessageSourceAware } 。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -62,6 +56,7 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	 * Return the unique id of this application context.
 	 * @return the unique id of the context, or {@code null} if none
 	 */
+	//当前的上下文Id
 	@Nullable
 	String getId();
 
@@ -69,6 +64,7 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	 * Return a name for the deployed application that this context belongs to.
 	 * @return a name for the deployed application, or the empty String by default
 	 */
+	//当前上下文的名称
 	String getApplicationName();
 
 	/**
@@ -78,37 +74,33 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	String getDisplayName();
 
 	/**
-	 * Return the timestamp when this context was first loaded.
+	 * 返回第一次加载此上下文时的时间戳
 	 * @return the timestamp (ms) when this context was first loaded
 	 */
 	long getStartupDate();
 
 	/**
-	 * Return the parent context, or {@code null} if there is no parent
-	 * and this is the root of the context hierarchy.
+	 * 返回父级上下文，如果没有父级，则返回{@code null}，这是上下文层次结构的根。
 	 * @return the parent context, or {@code null} if there is no parent
 	 */
 	@Nullable
 	ApplicationContext getParent();
 
 	/**
-	 * Expose AutowireCapableBeanFactory functionality for this context.
-	 * <p>This is not typically used by application code, except for the purpose of
-	 * initializing bean instances that live outside of the application context,
-	 * applying the Spring bean lifecycle (fully or partly) to them.
-	 * <p>Alternatively, the internal BeanFactory exposed by the
-	 * {@link ConfigurableApplicationContext} interface offers access to the
-	 * {@link AutowireCapableBeanFactory} interface too. The present method mainly
-	 * serves as a convenient, specific facility on the ApplicationContext interface.
+	 * 针对此上下文公开AutowireCapableBeanFactory功能。
+	 * <p>应用程序代码通常不使用此选项，除非是为了初始化遗留在应用程序上下文之外的bean实例，
+	 * 将Spring bean生命周期（全部或部分）应用于它们。
+	 * <p>或者，内部BeanFactory由
+	 * {@link ConfigurableApplicationContext}接口也提供对{@link AutowireCapableBeanFactory}接口的访问。
+	 * 本方法主要用作ApplicationContext接口上的一种方便的特定功能。
 	 * <p><b>NOTE: As of 4.2, this method will consistently throw IllegalStateException
 	 * after the application context has been closed.</b> In current Spring Framework
 	 * versions, only refreshable application contexts behave that way; as of 4.2,
 	 * all application context implementations will be required to comply.
-	 * @return the AutowireCapableBeanFactory for this context
-	 * @throws IllegalStateException if the context does not support the
-	 * {@link AutowireCapableBeanFactory} interface, or does not hold an
-	 * autowire-capable bean factory yet (e.g. if {@code refresh()} has
-	 * never been called), or if the context has been closed already
+	 * @return 当前Context的 {@link AutowireCapableBeanFactory}
+	 * @throws IllegalStateException 如果上下文不支持
+	 * {@link AutowireCapableBeanFactory} 接口，
+	 * 或尚不具有支持自动装配功能的Bean工厂（例如，如果从未调用{@code #refresh()}），或者上下文已经关闭
 	 * @see ConfigurableApplicationContext#refresh()
 	 * @see ConfigurableApplicationContext#getBeanFactory()
 	 */

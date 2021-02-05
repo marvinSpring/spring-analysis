@@ -129,6 +129,7 @@ public interface BeanFactory {
 	 * @throws NoSuchBeanDefinitionException 如果没有指定名称的bean
 	 * @throws BeansException 如果无法获取Bean
 	 */
+	//下面几个getBean差不多的
 	Object getBean(String name) throws BeansException;
 
 	/**
@@ -153,8 +154,7 @@ public interface BeanFactory {
 	 * <p>Allows for specifying explicit constructor arguments / factory method arguments,
 	 * overriding the specified default arguments (if any) in the bean definition.
 	 * @param name the name of the bean to retrieve
-	 * @param args arguments to use when creating a bean instance using explicit arguments
-	 * (only applied when creating a new instance as opposed to retrieving an existing one)
+	 * @param args 使用显式参数创建Bean实例时要使用的参数（仅在创建新实例而不是检索现有实例时才应用）
 	 * @return an instance of the bean
 	 * @throws NoSuchBeanDefinitionException if there is no such bean definition
 	 * @throws BeanDefinitionStoreException if arguments have been given but

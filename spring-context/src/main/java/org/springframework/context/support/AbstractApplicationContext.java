@@ -183,13 +183,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
 	/** System time in milliseconds when this context started. */
-	//spring的开启时间
+	//当前上下文启动的时间
 	private long startupDate;
-
-	/** Flag that indicates whether this context is currently active. */
+	//代表本上下文当前是否处于激活状态的状态
 	private final AtomicBoolean active = new AtomicBoolean();
 
-	/** Flag that indicates whether this context has been closed already. */
+	//代表本上下文当前是否处于已经被关闭的状态
 	private final AtomicBoolean closed = new AtomicBoolean();
 
 	//初始化一个同步监听器（该监听器用来监听spring容器的刷新和销毁）
@@ -199,7 +198,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private Thread shutdownHook;
 
-	/** ResourcePatternResolver used by this context. */
+	//当前上下文中使用的ResourcePatternResolver
 	private ResourcePatternResolver resourcePatternResolver;
 
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
@@ -320,9 +319,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Create and return a new {@link StandardEnvironment}.
-	 * <p>Subclasses may override this method in order to supply
-	 * a custom {@link ConfigurableEnvironment} implementation.
+	 * 创建并返回一个新的{@link StandardEnvironment}。
+	 * <p>子类可以重写此方法，以提供自定义的{@link ConfigurableEnvironment}实现。
 	 */
 	protected ConfigurableEnvironment createEnvironment() {
 		return new StandardEnvironment();
@@ -475,7 +473,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	//如果父级不是 null
 	//并且其环境是ConfigurableEnvironment的实例
-	//则设置此ApplicationContext的父级。
+	//则设置当前ApplicationContext的父级。
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
 		this.parent = parent;
@@ -526,7 +524,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			//创建BeanFactory之前的一些准备工作，比如设置开启时间，激活状态，设置Environment，还可以扩展自定义子类实现等等
 			prepareRefresh();
 
-			// 告诉子类刷新内部bean工厂。
+			// 刷新内部bean工厂。
 			// 核心方法：获取一个新的BeanFactory,就是BeanDefinition对象的创建过程
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -536,7 +534,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
 				// 钩子方法，子类可通过继承AbstractApplicationContext调用postProcessBeanFactory方法对BeanFactory进行操作
-				// 此钩子方法的修饰符是protected，仅spring内部用
 				postProcessBeanFactory(beanFactory);
 
 				// 调用上下文中作为bean注册的工厂处理器
@@ -580,10 +577,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 							"cancelling refresh attempt: " + ex);
 				}
 
-				// Destroy already created singletons to avoid dangling resources.
+				// 销毁已创建的单例以避免资源占用。
 				destroyBeans();
 
-				// Reset 'active' flag.
+				//重置“active”标志.
 				cancelRefresh(ex);
 
 				// Propagate exception to caller.
@@ -628,7 +625,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {
-			// 将本地应用程序侦听器重置为预刷新状态。
+			// 将本地ApplicationListener重置为预刷新状态。
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}
@@ -879,7 +876,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// 不重要
 		// 如果之前没有任何beanPostProcessor进行过注册，
-		// 则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：此时，该解析器主要用于注解属性值的解析。
+		// 则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：
+		// 此时，该解析器主要用于注解属性值的解析。
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}

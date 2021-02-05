@@ -53,26 +53,25 @@ package org.springframework.core.env;
  */
 public class StandardEnvironment extends AbstractEnvironment {
 
-	/** System environment property source name: {@value}. */
+	/** 系统环境属性源名称： {@value}. */
 	public static final String SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME = "systemEnvironment";
 
-	/** JVM system properties property source name: {@value}. */
+	/** JVM系统属性属性源名称： {@value}. */
 	public static final String SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME = "systemProperties";
 
 
 	/**
-	 * Customize the set of property sources with those appropriate for any standard
+	 * 使用适用于任何标准的资源来自定义资源集
 	 * Java environment:
 	 * <ul>
 	 * <li>{@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}
 	 * <li>{@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}
 	 * </ul>
-	 * <p>Properties present in {@value #SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME} will
-	 * take precedence over those in {@value #SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}.
+	 * <p>{@value SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME}中存在的属性将优先于{@value SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME}中的属性。
 	 * @see AbstractEnvironment#customizePropertySources(MutablePropertySources)
 	 * @see #getSystemProperties()
 	 * @see #getSystemEnvironment()
-	 */
+	 *///就是说操作系统属性的优先级高于JVM系统的属性
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
 		propertySources.addLast(
