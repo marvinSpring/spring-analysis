@@ -17,16 +17,13 @@
 package org.springframework.context;
 
 /**
- * An extension of the {@link Lifecycle} interface for those objects that require
- * to be started upon {@code ApplicationContext} refresh and/or shutdown in a
- * particular order.
+ * {@link Lifecycle}接口的扩展，
+ * 用于那些需要按特定顺序在{@code ApplicationContext}刷新和/或关闭时启动的对象。
  *
- * <p>The {@link #isAutoStartup()} return value indicates whether this object should
- * be started at the time of a context refresh. The callback-accepting
- * {@link #stop(Runnable)} method is useful for objects that have an asynchronous
- * shutdown process. Any implementation of this interface <i>must</i> invoke the
- * callback's {@code run()} method upon shutdown completion to avoid unnecessary
- * delays in the overall {@code ApplicationContext} shutdown.
+ * <p> {@link #isAutoStartup()}返回值指示是否应在刷新上下文时启动此对象。
+ * 接受回调的{@link #stop（Runnable）}方法对于具有异步关闭过程的对象很有用。
+ * 关闭完成后，此接口<i>的任何实现都必须调用回调的{@code run（）}方法，
+ * 以避免整体{@code ApplicationContext}关闭时不必要的延迟。
  *
  * <p>This interface extends {@link Phased}, and the {@link #getPhase()} method's
  * return value indicates the phase within which this {@code Lifecycle} component

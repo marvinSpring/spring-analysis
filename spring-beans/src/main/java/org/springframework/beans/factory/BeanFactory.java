@@ -21,7 +21,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
- * 用于访问bean容器的根接口
+ * spring的根接口
  * This is the basic client view of a bean container;
  * 还有其他接口，例如{@link ListableBeanFactory}
  * 和{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}可发挥特殊作用。

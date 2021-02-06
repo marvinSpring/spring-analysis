@@ -24,16 +24,12 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of the {@link BeanFactory} interface to be implemented by bean factories
- * that can enumerate all their bean instances, rather than attempting bean lookup
- * by name one by one as requested by clients. BeanFactory implementations that
- * preload all their bean definitions (such as XML-based factories) may implement
- * this interface.
+ * {@link BeanFactory}接口的扩展将由可以枚举其所有bean实例的bean工厂实现，
+ * 而不是按照客户端的请求按名称一一尝试进行bean查找。
+ * 预加载其所有bean定义的BeanFactory实现（例如基于XML的工厂）可以实现此接口。
  *
- * <p>If this is a {@link HierarchicalBeanFactory}, the return values will <i>not</i>
- * take any BeanFactory hierarchy into account, but will relate only to the beans
- * defined in the current factory. Use the {@link BeanFactoryUtils} helper class
- * to consider beans in ancestor factories too.
+ * <p>如果这是{@link HierarchicalBeanFactory}，则返回值<i>不<i>会考虑任何BeanFactory层次结构，
+ * 但仅与当前工厂中定义的bean有关。也可以使用{@link BeanFactoryUtils}帮助器类来考虑祖先工厂中的bean。
  *
  * <p>The methods in this interface will just respect bean definitions of this factory.
  * They will ignore any singleton beans that have been registered by other means like
@@ -55,6 +51,7 @@ import org.springframework.lang.Nullable;
  * @see HierarchicalBeanFactory
  * @see BeanFactoryUtils
  */
+//可罗列Bean的Bean工厂，是一个List的形式
 public interface ListableBeanFactory extends BeanFactory {
 
 	/**
@@ -66,6 +63,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @return if this bean factory contains a bean definition with the given name
 	 * @see #containsBean
 	 */
+	//是否包含BeanDefinition
 	boolean containsBeanDefinition(String beanName);
 
 	/**
@@ -75,6 +73,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * other means than bean definitions.
 	 * @return the number of beans defined in the factory
 	 */
+	//获取Bean Definition的数量
 	int getBeanDefinitionCount();
 
 	/**
@@ -85,6 +84,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @return the names of all beans defined in this factory,
 	 * or an empty array if none defined
 	 */
+	//获取BeanDefinition的名称数组
 	String[] getBeanDefinitionNames();
 
 	/**
@@ -204,6 +204,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class)
 	 */
+	//根据类型获取Bean
 	<T> Map<String, T> getBeansOfType(@Nullable Class<T> type) throws BeansException;
 
 	/**
@@ -252,6 +253,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @since 4.0
 	 * @see #findAnnotationOnBean
 	 */
+	//根据注解获取Bean名称
 	String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType);
 
 	/**
@@ -280,6 +282,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see #getBeanNamesForAnnotation
 	 * @see #getBeansWithAnnotation
 	 */
+	//找到某个Bean上的注解
 	@Nullable
 	<A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType)
 			throws NoSuchBeanDefinitionException;

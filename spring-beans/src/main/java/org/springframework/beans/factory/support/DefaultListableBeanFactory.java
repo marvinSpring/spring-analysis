@@ -84,23 +84,18 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Spring's default implementation of the {@link ConfigurableListableBeanFactory}
- * and {@link BeanDefinitionRegistry} interfaces: a full-fledged bean factory
- * based on bean definition metadata, extensible through post-processors.
+ * Spring的{@link ConfigurableListableBeanFactory}和{@link BeanDefinitionRegistry}
+ * 接口的默认实现：基于bean定义元数据的成熟bean工厂，可以通过后处理器进行扩展。
  *
- * <p>Typical usage is registering all bean definitions first (possibly read
- * from a bean definition file), before accessing beans. Bean lookup by name
- * is therefore an inexpensive operation in a local bean definition table,
- * operating on pre-resolved bean definition metadata objects.
+ * <p>典型的用法是在访问bean之前先注册所有bean定义（可能是从bean定义文件中读取）。
+ * 因此，按名称查找Bean是对本地Bean定义表进行的操作，该操作对预先解析的Bean定义元数据对象进行操作。
  *
- * <p>Note that readers for specific bean definition formats are typically
- * implemented separately rather than as bean factory subclasses: see for example
- * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}.
+ * <p>请注意，特定bean定义格式的阅读器通常是单独实现的，
+ * 而不是作为bean工厂的子类实现的：例如，
+ * 参见{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}。
  *
- * <p>For an alternative implementation of the
- * {@link org.springframework.beans.factory.ListableBeanFactory} interface,
- * have a look at {@link StaticListableBeanFactory}, which manages existing
- * bean instances rather than creating new ones based on bean definitions.
+ * <p>对于{@link org.springframework.beans.factory.ListableBeanFactory}接口的替代实现，
+ * 请查看{@link StaticListableBeanFactory}，它管理现有的bean实例，而不是基于bean定义创建新的bean实例。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -336,7 +331,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	//---------------------------------------------------------------------
-	// Implementation of remaining BeanFactory methods
+	// 剩余BeanFactory方法的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -445,7 +440,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
+	// ListableBeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1437,14 +1432,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * Find bean instances that match the required type.
-	 * Called during autowiring for the specified bean.
-	 * @param beanName the name of the bean that is about to be wired
-	 * @param requiredType the actual type of bean to look for
-	 * (may be an array component type or collection element type)
-	 * @param descriptor the descriptor of the dependency to resolve
-	 * @return a Map of candidate names and candidate instances that match
-	 * the required type (never {@code null})
+	 * 查找与所需类型匹配的bean实例。
+	 * 在自动装配指定的bean期间调用。
+	 *
+	 * @param beanName 即将连接的bean的名称
+	 * @param requiredType 要查找的bean的实际类型（可以是数组组件类型或集合元素类型）
+	 * @param descriptor 要解决的依赖项的描述符
+	 * @return 匹配所需类型的候选名称和候选实例的映射（永远{@code null}）
 	 * @throws BeansException in case of errors
 	 * @see #autowireByType
 	 * @see #autowireConstructor
@@ -1769,7 +1763,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	//---------------------------------------------------------------------
-	// Serialization support
+	// 为了支持序列化的方法
 	//---------------------------------------------------------------------
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

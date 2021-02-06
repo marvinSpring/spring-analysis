@@ -24,7 +24,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
 
 /**
- * 上下文中央接口，为应用程序提供上下文配置。
+ * Spring的核心接口，为应用程序提供上下文配置。
  * 一般情况下本接口是只读的，
  * 但是如果实现本接口就可以重载。
  *
@@ -34,6 +34,7 @@ import org.springframework.lang.Nullable;
 	 * <li>以通用方式加载文件资源。————{@link org.springframework.core.io.ResourceLoader} interface.
 	 * <li>将事件发布给注册的Listener。————{@link ApplicationEventPublisher} interface.
 	 * <li>解决消息的能力，支持国际化。————{@link MessageSource} interface.
+ 	 * 有上面这些接口，我Application Context就拥有了N多的功能，各种能力
 	 * <li>从父级Context继承. 在后代Context中的定义将始终优先。
  	 * 例如：
  		* 这意味着整个Web应用程序都可以使用单个父上下文，而每个servlet都有其自己的子上下文，该子上下文独立于任何其他servlet的子上下文。
@@ -42,6 +43,7 @@ import org.springframework.lang.Nullable;
  * <p>除了标准的{@link org.springframework.beans.factory.BeanFactory}生命周期功能之外，
  * ApplicationContext实现还检测并调用{@link ApplicationContextAware} bean以及{@link ResourceLoaderAware}，
  * {@link ApplicationEventPublisherAware}和{@link MessageSourceAware } 。
+ * 除了标准的Spring生命周期之外还会有上面这些aware接口的执行
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,6 +51,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
  */
+//Spring真正的总接口
 public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
 
@@ -93,14 +96,13 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	 * <p>或者，内部BeanFactory由
 	 * {@link ConfigurableApplicationContext}接口也提供对{@link AutowireCapableBeanFactory}接口的访问。
 	 * 本方法主要用作ApplicationContext接口上的一种方便的特定功能。
-	 * <p><b>NOTE: As of 4.2, this method will consistently throw IllegalStateException
-	 * after the application context has been closed.</b> In current Spring Framework
-	 * versions, only refreshable application contexts behave that way; as of 4.2,
-	 * all application context implementations will be required to comply.
+	 *
+	 * <p><b>注意：从4.2开始，此方法将在关闭应用程序上下文后始终引发IllegalStateException。
+	 * <b>在当前的Spring Framework版本中，只有可刷新的应用程序上下文才具有这种行为；
+	 * 从4.2开始，将要求所有应用程序上下文实现都必须遵守。
 	 * @return 当前Context的 {@link AutowireCapableBeanFactory}
 	 * @throws IllegalStateException 如果上下文不支持
-	 * {@link AutowireCapableBeanFactory} 接口，
-	 * 或尚不具有支持自动装配功能的Bean工厂（例如，如果从未调用{@code #refresh()}），或者上下文已经关闭
+	 * {@link AutowireCapableBeanFactory} 接口，或尚不具有支持自动装配功能的Bean工厂（例如，如果从未调用{@code #refresh()}），或者上下文已经关闭
 	 * @see ConfigurableApplicationContext#refresh()
 	 * @see ConfigurableApplicationContext#getBeanFactory()
 	 */

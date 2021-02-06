@@ -27,14 +27,12 @@ import org.springframework.core.io.ProtocolResolver;
 import org.springframework.lang.Nullable;
 
 /**
- * SPI interface to be implemented by most if not all application contexts.
- * Provides facilities to configure an application context in addition
- * to the application context client methods in the
- * {@link org.springframework.context.ApplicationContext} interface.
+ * SPI接口将由大多数（如果不是全部）应用程序上下文实现。
+ * 除了{@link org.springframework.context.ApplicationContext}界面中的应用程序上下文客户端方法之外，
+ * 还提供了配置ApplicationContext的功能。
  *
- * <p>Configuration and lifecycle methods are encapsulated here to avoid
- * making them obvious to ApplicationContext client code. The present
- * methods should only be used by startup and shutdown code.
+ * <p>此处封装了配置和生命周期方法，
+ * 以避免对ApplicationContext客户端代码显而易见。本方法仅应由启动和关闭代码使用。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -119,19 +117,16 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	ConfigurableEnvironment getEnvironment();
 
 	/**
-	 * Add a new BeanFactoryPostProcessor that will get applied to the internal
-	 * bean factory of this application context on refresh, before any of the
-	 * bean definitions get evaluated. To be invoked during context configuration.
+	 * 添加一个新的BeanFactoryPostProcessor，在刷新任何bean定义之前，
+	 * 将在刷新时将其应用于此应用程序上下文的内部bean工厂。在上下文配置期间调用。
 	 * @param postProcessor the factory processor to register
 	 */
 	void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor);
 
 	/**
-	 * Add a new ApplicationListener that will be notified on context events
-	 * such as context refresh and context shutdown.
-	 * <p>Note that any ApplicationListener registered here will be applied
-	 * on refresh if the context is not active yet, or on the fly with the
-	 * current event multicaster in case of a context that is already active.
+	 * 添加一个新的ApplicationListener，它将在上下文事件（例如上下文刷新和上下文关闭）时收到通知。
+	 * <p>请注意，如果上下文尚未处于活动状态，则在刷新时将应用此处注册的所有ApplicationListener；
+	 * 如果上下文已经处于活动状态，则将与当前事件多播程序一起即时应用。
 	 * @param listener the ApplicationListener to register
 	 * @see org.springframework.context.event.ContextRefreshedEvent
 	 * @see org.springframework.context.event.ContextClosedEvent
@@ -139,21 +134,18 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void addApplicationListener(ApplicationListener<?> listener);
 
 	/**
-	 * Register the given protocol resolver with this application context,
-	 * allowing for additional resource protocols to be handled.
-	 * <p>Any such resolver will be invoked ahead of this context's standard
-	 * resolution rules. It may therefore also override any default rules.
+	 * 在此应用程序上下文中注册给定的协议解析器，从而允许处理其他资源协议。
+	 * <p>任何此类解析程序都将在此上下文的标准解析规则之前调用。
+	 * 因此，它也可以覆盖任何默认规则。
 	 * @since 4.3
 	 */
 	void addProtocolResolver(ProtocolResolver resolver);
 
 	/**
-	 * Load or refresh the persistent representation of the configuration, which
-	 * might be from Java-based configuration, an XML file, a properties file, a
-	 * relational database schema, or some other format.
-	 * <p>As this is a startup method, it should destroy already created singletons
-	 * if it fails, to avoid dangling resources. In other words, after invocation
-	 * of this method, either all or no singletons at all should be instantiated.
+	 * 加载或刷新配置的持久表示形式，该表示形式可能来自于基于Java的配置，XML文件，
+	 * 属性文件，关系数据库模式或其他某种格式。 <p>由于这是一种启动方法，因此，如果失败，
+	 * 它应该销毁已创建的单例，以避免悬挂资源。
+	 * 换句话说，在调用此方法之后，应实例化所有单例或根本不实例化。
 	 * @throws BeansException if the bean factory could not be initialized
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
@@ -161,22 +153,21 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void refresh() throws BeansException, IllegalStateException;
 
 	/**
-	 * Register a shutdown hook with the JVM runtime, closing this context
-	 * on JVM shutdown unless it has already been closed at that time.
-	 * <p>This method can be called multiple times. Only one shutdown hook
-	 * (at max) will be registered for each context instance.
+	 * 在JVM运行时中注册一个关闭挂钩，除非当时已关闭该上下文，
+	 * 否则在JVM关闭时将其关闭。
+	 * <p>可以多次调用此方法。每个上下文实例仅注册一个关闭挂钩（最大数量）。
 	 * @see java.lang.Runtime#addShutdownHook
 	 * @see #close()
 	 */
 	void registerShutdownHook();
 
 	/**
-	 * Close this application context, releasing all resources and locks that the
-	 * implementation might hold. This includes destroying all cached singleton beans.
-	 * <p>Note: Does <i>not</i> invoke {@code close} on a parent context;
-	 * parent contexts have their own, independent lifecycle.
-	 * <p>This method can be called multiple times without side effects: Subsequent
-	 * {@code close} calls on an already closed context will be ignored.
+	 * 关闭此应用程序上下文，释放实现可能持有的所有资源和锁。
+	 * 这包括销毁所有缓存的单例bean。
+	 * <p>注意：<i>不<i>是否在父上下文上调用{@code close}；
+	 * 父级上下文具有自己的独立生命周期。
+	 * <p>可以多次调用此方法，而不会产生副作用：
+	 * 在已关闭的上下文上进行的后续{@code close}调用将被忽略。
 	 */
 	@Override
 	void close();
@@ -192,15 +183,12 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	boolean isActive();
 
 	/**
-	 * Return the internal bean factory of this application context.
-	 * Can be used to access specific functionality of the underlying factory.
-	 * <p>Note: Do not use this to post-process the bean factory; singletons
-	 * will already have been instantiated before. Use a BeanFactoryPostProcessor
-	 * to intercept the BeanFactory setup process before beans get touched.
-	 * <p>Generally, this internal factory will only be accessible while the context
-	 * is active, that is, in-between {@link #refresh()} and {@link #close()}.
-	 * The {@link #isActive()} flag can be used to check whether the context
-	 * is in an appropriate state.
+	 * 返回此应用程序上下文的内部bean工厂。可用于访问基础工厂的特定功能。
+	 * <p>注意：请勿使用此方法对bean工厂进行后处理；单例之前已经实例化。
+	 * 使用BeanFactoryPostProcessor来拦截Bean之前的BeanFactory设置过程。
+	 * <p>通常，只有在上下文处于活动状态时，即{@link refresh()}和{@link close（）}之间，
+	 * 才能访问此内部工厂。 {@link isActive（）}标志可用于检查上下文是否处于适当的状态。
+	 * 
 	 * @return the underlying bean factory
 	 * @throws IllegalStateException if the context does not hold an internal
 	 * bean factory (usually if {@link #refresh()} hasn't been called yet or

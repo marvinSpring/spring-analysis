@@ -20,10 +20,9 @@ import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.lang.Nullable;
 
 /**
- * Configuration interface to be implemented by most if not all {@link PropertyResolver}
- * types. Provides facilities for accessing and customizing the
- * {@link org.springframework.core.convert.ConversionService ConversionService}
- * used when converting property values from one type to another.
+ *大多数{@link PropertyResolver}类型都将实现配置接口。
+ * 提供用于访问和自定义将属性值
+ * 从一种类型转换为另一种类型时使用的{@link org.springframework.core.convert.ConversionServiceConversionService}的功能。
  *
  * @author Chris Beams
  * @since 3.1
