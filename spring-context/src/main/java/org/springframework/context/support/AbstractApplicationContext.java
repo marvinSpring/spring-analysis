@@ -726,7 +726,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * 实例化并调用所有注册的BeanFactoryPostProcessorBean，
 	 * 如果给定的排序的话就遵循显式顺序
-	 * 该方法在单例实例化之前被调用。
+	 * 该方法在单例Bean被实例化之前被调用。
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		//调用所有实现了[@link BeanDefinitionRegistryPostProcessor]和[@link BeanFactoryPostProcessor]接口的实现类方法

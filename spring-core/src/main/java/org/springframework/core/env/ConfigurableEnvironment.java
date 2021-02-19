@@ -19,50 +19,41 @@ package org.springframework.core.env;
 import java.util.Map;
 
 /**
- * Configuration interface to be implemented by most if not all {@link Environment} types.
- * Provides facilities for setting active and default profiles and manipulating underlying
- * property sources. Allows clients to set and validate required properties, customize the
- * conversion service and more through the {@link ConfigurablePropertyResolver}
- * superinterface.
+ * 大多数{@link Environment}类型都将实现配置接口。
+ * 提供用于设置活动和默认配置文件以及操纵基础属性源的工具。
+ * 允许客户端通过{@link ConfigurablePropertyResolver}超级接口来设置和验证所需的属性，自定义转换服务等。
  *
- * <h2>Manipulating property sources</h2>
- * <p>Property sources may be removed, reordered, or replaced; and additional
- * property sources may be added using the {@link MutablePropertySources}
- * instance returned from {@link #getPropertySources()}. The following examples
- * are against the {@link StandardEnvironment} implementation of
- * {@code ConfigurableEnvironment}, but are generally applicable to any implementation,
- * though particular default property sources may differ.
+ * <h2>处理属性源</h2>
+ * <p>属性可能会被删除，重新排序或替换；并且可以使用从{@link #getPropertySources()}返回的{@link MutablePropertySources}实例添加其他属性源。
+ * 以下示例与{@code ConfigurableEnvironment}的{@link StandardEnvironment}实现相反，但通常适用于任何实现，尽管特定的默认属性来源可能有所不同。
  *
- * <h4>Example: adding a new property source with highest search priority</h4>
+ * <h4>示例：添加具有最高搜索优先级的新属性源</h4>
  * <pre class="code">
- * ConfigurableEnvironment environment = new StandardEnvironment();
- * MutablePropertySources propertySources = environment.getPropertySources();
- * Map&lt;String, String&gt; myMap = new HashMap&lt;&gt;();
- * myMap.put("xyz", "myValue");
- * propertySources.addFirst(new MapPropertySource("MY_MAP", myMap));
+	   ConfigurableEnvironment environment = new StandardEnvironment();
+	   MutablePropertySources propertySources = environment.getPropertySources();
+	   Map&lt;String, String&gt; myMap = new HashMap&lt;&gt;();
+	   myMap.put("xyz", "myValue");
+	   propertySources.addFirst(new MapPropertySource("MY_MAP", myMap));
  * </pre>
  *
- * <h4>Example: removing the default system properties property source</h4>
+ * <h4>示例：删除默认的系统属性属性源</h4>
  * <pre class="code">
- * MutablePropertySources propertySources = environment.getPropertySources();
- * propertySources.remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME)
+	   MutablePropertySources propertySources = environment.getPropertySources();
+	   propertySources.remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME)
  * </pre>
  *
- * <h4>Example: mocking the system environment for testing purposes</h4>
+ * <h4>示例：模拟系统环境以进行测试</h4>
  * <pre class="code">
- * MutablePropertySources propertySources = environment.getPropertySources();
- * MockPropertySource mockEnvVars = new MockPropertySource().withProperty("xyz", "myValue");
- * propertySources.replace(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, mockEnvVars);
+ *     MutablePropertySources propertySources = environment.getPropertySources();
+ *     MockPropertySource mockEnvVars = new MockPropertySource().withProperty("xyz", "myValue");
+ *     propertySources.replace(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, mockEnvVars);
  * </pre>
  *
- * When an {@link Environment} is being used by an {@code ApplicationContext}, it is
- * important that any such {@code PropertySource} manipulations be performed
- * <em>before</em> the context's {@link
- * org.springframework.context.support.AbstractApplicationContext#refresh() refresh()}
- * method is called. This ensures that all property sources are available during the
- * container bootstrap process, including use by {@linkplain
- * org.springframework.context.support.PropertySourcesPlaceholderConfigurer property
- * placeholder configurers}.
+ * 当{@code ApplicationContext}使用{@link Environment}时，
+ * 重要的是在调用上下文的{@link org.springframework.context.support.AbstractApplicationContext#refresh() refresh()}方法之前，
+ * 应执行任何此类{@code PropertySource}操作。
+ * 这样可确保在容器引导过程中所有属性源均可用，
+ * 包括由{@linkplain org.springframework.context.support.PropertySourcesPlaceholderConfigurer 属性占位符配置程序}使用。
  *
  * @author Chris Beams
  * @since 3.1
@@ -72,12 +63,10 @@ import java.util.Map;
 public interface ConfigurableEnvironment extends Environment, ConfigurablePropertyResolver {
 
 	/**
-	 * Specify the set of profiles active for this {@code Environment}. Profiles are
-	 * evaluated during container bootstrap to determine whether bean definitions
-	 * should be registered with the container.
-	 * <p>Any existing active profiles will be replaced with the given arguments; call
-	 * with zero arguments to clear the current set of active profiles. Use
-	 * {@link #addActiveProfile} to add a profile while preserving the existing set.
+	 * 指定为此{@code Environment}激活的配置文件集。
+	 * 在容器引导期间检查概要文件，以确定是否应在容器中注册bean定义。
+	 * <p>任何现有的活动简档将与给定的参数来代替;零个参数调用清除当前的一组活动配置文件。
+	 * 使用{@link #addActiveProfile}在保留现有设置的同时添加配置文件。
 	 * @throws IllegalArgumentException if any profile is null, empty or whitespace-only
 	 * @see #addActiveProfile
 	 * @see #setDefaultProfiles

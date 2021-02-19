@@ -30,9 +30,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.ConfigurableWebEnvironment;
 
 /**
- * {@link Environment} implementation to be used by {@code Servlet}-based web
- * applications. All web-related (servlet-based) {@code ApplicationContext} classes
- * initialize an instance by default.
+ *基于{@code Servlet}的Web应用程序将使用{@link Environment}实现。
+ * 默认情况下，所有与Web相关的（基于Servlet的）{@code ApplicationContext}类都将初始化一个实例。
  *
  * <p>Contributes {@code ServletConfig}, {@code ServletContext}, and JNDI-based
  * {@link PropertySource} instances. See {@link #customizePropertySources} method
@@ -55,8 +54,7 @@ public class StandardServletEnvironment extends StandardEnvironment implements C
 
 
 	/**
-	 * Customize the set of property sources with those contributed by superclasses as
-	 * well as those appropriate for standard servlet-based environments:
+	 * 使用父类提供的属性源以及适用于基于标准servlet的环境的属性源来定制属性源集：
 	 * <ul>
 	 * <li>{@value #SERVLET_CONFIG_PROPERTY_SOURCE_NAME}
 	 * <li>{@value #SERVLET_CONTEXT_PROPERTY_SOURCE_NAME}
