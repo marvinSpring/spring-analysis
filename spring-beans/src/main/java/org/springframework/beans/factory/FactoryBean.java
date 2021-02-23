@@ -21,21 +21,20 @@ import org.springframework.lang.Nullable;
 /**
  * 由{@link BeanFactory}中使用的对象实现的接口，
  * 这些对象本身就是单个对象的工厂。如果Bean实现此接口，
- * 则它将用作对象公开的工厂，而不是直接用作将自身公开的Bean实例。
+ * 则它将用作对象生产的工厂，而不是直接将FactoryBean用作实例。
  *
  * <p><b>注意：实现此接口的bean不能用作普通bean。
  * <b> FactoryBean是用bean样式定义的，
- * 但为bean引用公开的对象（{@link getObject（）}）始终是该对象创建。
+ * 但为bean引用公开的对象（{@link #getObject()}）始终是该对象创建。
  *
- * <p>FactoryBeans可以支持单例和原型，并且可以按需延迟创建对象，
+ * <p>FactoryBeans可以支持单例和多例，并且可以按需延迟创建对象，
  * 也可以在启动时急于创建对象。{@link SmartFactoryBean}接口允许公开更细粒度的行为元数据。
  *
- * <p>此接口在框架本身中大量使用，例如用于AOP {@link org.springframework.aop.framework.ProxyFactoryBean}
- * 或{@link org.springframework.jndi.JndiObjectFactoryBean}。
+ * <p>此接口在框架本身中大量使用，例如用于AOP {@link org.springframework.aop.framework.ProxyFactoryBean}或{@link org.springframework.jndi.JndiObjectFactoryBean}。
  * 它也可以用于自定义组件。但是，这仅在基础结构代码中很常见。
  *
  * <p><b>{@code FactoryBean}是程序性合同。实现不应依赖于注释驱动的注入或其他反射性工具。
- * <b> {@link getObjectType（）} {@link getObject（）}调用可能会在引导过程的早期到达，
+ * <b> {@link #getObjectType())} {@link #getObject()}调用可能会在引导过程的早期到达，
  * 即使在任何后处理器设置之前也是如此。
  * 如果您需要访问其他bean，请实现{@link BeanFactoryAware}并以编程方式获取它们。
  *
@@ -69,6 +68,7 @@ public interface FactoryBean<T> {
 	 * @throws Exception in case of creation errors
 	 * @see FactoryBeanNotInitializedException
 	 */
+	//获取bean的对象
 	@Nullable
 	T getObject() throws Exception;
 
@@ -90,6 +90,7 @@ public interface FactoryBean<T> {
 	 * or {@code null} if not known at the time of the call
 	 * @see ListableBeanFactory#getBeansOfType
 	 */
+	//获取Bean对象的class类型
 	@Nullable
 	Class<?> getObjectType();
 
@@ -118,6 +119,7 @@ public interface FactoryBean<T> {
 	 * @see #getObject()
 	 * @see SmartFactoryBean#isPrototype()
 	 */
+	//判断该bean是否是单例bean
 	default boolean isSingleton() {
 		return true;
 	}

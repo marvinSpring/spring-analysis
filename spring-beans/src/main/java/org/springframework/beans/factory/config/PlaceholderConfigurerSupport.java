@@ -24,16 +24,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Abstract base class for property resource configurers that resolve placeholders
- * in bean definition property values. Implementations <em>pull</em> values from a
- * properties file or other {@linkplain org.springframework.core.env.PropertySource
- * property source} into bean definitions.
+ * 属性资源配置程序的抽象基类，用于解析bean定义属性值中的占位符。
+ * 将属性文件或其他{@linkplain org.springframework.core.env.PropertySource#source}的实现
+ * <em> pull <em>值转换为bean定义。
  *
- * <p>The default placeholder syntax follows the Ant / Log4J / JSP EL style:
+ * <p>默认的占位符语法遵循Ant Log4J JSP EL样式：
  *
  * <pre class="code">${...}</pre>
  *
- * Example XML bean definition:
+ * XML bean定义示例：
  *
  * <pre class="code">
  * &lt;bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"/&gt;
@@ -42,39 +41,31 @@ import org.springframework.util.StringValueResolver;
  * &lt;/bean&gt;
  * </pre>
  *
- * Example properties file:
+ * 示例Properties文件：
  *
  * <pre class="code">driver=com.mysql.jdbc.Driver
  * dbname=mysql:mydb</pre>
  *
- * Annotated bean definitions may take advantage of property replacement using
- * the {@link org.springframework.beans.factory.annotation.Value @Value} annotation:
+ * 带注释的Bean定义可以使用{@link org.springframework.beans.factory.annotation.Value @Value}注释进行属性替换：
  *
  * <pre class="code">@Value("${person.age}")</pre>
  *
- * Implementations check simple property values, lists, maps, props, and bean names
- * in bean references. Furthermore, placeholder values can also cross-reference
- * other placeholders, like:
+ * 实现检查bean引用中的简单属性值，list，map，props和bean名称。
+ * 此外，占位符值还可以交叉引用其他占位符，例如：
  *
- * <pre class="code">rootPath=myrootdir
- * subPath=${rootPath}/subdir</pre>
+ * <pre class="code">rootPath=myrootdirsubPath=${rootPath}/subdir</pre>
  *
- * In contrast to {@link PropertyOverrideConfigurer}, subclasses of this type allow
- * filling in of explicit placeholders in bean definitions.
+ * 与{@link PropertyOverrideConfigurer}相比，此类型的子类允许在bean定义中填充显式占位符。
  *
- * <p>If a configurer cannot resolve a placeholder, a {@link BeanDefinitionStoreException}
- * will be thrown. If you want to check against multiple properties files, specify multiple
- * resources via the {@link #setLocations locations} property. You can also define multiple
- * configurers, each with its <em>own</em> placeholder syntax. Use {@link
- * #ignoreUnresolvablePlaceholders} to intentionally suppress throwing an exception if a
- * placeholder cannot be resolved.
+ * <p>如果配置程序无法解析占位符，则将引发{@link BeanDefinitionStoreException}异常。
+ * 如果要检查多个属性文件，请通过{@link #setLocations locations}属性指定多个资源。
+ * 您还可以定义多个配置程序，每个配置程序都有自己的占位符语法。
+ * 如果无法解析占位符，请使用{@link #ignoreUnresolvablePlaceholders}有意抑制抛出异常。
  *
- * <p>Default property values can be defined globally for each configurer instance
- * via the {@link #setProperties properties} property, or on a property-by-property basis
- * using the default value separator which is {@code ":"} by default and
- * customizable via {@link #setValueSeparator(String)}.
+ * <p>可以通过{@link #setProperties properties}属性为每个配置程序实例全局定义默认属性值，
+ * 也可以使用默认值分隔符（默认情况下为{@code“：”}）并通过{@link #setValueSeparator（String）}设置全局默认属性值。
  *
- * <p>Example XML property with default value:
+ * <p>具有默认值的示例XML属性：
  *
  * <pre class="code">
  *   <property name="url" value="jdbc:${dbname:defaultdb}"/>

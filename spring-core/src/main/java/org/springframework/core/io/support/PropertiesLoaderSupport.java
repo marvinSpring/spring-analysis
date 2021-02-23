@@ -32,9 +32,8 @@ import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.PropertiesPersister;
 
 /**
- * Base class for JavaBean-style components that need to load properties
- * from one or more resources. Supports local properties as well, with
- * configurable overriding.
+ * 需要从一种或多种资源（不同的资源文件）加载属性的JavaBean样式的组件的基类（配置文件的积累）。
+ * 配置可以被复写，还支持本地属性。
  *
  * @author Juergen Hoeller
  * @since 1.2.2
@@ -61,68 +60,57 @@ public abstract class PropertiesLoaderSupport {
 
 
 	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions.
-	 * These can be considered defaults, to be overridden by properties
-	 * loaded from files.
+	 * 设置本地属性，例如通过XML bean定义中的“ props”标签。这些可以被视为默认值，这些默认值将被从文件加载的属性覆盖。
 	 */
 	public void setProperties(Properties properties) {
 		this.localProperties = new Properties[] {properties};
 	}
 
 	/**
-	 * Set local properties, e.g. via the "props" tag in XML bean definitions,
-	 * allowing for merging multiple properties sets into one.
+	 *设置本地属性，例如通过XML bean定义中的“ props”标签，可以将多个属性集合并为一个。
 	 */
 	public void setPropertiesArray(Properties... propertiesArray) {
 		this.localProperties = propertiesArray;
 	}
 
 	/**
-	 * Set a location of a properties file to be loaded.
-	 * <p>Can point to a classic properties file or to an XML file
-	 * that follows JDK 1.5's properties XML format.
+	 *设置要加载的属性文件的位置。
+	 *<p>可以指向普通的属性文件或遵循JDK 1.5的属性XML格式的XML文件。
 	 */
 	public void setLocation(Resource location) {
 		this.locations = new Resource[] {location};
 	}
 
 	/**
-	 * Set locations of properties files to be loaded.
-	 * <p>Can point to classic properties files or to XML files
-	 * that follow JDK 1.5's properties XML format.
-	 * <p>Note: Properties defined in later files will override
-	 * properties defined earlier files, in case of overlapping keys.
-	 * Hence, make sure that the most specific files are the last
-	 * ones in the given list of locations.
+	 *设置要加载的属性文件的位置。
+	 * <p>可以指向普通属性文件或遵循JDK 1.5的属性XML格式的XML文件。
+	 * <p>注意：在键重叠的情况下，以后文件中定义的属性将覆盖以前文件中定义的属性。
+	 * 因此，请确保最具体的文件是给定位置列表中的最后一个文件。
 	 */
 	public void setLocations(Resource... locations) {
 		this.locations = locations;
 	}
 
 	/**
-	 * Set whether local properties override properties from files.
-	 * <p>Default is "false": Properties from files override local defaults.
-	 * Can be switched to "true" to let local properties override defaults
-	 * from files.
+	 * 设置本地属性是否覆盖文件中的属性。
+	 * <p>默认值为“ false”：文件中的属性将覆盖本地默认值。可以切换为“ true”以使本地属性覆盖文件中的默认值。
 	 */
 	public void setLocalOverride(boolean localOverride) {
 		this.localOverride = localOverride;
 	}
 
 	/**
-	 * Set if failure to find the property resource should be ignored.
-	 * <p>"true" is appropriate if the properties file is completely optional.
-	 * Default is "false".
+	 * 设置是否找不到属性资源失败。如果属性文件是完全可选的，
+	 * 则<p>“ true”是适当的。默认值为“ false”。
 	 */
 	public void setIgnoreResourceNotFound(boolean ignoreResourceNotFound) {
 		this.ignoreResourceNotFound = ignoreResourceNotFound;
 	}
 
 	/**
-	 * Set the encoding to use for parsing properties files.
-	 * <p>Default is none, using the {@code java.util.Properties}
-	 * default encoding.
-	 * <p>Only applies to classic properties files, not to XML files.
+	 * 设置用于解析属性文件的编码。
+	 * <p>默认为无，使用{@code java.util.Properties}默认编码。
+	 * <p>仅适用于普通的属性文件，不适用于XML文件。
 	 * @see org.springframework.util.PropertiesPersister#load
 	 */
 	public void setFileEncoding(String encoding) {
@@ -130,8 +118,7 @@ public abstract class PropertiesLoaderSupport {
 	}
 
 	/**
-	 * Set the PropertiesPersister to use for parsing properties files.
-	 * The default is DefaultPropertiesPersister.
+	 * 设置PropertiesPersister以用于解析属性文件。默认值为DefaultPropertiesPersister。
 	 * @see org.springframework.util.DefaultPropertiesPersister
 	 */
 	public void setPropertiesPersister(@Nullable PropertiesPersister propertiesPersister) {
@@ -141,8 +128,7 @@ public abstract class PropertiesLoaderSupport {
 
 
 	/**
-	 * Return a merged Properties instance containing both the
-	 * loaded properties and properties set on this FactoryBean.
+	 * 返回一个合并的Properties实例，其中包含已加载的属性和在此FactoryBean上设置的属性。
 	 */
 	protected Properties mergeProperties() throws IOException {
 		Properties result = new Properties();
@@ -167,7 +153,7 @@ public abstract class PropertiesLoaderSupport {
 	}
 
 	/**
-	 * Load properties into the given instance.
+	 * 将属性加载到给定实例中。
 	 * @param props the Properties instance to load into
 	 * @throws IOException in case of I/O errors
 	 * @see #setLocations

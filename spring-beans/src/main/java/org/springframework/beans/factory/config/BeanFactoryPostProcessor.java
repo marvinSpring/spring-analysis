@@ -20,14 +20,11 @@ import org.springframework.beans.BeansException;
 
 /**
  * 允许自定义修改应用程序上下文的Bean定义，以适应上下文基础bean工厂的Bean属性值。
- *
- * <p>应用程序上下文可以在其Bean定义中自动检测BeanFactoryPostProcessor Bean，
- * 并在创建Bean之前应用它们。
- *
+ * <p>ApplicationContext可以在其Bean定义之前自动检测（探测）BeanFactoryPostProcessor Bean，并在创建Bean之前应用它们。
  * <p>对于针对系统管理员的自定义配置文件很有用，这些文件覆盖了在应用程序上下文中配置的Bean属性。
  *
- * <p>See PropertyResourceConfigurer and its concrete implementations
- * for out-of-the-box solutions that address such configuration needs.
+ * <p>请参见PropertyResourceConfigurer及其具体实现，
+ * 以获取可解决此类配置需求的Spring容器外的解决方案——通过pc读取properties信息注入。
  *
  * <p>BeanFactoryPostProcessor可以与Bean定义进行交互并对其进行修改，
  * 但不能与Bean实例进行交互。这样做可能会导致bean实例化过早，
