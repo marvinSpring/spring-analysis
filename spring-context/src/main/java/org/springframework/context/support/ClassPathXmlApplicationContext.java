@@ -24,20 +24,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * 独立XML应用程序上下文，从类路径中获取上下文定义文件，
- * 将纯路径解释为包含包路径的类路径资源名称（例如“ mypackagemyresource.txt”）。
+ * 独立XMLApplicationContext，从类路径中获取上下文定义文件，
+ * 将纯路径解释为包含包路径的类路径资源名称（例如“ mypackage/myresource.txt”）。
  * 对于测试工具以及嵌入在JAR中的应用程序上下文很有用。
  *
  * <p>可以通过{@link #getConfigLocations}覆盖配置位置的默认值。
  * 配置位置可以表示诸如“ myfilescontext.xml”之类的具体文件，也可以表示诸如“ myfiles-context.xml”之类的Ant样式模式
- * （请参阅{@link org.springframework。 util.AntPathMatcher} Javadoc（有关模式的详细信息）。
  *
  * <p>注意：如果有多个配置位置，则最新的Bean定义将覆盖较早加载的文件中定义的定义。
  * 可以利用它来通过一个额外的XML文件有意覆盖某些bean定义。
  *
  * <p><b>这是一个简单的一站式便利ApplicationContext。
- * 考虑将{@link GenericApplicationContext}类与
- * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}结合使用，以实现更灵活的上下文设置。<b>
+ * 考虑将{@link GenericApplicationContext}类与 {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}结合使用，以实现更灵活的上下文设置。<b>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -72,8 +70,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 从给定的XML文件中加载bean的定义信息然后new一个ClassPathXmlApplicationContext，
-	 * 并自动刷新上下文。
+	 * 从给定的 XML文件中加载bean的定义信息然后new一个ClassPathXmlApplicationContext，并自动刷新上下文。
 	 * @param configLocation resource location
 	 * @throws BeansException if context creation failed
 	 */

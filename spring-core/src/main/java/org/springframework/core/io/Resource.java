@@ -27,12 +27,10 @@ import java.nio.channels.ReadableByteChannel;
 import org.springframework.lang.Nullable;
 
 /**
- * Interface for a resource descriptor that abstracts from the actual
- * type of underlying resource, such as a file or class path resource.
+ * 资源描述符的接口，该描述符从基础资源的实际类型中抽象出来，例如文件或类路径资源。
  *
- * <p>An InputStream can be opened for every resource if it exists in
- * physical form, but a URL or File handle can just be returned for
- * certain resources. The actual behavior is implementation-specific.
+ * <p>如果InputStream以物理形式存在，则可以为每个资源打开InputStream，
+ * 但是仅可以为某些资源返回URL或File。实际行为是基于特定实现的。
  *
  * @author Juergen Hoeller
  * @since 28.12.2003
@@ -52,16 +50,13 @@ import org.springframework.lang.Nullable;
 public interface Resource extends InputStreamSource {
 
 	/**
-	 * Determine whether this resource actually exists in physical form.
-	 * <p>This method performs a definitive existence check, whereas the
-	 * existence of a {@code Resource} handle only guarantees a valid
-	 * descriptor handle.
+	 * 确定此资源是否实际以物理形式存在。
+	 * <p>此方法执行确定的存在性检查，而{@code Resource}句柄的存在仅保证有效的描述符句柄。
 	 */
 	boolean exists();
 
 	/**
-	 * Indicate whether non-empty contents of this resource can be read via
-	 * {@link #getInputStream()}.
+	 * 指示是否可以通过{@link #getInputStream()}读取此资源的非空内容。
 	 * <p>Will be {@code true} for typical resource descriptors that exist
 	 * since it strictly implies {@link #exists()} semantics as of 5.1.
 	 * Note that actual content reading may still fail when attempted.

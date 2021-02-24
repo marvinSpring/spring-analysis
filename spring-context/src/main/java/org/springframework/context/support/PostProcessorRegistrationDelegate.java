@@ -52,22 +52,22 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 
-		// 如果有BeanDefinitionRegistryPostProcessors接口的实现类，就调用
+	// 如果有BeanDefinitionRegistryPostProcessors接口的实现类，就调用BeanDefinitionRegistryPostProcessors接口的实现类
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
-		//已经处理过的bean放入到这个集合中
+		//这个集合中存的是已经处理过的bean
 		Set<String> processedBeans = new HashSet<>();
 
-		// 若beanFactory实现BeanDefinitionRegistry接口，则调用
-		// 默认创建的DefaultListableBeanFactory是实现了这个接口的
+		// 如果beanFactory实现BeanDefinitionRegistry接口(默认创建的DefaultListableBeanFactory是实现了这个接口的)，则调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法
+		//
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
-			// 在创建上下文时，通过调用addBeanFactoryPostProcessor（）方法
+			// 在创建context时，通过调用#addBeanFactoryPostProcessor()方法
 			// 将实现了BeanFactoryPostProcessor的类实例化（new），
-			// 然后放入到集合中，在这里进行调用，如果用户不自己实现BeanFactoryPostProcessor一般没有默认的实现类
+			// 然后放入到集合中，在这里进行调用，如果用户不自己实现BeanFactoryPostProcessor(一般没有默认的实现类),则默认不会调用
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
@@ -88,11 +88,11 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			// 首先，从beanFactory中寻找实现了BeanDefinitionRegistryPostProcessor的类
+			// 首先，从beanFactory中找实现了BeanDefinitionRegistryPostProcessor的类
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
-				//判断类上是否还实现了PriorityOrdered排序接口，
+				// 判断类上是否还实现了PriorityOrdered排序接口，
 				// 如果存在，则调用getBean将其实例化放入currentRegistryProcessors中
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));

@@ -34,8 +34,8 @@ import org.springframework.lang.Nullable;
 	 * <li>以通用方式加载文件资源。————{@link org.springframework.core.io.ResourceLoader} interface.
 	 * <li>将事件发布给注册的Listener。————{@link ApplicationEventPublisher} interface.
 	 * <li>解决消息的能力，支持国际化。————{@link MessageSource} interface.
- 	 * 有上面这些接口，我Application Context就拥有了N多的功能，各种能力
-	 * <li>从父级Context继承. 在后代Context中的定义将始终优先。
+ 	 * 有上面这些接口，Application Context就拥有了各种的功能，各种能力
+	 * <li>从父级Context继承. 在后代Context中的定义将始终优先，也就是说一般子级会覆盖父级。
  	 * 例如：
  		* 这意味着整个Web应用程序都可以使用单个父上下文，而每个servlet都有其自己的子上下文，该子上下文独立于任何其他servlet的子上下文。
  * </ul>
@@ -51,7 +51,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
  */
-//Spring真正的总接口
+//Spring上下文的总接口
 public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
 

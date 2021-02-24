@@ -535,9 +535,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 钩子方法，子类可通过继承AbstractApplicationContext调用postProcessBeanFactory方法对BeanFactory进行操作
 				postProcessBeanFactory(beanFactory);
 
-				// 调用上下文中作为bean注册的工厂处理器
-				// 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，
-				// 可以对BeanDefinition和BeanFactory进行处理和管理
+				// 在context中调用作为bean注册的工厂处理器
+				// 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，从而对BeanDefinition和BeanFactory进行处理和管理
+				//
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// 注册BeanPostProcessor
@@ -553,7 +553,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 初始化广播 不重要
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
+				//在Bean实例化之前自定义方法
 				// 钩子方法，springboot用于初始化中间件容器
 				onRefresh();
 
@@ -639,6 +639,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */
+	//在Spring容器构建的时候去动态的添加自定义属性...
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
 	}
@@ -729,8 +730,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 该方法在单例Bean被实例化之前被调用。
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		//调用所有实现了[@link BeanDefinitionRegistryPostProcessor]和[@link BeanFactoryPostProcessor]接口的实现类方法
-		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
+		//调用所有实现了BeanDefinitionRegistryPostProcessor和 BeanFactoryPostProcessor接口的实现类方法
+ 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)

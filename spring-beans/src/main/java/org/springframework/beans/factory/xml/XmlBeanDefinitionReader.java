@@ -302,7 +302,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 */
 	@Override
 	public int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException {
-		return loadBeanDefinitions(new EncodedResource(resource));
+ 		return loadBeanDefinitions(new EncodedResource(resource));
 	}
 
 	/**
@@ -336,7 +336,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
 				//核心方法(开始做正事了)————加载BeanDefinition对象
-				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
+ 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
 			finally {
 				inputStream.close();
