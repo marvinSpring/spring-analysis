@@ -502,7 +502,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				 如果有返回值：再触发postProcessAfterInitialization()；
 			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
-			if (bean != null) {//如果有对象返回
+			if (bean != null) {//如果有返回对象
 				return bean;
 			}
 		}
@@ -565,7 +565,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			mbd.resolvedTargetType = beanType;
 		}
 
-		//允许后处理器修改合并的bean定义。
+		//允许后置处理器修改合并的bean定义。
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				//调用MergedBeanDefinitionPostProcessor的postProcessMergedBeanDefinition(mbd, beanType, beanName);
@@ -1166,7 +1166,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
-		//如果beanDefinfition中存在FactoryMethod，用FactoryMethod实例化
+		//如果beanDefinition中存在FactoryMethod，用FactoryMethod实例化
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}

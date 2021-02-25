@@ -2,8 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<bean id="person" class="com.marvin.test.model.Person">
-		<property name="id" value="3"/>
-		<property name="name" value="Marvin"/>
+	<bean id="teacher" class="com.marvin.test.model.Teacher">
+		<property name="student" ref="student"/>
+	</bean>
+	<bean id="student" class="com.marvin.test.model.Student">
+		<property name="teacher" ref="teacher"/>
 	</bean>
 </beans>

@@ -526,7 +526,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			//2 刷新内部bean工厂
 			//（1）获取BeanFactory；默认实现是DefaultListableBeanFactory
-			//（2）加载BeanDefition 并注册到 BeanDefitionRegistry
+			//（2）加载BeanDefinition 并注册到 BeanDefinitionRegistry
 			/* 获取一个新的BeanFactory,就是创建BeanDefinition对象的过程*/
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 

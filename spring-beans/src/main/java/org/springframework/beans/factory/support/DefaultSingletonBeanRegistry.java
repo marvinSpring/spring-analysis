@@ -137,6 +137,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param singletonObject the singleton object
 	 */
+	//将当前bean放入到一级缓存中，然后从二三级缓存中删除
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
 			this.singletonObjects.put(beanName, singletonObject);
@@ -299,9 +300,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void removeSingleton(String beanName) {
 		synchronized (this.singletonObjects) {
-			this.singletonObjects.remove(beanName);
-			this.singletonFactories.remove(beanName);
-			this.earlySingletonObjects.remove(beanName);
+			this.singletonObjects.remove(beanName);//从一级缓存中移除
+			this.singletonFactories.remove(beanName);//从三级缓存中移除
+			this.earlySingletonObjects.remove(beanName);//从二级缓存中移除
 			this.registeredSingletons.remove(beanName);
 		}
 	}

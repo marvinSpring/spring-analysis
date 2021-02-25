@@ -270,7 +270,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
-			//  获取父beanFatory 检查这个bean是否创建了
+			//  获取父beanFactory 检查这个bean是否创建了
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
@@ -291,7 +291,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 
-			// 4、标记当前bean已经被创建
+			// 4、标记当前bean是否已经被创建了，true:已经被创建了，false;未创建
 			if (!typeCheckOnly) {
 				markBeanAsCreated(beanName);
 			}
