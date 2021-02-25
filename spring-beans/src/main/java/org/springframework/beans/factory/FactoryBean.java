@@ -39,7 +39,7 @@ import org.springframework.lang.Nullable;
  * 如果您需要访问其他bean，请实现{@link BeanFactoryAware}并以编程方式获取它们。
  *
  * <p> <b>该容器仅负责管理FactoryBean实例的生命周期，而不负责管理由FactoryBean创建的对象的生命周期。
- * <b>因此，对公开的bean对象（例如{@link java.io.Closeableclose（）}将自动被<i> not <i>调用，
+ * <b>因此，对公开的bean对象（例如{@link java.io.Closeableclose()}将自动被<i> not <i>调用，
  * 相反，FactoryBean应该实现{@link DisposableBean}并将任何此类close调用委托给基础对象。
  *
  * <p>最后，FactoryBean对象参与包含BeanFactory的Bean创建同步。

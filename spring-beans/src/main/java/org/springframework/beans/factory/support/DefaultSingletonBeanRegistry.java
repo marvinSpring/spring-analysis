@@ -179,24 +179,27 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param allowEarlyReference whether early references should be created or not
 	 * @return the registered singleton object, or {@code null} if none found
 	 */
+	/**
+	 * allowEarlyReference参数的含义是Spring是否允许循环依赖，默认为true
+	 * 所以当allowEarlyReference设置为false的时候，当项目存在循环依赖，会启动失败
+	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// Quick check for existing instance without full singleton lock
-		Object singletonObject = this.singletonObjects.get(beanName);
-		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
-			singletonObject = this.earlySingletonObjects.get(beanName);
-			if (singletonObject == null && allowEarlyReference) {
-				synchronized (this.singletonObjects) {
-					// Consistent creation of early reference within full singleton lock
-					singletonObject = this.singletonObjects.get(beanName);
-					if (singletonObject == null) {
-						singletonObject = this.earlySingletonObjects.get(beanName);
-						if (singletonObject == null) {
-							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
-							if (singletonFactory != null) {
-								singletonObject = singletonFactory.getObject();
-								this.earlySingletonObjects.put(beanName, singletonObject);
-								this.singletonFactories.remove(beanName);
+		// 快速检查现有实例而无需锁定单例
+		Object singletonObject = this.singletonObjects.get(beanName);//1.先从一级缓存中找
+		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {//如果一级缓存中没有，但是当前bean正在创建中
+			singletonObject = this.earlySingletonObjects.get(beanName);//2.再从二级缓存中找
+			if (singletonObject == null && allowEarlyReference) {//如果二级缓存中也没有，但是允许循环依赖
+				synchronized (this.singletonObjects) {//锁定当前bean
+					singletonObject = this.singletonObjects.get(beanName);/*再从一级缓存中找*/
+					if (singletonObject == null) {/*如果一级缓存中还没有*/
+						singletonObject = this.earlySingletonObjects.get(beanName);/*再从二级缓存中找*/
+						if (singletonObject == null) {//如果还是没有找到
+							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);//最后到三级缓存中找
+							if (singletonFactory != null) {//如果最后在三级缓存中找到了
+								singletonObject = singletonFactory.getObject();//那么就将该bean对象赋值返回
+								this.earlySingletonObjects.put(beanName, singletonObject);//然后将其放入二级缓存中
+								this.singletonFactories.remove(beanName);//最后将其从三级缓存中移除
 							}
 						}
 					}
