@@ -104,9 +104,9 @@ class BeanDefinitionValueResolver {
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			//解析factoryBean依赖————也就是解析属性的值
 			return resolveReference(argName, ref);
 		}
 		else if (value instanceof RuntimeBeanNameReference) {
@@ -281,10 +281,9 @@ class BeanDefinitionValueResolver {
 		return value.resolveTargetType(this.beanFactory.getBeanClassLoader());
 	}
 
-	/**
-	 * Resolve a reference to another bean in the factory.
-	 */
+
 	@Nullable
+	//在工厂中解决对另一个bean的引用。
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
@@ -300,6 +299,7 @@ class BeanDefinitionValueResolver {
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
 			else {
+				//再去创建依赖的bean
 				bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}

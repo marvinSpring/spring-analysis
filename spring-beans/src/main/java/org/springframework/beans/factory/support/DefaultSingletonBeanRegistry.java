@@ -184,7 +184,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * allowEarlyReference参数的含义是Spring是否允许循环依赖，默认为true
 	 * 所以当allowEarlyReference设置为false的时候，当项目存在循环依赖，会启动失败
 	 */
-	@Nullable
+	@Nullable//解决循环依赖的主方法
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// 快速检查现有实例而无需锁定单例
 		Object singletonObject = this.singletonObjects.get(beanName);//1.先从一级缓存中找
@@ -268,7 +268,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
-					addSingleton(beanName, singletonObject);
+					addSingleton(beanName, singletonObject);//将bean添加到一级缓存中
 				}
 			}
 			return singletonObject;
