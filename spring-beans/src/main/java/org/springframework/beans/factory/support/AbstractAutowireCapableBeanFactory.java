@@ -84,27 +84,20 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Abstract bean factory superclass that implements default bean creation,
- * with the full capabilities specified by the {@link RootBeanDefinition} class.
- * Implements the {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
- * interface in addition to AbstractBeanFactory's {@link #createBean} method.
+ * 抽象的bean工厂父类，它实现默认的createBean方法，并具有{@link RootBeanDefinition}类指定的全部功能。
+ * 除了AbstractBeanFactory的{@link #createBean}方法之外，
+ * 还实现{@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}接口。
  *
- * <p>Provides bean creation (with constructor resolution), property population,
- * wiring (including autowiring), and initialization. Handles runtime bean
- * references, resolves managed collections, calls initialization methods, etc.
- * Supports autowiring constructors, properties by name, and properties by type.
+ * <p>提供Bean创建（具有构造函数解析），属性填充，接线（包括自动装配）和初始化。
+ * 处理运行时Bean引用，解析托管集合，调用初始化方法等。支持自动装配构造函数，按名称的属性和按类型的属性。
  *
- * <p>The main template method to be implemented by subclasses is
- * {@link #resolveDependency(DependencyDescriptor, String, Set, TypeConverter)},
- * used for autowiring by type. In case of a factory which is capable of searching
- * its bean definitions, matching beans will typically be implemented through such
- * a search. For other factory styles, simplified matching algorithms can be implemented.
+ * <p>子类要实现的主要模板方法是{@link #resolveDependency(DependencyDescriptor,String,Set,TypeConverter)}，用于按类型自动装配。
+ * 如果工厂能够搜索其bean定义，则通常将通过此类搜索来实现匹配的bean。
+ * 对于其他工厂样式，可以实现简化的匹配算法。
  *
- * <p>Note that this class does <i>not</i> assume or implement bean definition
- * registry capabilities. See {@link DefaultListableBeanFactory} for an implementation
- * of the {@link org.springframework.beans.factory.ListableBeanFactory} and
- * {@link BeanDefinitionRegistry} interfaces, which represent the API and SPI
- * view of such a factory, respectively.
+ * <p>请注意，该类不<i>不<i>承担或实现bean定义注册表功能。
+ * 有关{@link org.springframework.beans.factory.ListableBeanFactory}和{@link BeanDefinitionRegistry}接口的实现，
+ * 请参见{@link DefaultListableBeanFactory}，它们分别表示此类工厂的API和SPI视图。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -293,7 +286,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Typical methods for creating and populating external bean instances
+	// 创建和填充外部Bean实例的典型方法
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -341,7 +334,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Specialized methods for fine-grained control over the bean lifecycle
+	// 专门的方法可以细粒度地控制bean的生命周期
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -442,7 +435,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//-------------------------------------------------------------------------
-	// Delegate methods for resolving injection points
+	// 解决注入点的委托方法
 	//-------------------------------------------------------------------------
 
 	@Override
@@ -464,7 +457,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 
 	//---------------------------------------------------------------------
-	// Implementation of relevant AbstractBeanFactory template methods
+	// 相关AbstractBeanFactory模板方法的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -494,7 +487,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			// 从BeanPostProcessors容器中找到实现InstantiationAwareBeanPostProcessor接口的类，调用其中的实例前置方法和后置方法，让BeanPostProcessor先拦截返回代理对象；
 			/* 判断是否为：InstantiationAwareBeanPostProcessor 的，如果是则执行前后置方法
 				 【InstantiationAwareBeanPostProcessor】：提前执行；
@@ -584,7 +576,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
-		//判断bean 是否为单实例的，如果是单实例的添加到缓存中
+		//判断bean 是否为单例的，如果是单例的添加到缓存中
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
@@ -598,7 +590,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			//为bean 赋值
 			populateBean(beanName, mbd, instanceWrapper);
-			// 4）、【Bean的实例化】
+			// 4）、【Bean的实例化】————————AOP的代理也是在这里面完成的
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -1784,7 +1776,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			//2）、【执行后置处理器BeanPostProcessor初始化之前】 执行所有的 BeanPostProcessor.postProcessBeforeInitialization（）;
+			//2）、【执行后置处理器BeanPostProcessor初始化之前】 执行所有的 BeanPostProcessor.postProcessBeforeInitialization();
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
@@ -1799,6 +1791,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		//4）、【执行后置处理器初始化之后】 执行所有的beanProcessor.postProcessAfterInitialization(result, beanName);方法
 		if (mbd == null || !mbd.isSynthetic()) {
+			//AOP代理的地方————从这里可以看出AOP其实也是Spring容器的后置处理器实现的
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 

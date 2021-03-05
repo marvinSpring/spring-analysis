@@ -34,12 +34,10 @@ package org.springframework.beans.factory;
 public interface InitializingBean {
 
 	/**
-	 * Invoked by the containing {@code BeanFactory} after it has set all bean properties
-	 * and satisfied {@link BeanFactoryAware}, {@code ApplicationContextAware} etc.
-	 * <p>This method allows the bean instance to perform validation of its overall
-	 * configuration and final initialization when all bean properties have been set.
-	 * @throws Exception in the event of misconfiguration (such as failure to set an
-	 * essential property) or if initialization fails for any other reason
+	 * 由包含的{@code BeanFactory}设置所有bean属性并满足{@link BeanFactoryAware}，
+	 * {@code ApplicationContextAware}等之后调用
+	 * 。<p>此方法允许bean实例执行其整体配置的验证和最终初始化。
+	 * 设置了所有bean属性后。 @throws在配置错误（例如无法设置基本属性）或初始化由于任何其他原因而失败的情况下发生的异常
 	 */
 	void afterPropertiesSet() throws Exception;
 

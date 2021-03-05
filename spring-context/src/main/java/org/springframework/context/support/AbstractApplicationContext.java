@@ -39,6 +39,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -518,9 +519,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			//------------------------------ BeanFactory的创建及预准备工作  ------------------------------------------/
 			//1 刷新前的预处理
 			/*创建BeanFactory之前的一些准备工作，比如设置开启时间，激活状态，设置Environment，还可以扩展自定义子类实现等等*/
-			/**
-			 * 刷新前的预处理表示在真正做refresh操作之前需要准备做的事情：
-			 * 设置Spring容器的启动时间，开启活跃状态，撤销关闭状态验证环境信息里一些必须存在的属性等
+			/*
+			   刷新前的预处理表示在真正做refresh操作之前需要准备做的事情：
+			   设置Spring容器的启动时间，开启活跃状态，撤销关闭状态验证环境信息里一些必须存在的属性等
 			 */
 			prepareRefresh();
 
@@ -543,6 +544,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				//5 在context中调用BeanFactoryPostProcessor【BeanFactoryPostProcessor：BeanFactory的后置处理器。在BeanFactory标准初始化之后执行的】
 				/* 实例化实现了BeanFactoryPostProcessor接口的Bean，并调用实现了接口的实现类中的方法*/
 				/* 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，从而对BeanDefinition和BeanFactory进行处理和管理*/
+				/*大部分bean定义信息在这一步之后就已经注册成功了*/
 				invokeBeanFactoryPostProcessors(beanFactory);
 				//----------------------------------------------------------------------------------------------/
 
@@ -575,6 +577,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				  （5）调用BeanPostProcessor（后置处理器）对实例bean进行后置处理*/
 				finishBeanFactoryInitialization(beanFactory);
 
+				int a = 0;
+				if(a==0){
+					throw new BeanDefinitionOverrideException(null,null,null);
+				}
+
 				//12 完成上下文的刷新工作
 				/* 发布公共事件，用于监听者接收*/
 				/* 完成BeanFactory的初始化工作；IOC容器创建完成；*/
@@ -587,16 +594,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 							"cancelling refresh attempt: " + ex);
 				}
 
-				//13 销毁已创建的单例以避免资源占用。
+				// 销毁已创建的单例以避免资源占用。
 				destroyBeans();
-				//14 重置“active”标志.
+				// 重置“active”标志.
 				cancelRefresh(ex);
 				// Propagate exception to caller.
 				throw ex;
 			}
 
 			finally {
-				//15 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
+				//13 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
 				resetCommonCaches();
 			}
 		}
@@ -706,7 +713,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
-
 		// 5）、添加BeanPostProcessor【ApplicationListenerDetector】后置处理器，在bean初始化前后的一些工作
 		/* 如果当前的BeanFactory包含loadTimeWeaver这个Bean，则说明存在类加载期织入AspectJ，
 		   那么就把当前BeanFactory交给类加载期BeanPostProcessor实现类LoadTimeWeaverAwareProcessor来处理，从而实现类加载期织入AspectJ的目的。*/
@@ -903,8 +909,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.setConversionService(
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
-
 		// 值解析器
+
 		// 不重要
 		/* 如果之前没有任何beanPostProcessor进行过注册，
 		   则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：
@@ -1019,9 +1025,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Close this application context, destroying all beans in its bean factory.
-	 * <p>Delegates to {@code doClose()} for the actual closing procedure.
-	 * Also removes a JVM shutdown hook, if registered, as it's not needed anymore.
+	 * 关闭此应用程序上下文，销毁其bean工厂中的所有bean。
+	 * <p>代表{@code doClose（）}进行实际的关闭过程。
+	 * 如果已注册JVM关闭钩子，那么就删除它，因为不再需要它。
 	 * @see #doClose()
 	 * @see #registerShutdownHook()
 	 */
@@ -1029,8 +1035,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void close() {
 		synchronized (this.startupShutdownMonitor) {
 			doClose();
-			// If we registered a JVM shutdown hook, we don't need it anymore now:
-			// We've already explicitly closed the context.
+			// 如果我们注册了JVM关闭钩子，则现在不再需要它：我们已经显式关闭了上下文。
 			if (this.shutdownHook != null) {
 				try {
 					Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
@@ -1043,16 +1048,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Actually performs context closing: publishes a ContextClosedEvent and
-	 * destroys the singletons in the bean factory of this application context.
-	 * <p>Called by both {@code close()} and a JVM shutdown hook, if any.
+	 * 实际执行上下文关闭：发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例。
+	 * <p>由{@code close（）}和JVM关闭钩子（如果有）调用。
 	 * @see org.springframework.context.event.ContextClosedEvent
 	 * @see #destroyBeans()
 	 * @see #close()
 	 * @see #registerShutdownHook()
 	 */
 	protected void doClose() {
-		// Check whether an actual close attempt is necessary...
+		// 检查是否需要实际的尝试关闭...
 		if (this.active.get() && this.closed.compareAndSet(false, true)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Closing " + this);
@@ -1061,14 +1065,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			LiveBeansView.unregisterApplicationContext(this);
 
 			try {
-				// Publish shutdown event.
+				// 发布关闭事件。
 				publishEvent(new ContextClosedEvent(this));
 			}
 			catch (Throwable ex) {
 				logger.warn("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
 			}
 
-			// Stop all Lifecycle beans, to avoid delays during individual destruction.
+			// 停止所有Lifecycle bean，以避免在单个销毁期间造成延迟。
 			if (this.lifecycleProcessor != null) {
 				try {
 					this.lifecycleProcessor.onClose();
@@ -1078,22 +1082,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				}
 			}
 
-			// Destroy all cached singletons in the context's BeanFactory.
+			//销毁上下文的BeanFactory中所有缓存的单例。
 			destroyBeans();
 
-			// Close the state of this context itself.
+			// 关闭此上下文本身的状态。
 			closeBeanFactory();
 
-			// Let subclasses do some final clean-up if they wish...
+			// 如果愿意，让子类做一些最后的清理...
 			onClose();
 
-			// Reset local application listeners to pre-refresh state.
+			// 将本地应用程序侦听器重置为预刷新状态。
 			if (this.earlyApplicationListeners != null) {
 				this.applicationListeners.clear();
 				this.applicationListeners.addAll(this.earlyApplicationListeners);
 			}
 
-			// Switch to inactive.
+			// 切换为非活动状态。
 			this.active.set(false);
 		}
 	}

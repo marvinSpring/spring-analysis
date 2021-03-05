@@ -155,7 +155,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
 	/** Map of bean definition objects, keyed by bean name. */
-	//BeanDefinition真正存放的地方————相当于BeanFactory的容器（装配Bean的地方）
+	//BeanDefinition真正存放的地方————相当于BeanFactory的容器（装配Bean的地方）——————IOC容器
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
 	/** Map from bean name to merged BeanDefinitionHolder. */
@@ -957,7 +957,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 			else {
-				// Still in startup registration phase
 				// 核心方法————beanDefinitionMap放入键值对，beanDefinitionNames是个BeanName的list集合
 				// 这两个容器是DefaultListableFactory的，也就是属于最开始传入的BeanFactory容器中的两个属性
 				this.beanDefinitionMap.put(beanName, beanDefinition);

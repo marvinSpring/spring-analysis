@@ -3,9 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean id="teacher" class="com.marvin.test.model.Teacher">
-		<property name="student" ref="student"/>
+		<property name="age" value="12"/>
 	</bean>
-	<bean id="student" class="com.marvin.test.model.Student">
-		<property name="teacher" ref="teacher"/>
-	</bean>
+<!--	<bean id="student" class="com.marvin.test.model.Student">-->
+<!--		<property name="teacher" ref="teacher"/>-->
+<!--	</bean>-->
 </beans>
