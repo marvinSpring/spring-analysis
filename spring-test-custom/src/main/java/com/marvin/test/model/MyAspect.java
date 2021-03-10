@@ -13,7 +13,7 @@ package com.marvin.test.model;
 //@Component
 public class MyAspect {
 
-    private Long time;
+    private Long time = 0L;
 
 //    @Pointcut(value = "execution(* com.marvin.test.model.StudentService.*(..))")
 //    public void pointCut(){

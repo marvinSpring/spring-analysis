@@ -577,11 +577,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				  （5）调用BeanPostProcessor（后置处理器）对实例bean进行后置处理*/
 				finishBeanFactoryInitialization(beanFactory);
 
-				int a = 0;
-				if(a==0){
-					throw new BeanDefinitionOverrideException(null,null,null);
-				}
-
 				//12 完成上下文的刷新工作
 				/* 发布公共事件，用于监听者接收*/
 				/* 完成BeanFactory的初始化工作；IOC容器创建完成；*/
@@ -603,7 +598,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 
 			finally {
-				//13 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
+				//13 在Spring的核心中重置常见的自省缓存，因为现在可能不再需要单例bean的元数据...
 				resetCommonCaches();
 			}
 		}
