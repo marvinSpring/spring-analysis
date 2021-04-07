@@ -17,13 +17,10 @@
 package org.springframework.beans.factory;
 
 /**
- * Interface to be implemented by beans that need to react once all their properties
- * have been set by a {@link BeanFactory}: e.g. to perform custom initialization,
- * or merely to check that all mandatory properties have been set.
- *
- * <p>An alternative to implementing {@code InitializingBean} is specifying a custom
- * init method, for example in an XML bean definition. For a list of all bean
- * lifecycle methods, see the {@link BeanFactory BeanFactory javadocs}.
+ * 由{@link BeanFactory}设置完所有属性后需要响应的bean所实现的接口：
+ * 执行自定义初始化，或仅检查是否已设置所有必填属性。
+ * <p>实现{@code InitializingBean}的另一种方法是指定一个自定义的init方法，
+ * 例如在XML bean定义中。有关所有bean生命周期方法的列表，请参见{@link BeanFactory BeanFactory javadocs}。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -37,7 +34,8 @@ public interface InitializingBean {
 	 * 由包含的{@code BeanFactory}设置所有bean属性并满足{@link BeanFactoryAware}，
 	 * {@code ApplicationContextAware}等之后调用
 	 * 。<p>此方法允许bean实例执行其整体配置的验证和最终初始化。
-	 * 设置了所有bean属性后。 @throws在配置错误（例如无法设置基本属性）或初始化由于任何其他原因而失败的情况下发生的异常
+	 * 设置了所有bean属性后。
+	 * @throws 在配置错误（例如无法设置基本属性）或初始化由于任何其他原因而失败的情况下发生的异常
 	 */
 	void afterPropertiesSet() throws Exception;
 

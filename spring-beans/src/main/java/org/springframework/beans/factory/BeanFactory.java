@@ -26,18 +26,13 @@ import org.springframework.lang.Nullable;
  * 还有其他接口，例如{@link ListableBeanFactory}
  * 和{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}可发挥特殊作用。
  *
- * <p>该接口由包含多个bean定义的对象实现，每个bean定义均由String名称唯一标识。
- * 根据bean的定义，工厂将返回所包含对象的独立实例（Prototype设计模式），
- * 或者返回单个共享实例（Singleton设计模式的替代方案，其中实例是作用域中的单例）的工厂）。
- * 将返回哪种类型的实例取决于bean工厂的配置：API是相同的。
- * the API is the same. Since Spring
- * 2.0, further scopes are available depending on the concrete application
- * context (e.g. "request" and "session" scopes in a web environment).
+ * <p>该接口由包含多个bean定义的对象实现，每个bean定义均都有一个唯一的字符串名称标识。
+ * 根据bean的定义，工厂将返回包含对象(单例)的（Prototype设计模式）bean，
+ * 或者返回一个多例（Singleton设计模式的替代方案，其中实例是作用域中的单例）的工厂）。
+ * 返回哪种类型的实例取决于bean工厂的配置：API是相同的。
  *
- * <p>这种方法的重点是BeanFactory是应用程序组件的中央注册表，
- * 并集中了应用程序组件的配置（例如，不再需要单个对象读取属性文件）。
- * See chapters 4 and 11 of "Expert One-on-One J2EE Design and
- * Development" for a discussion of the benefits of this approach.
+ * <p>实现上面方法的重点是BeanFactory是应用程序组件的中央注册表，
+ * 并且集中了ApplicationComponent的配置（例如，不再需要单个对象读取属性文件）。
  *
  * <p>Note that it is generally better to rely on Dependency Injection
  * ("push" configuration) to configure application objects through setters
@@ -50,11 +45,10 @@ import org.springframework.lang.Nullable;
  * 但是，实现类可以根据需要直接在Java代码中直接返回它创建的Java对象
  * 定义的存储方式没有任何限制：LDAP，RDBMS，XML，属性文件等。
  *
- * Implementations are encouraged to support references
- * amongst beans (Dependency Injection).
+ * 鼓励实现支持Bean之间的引用（依赖注入）。
  *
  * {@link ListableBeanFactory}让bean的定义是可罗列的，有列表形式的
- * {@link HierarchicalBeanFactory}提供父子容器关系的
+ * {@link HierarchicalBeanFactory}提供父子容器关系的容器
  *
  * <p>In contrast to the methods in {@link ListableBeanFactory}, all of the
  * operations in this interface will also check parent factories if this is a

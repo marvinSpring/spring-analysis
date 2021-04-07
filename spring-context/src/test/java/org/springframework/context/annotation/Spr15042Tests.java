@@ -19,7 +19,6 @@ package org.springframework.context.annotation;
 import org.junit.Test;
 
 import org.springframework.aop.framework.ProxyFactoryBean;
-import org.springframework.aop.target.CommonsPool2TargetSource;
 
 /**
  * @author Juergen Hoeller
@@ -39,17 +38,9 @@ public class Spr15042Tests {
 		@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 		public ProxyFactoryBean myObject() {
 			ProxyFactoryBean pfb = new ProxyFactoryBean();
-			pfb.setTargetSource(poolTargetSource());
 			return pfb;
 		}
 
-		@Bean
-		public CommonsPool2TargetSource poolTargetSource() {
-			CommonsPool2TargetSource pool = new CommonsPool2TargetSource();
-			pool.setMaxSize(3);
-			pool.setTargetBeanName("myObjectTarget");
-			return pool;
-		}
 
 		@Bean(name = "myObjectTarget")
 		@Scope(scopeName = "prototype")

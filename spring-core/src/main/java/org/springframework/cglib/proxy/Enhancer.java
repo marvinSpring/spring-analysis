@@ -118,7 +118,7 @@ public class Enhancer extends AbstractClassGenerator {
 	private static final String CONSTRUCTED_FIELD = "CGLIB$CONSTRUCTED";
 
 	/**
-	 * {@link org.springframework.cglib.core.AbstractClassGenerator.ClassLoaderData#generatedClasses} requires to keep cache key
+	 * {@link org.springframework.cglib.core.AbstractClassGenerator.ClassLoaderData#generatedClasses()} requires to keep cache key
 	 * in a good shape (the keys should be up and running if the proxy class is alive), and one of the cache keys is
 	 * {@link CallbackFilter}. That is why the generated class contains static field that keeps strong reference to
 	 * the {@link #filter}.

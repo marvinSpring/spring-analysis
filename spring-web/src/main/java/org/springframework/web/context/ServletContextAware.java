@@ -21,9 +21,7 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.Aware;
 
 /**
- * Interface to be implemented by any object that wishes to be notified of the
- * {@link ServletContext} (typically determined by the {@link WebApplicationContext})
- * that it runs in.
+ * 希望通过其运行在其中的{@link ServletContext}（通常由{@link WebApplicationContext}通知）的任何对象实现的接口。
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -33,11 +31,9 @@ import org.springframework.beans.factory.Aware;
 public interface ServletContextAware extends Aware {
 
 	/**
-	 * Set the {@link ServletContext} that this object runs in.
-	 * <p>Invoked after population of normal bean properties but before an init
-	 * callback like InitializingBean's {@code afterPropertiesSet} or a
-	 * custom init-method. Invoked after ApplicationContextAware's
-	 * {@code setApplicationContext}.
+	 * 设置此对象在其中运行的{@link ServletContext}。
+	 * <p>在填充正常的bean属性之后但在诸如InitializingBean的{@code afterPropertiesSet}之类的初始化回调或自定义的init-method之前调用。
+	 * 在ApplicationContextAware的{@code setApplicationContext}之后调用。
 	 * @param servletContext the ServletContext object to be used by this object
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext

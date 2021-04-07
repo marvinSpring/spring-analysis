@@ -17,11 +17,9 @@
 package org.springframework.beans.factory;
 
 /**
- * Interface to be implemented by beans that want to be aware of their
- * bean name in a bean factory. Note that it is not usually recommended
- * that an object depends on its bean name, as this represents a potentially
- * brittle dependence on external configuration, as well as a possibly
- * unnecessary dependence on a Spring API.
+ * 想要在Bean工厂中知道其Bean名称的Bean将实现的接口。
+ * 请注意，通常不建议对象依赖于其bean名称，
+ * 因为这表示对外部配置的潜在脆弱依赖，以及对Spring API的不必要依赖。
  *
  * <p>For a list of all bean lifecycle methods, see the
  * {@link BeanFactory BeanFactory javadocs}.
@@ -36,16 +34,13 @@ package org.springframework.beans.factory;
 public interface BeanNameAware extends Aware {
 
 	/**
-	 * Set the name of the bean in the bean factory that created this bean.
-	 * <p>Invoked after population of normal bean properties but before an
-	 * init callback such as {@link InitializingBean#afterPropertiesSet()}
-	 * or a custom init-method.
-	 * @param name the name of the bean in the factory.
-	 * Note that this name is the actual bean name used in the factory, which may
-	 * differ from the originally specified name: in particular for inner bean
-	 * names, the actual bean name might have been made unique through appending
-	 * "#..." suffixes. Use the {@link BeanFactoryUtils#originalBeanName(String)}
-	 * method to extract the original bean name (without suffix), if desired.
+	 * 在创建此bean的bean工厂中设置bean的名称。
+	 * <p>在填充正常的bean属性之后但在初始化回调
+	 * （例如{@link InitializingBeanafterPropertiesSet（）}或自定义的初始化方法）之前调用。
+	 * @param name工厂中的bean的名称。
+	 *        请注意，此名称是工厂中使用的实际bean名称，该名称可能与最初指定的名称不同：
+	 *        特别是对于内部bean名称，实际的bean名称可能已通过附加“ ...”后缀而变得唯一。
+	 *        如果需要，请使用{@link BeanFactoryUtilsoriginalBeanName（String）}方法提取原始bean名称（不带后缀）。
 	 */
 	void setBeanName(String name);
 

@@ -23,13 +23,9 @@ import test.mixin.Lockable;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
-import org.springframework.aop.framework.autoproxy.target.AbstractBeanFactoryBasedTargetSourceCreator;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.target.AbstractBeanFactoryBasedTargetSource;
-import org.springframework.aop.target.CommonsPool2TargetSource;
 import org.springframework.aop.target.LazyInitTargetSource;
-import org.springframework.aop.target.PrototypeTargetSource;
-import org.springframework.aop.target.ThreadLocalTargetSource;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.tests.aop.advice.CountingBeforeAdvice;
@@ -42,7 +38,6 @@ import static org.junit.Assert.*;
 /**
  * Tests for auto proxy creation by advisor recognition.
  *
- * @see org.springframework.aop.framework.autoproxy.AdvisorAutoProxyCreatorIntegrationTests
  *
  * @author Rod Johnson
  * @author Dave Syer
@@ -134,7 +129,6 @@ public class AdvisorAutoProxyCreatorTests {
 		ITestBean test = (ITestBean) bf.getBean("prototypeTest");
 		assertTrue(AopUtils.isAopProxy(test));
 		Advised advised = (Advised) test;
-		assertTrue(advised.getTargetSource() instanceof PrototypeTargetSource);
 		assertEquals("Rod", test.getName());
 		// Check that references survived prototype creation
 		assertEquals("Kerry", test.getSpouse().getName());
@@ -158,51 +152,6 @@ public class AdvisorAutoProxyCreatorTests {
 	}
 
 	@Test
-	public void testQuickTargetSourceCreator() throws Exception {
-		ClassPathXmlApplicationContext bf =
-				new ClassPathXmlApplicationContext(QUICK_TARGETSOURCE_CONTEXT, CLASS);
-		ITestBean test = (ITestBean) bf.getBean("test");
-		assertFalse(AopUtils.isAopProxy(test));
-		assertEquals("Rod", test.getName());
-		// Check that references survived pooling
-		assertEquals("Kerry", test.getSpouse().getName());
-
-		// Now test the pooled one
-		test = (ITestBean) bf.getBean(":test");
-		assertTrue(AopUtils.isAopProxy(test));
-		Advised advised = (Advised) test;
-		assertTrue(advised.getTargetSource() instanceof CommonsPool2TargetSource);
-		assertEquals("Rod", test.getName());
-		// Check that references survived pooling
-		assertEquals("Kerry", test.getSpouse().getName());
-
-		// Now test the ThreadLocal one
-		test = (ITestBean) bf.getBean("%test");
-		assertTrue(AopUtils.isAopProxy(test));
-		advised = (Advised) test;
-		assertTrue(advised.getTargetSource() instanceof ThreadLocalTargetSource);
-		assertEquals("Rod", test.getName());
-		// Check that references survived pooling
-		assertEquals("Kerry", test.getSpouse().getName());
-
-		// Now test the Prototype TargetSource
-		test = (ITestBean) bf.getBean("!test");
-		assertTrue(AopUtils.isAopProxy(test));
-		advised = (Advised) test;
-		assertTrue(advised.getTargetSource() instanceof PrototypeTargetSource);
-		assertEquals("Rod", test.getName());
-		// Check that references survived pooling
-		assertEquals("Kerry", test.getSpouse().getName());
-
-
-		ITestBean test2 = (ITestBean) bf.getBean("!test");
-		assertFalse("Prototypes cannot be the same object", test == test2);
-		assertEquals("Rod", test2.getName());
-		assertEquals("Kerry", test2.getSpouse().getName());
-		bf.close();
-	}
-
-	@Test
 	public void testWithOptimizedProxy() throws Exception {
 		BeanFactory beanFactory = new ClassPathXmlApplicationContext(OPTIMIZED_CONTEXT, CLASS);
 
@@ -219,17 +168,4 @@ public class AdvisorAutoProxyCreatorTests {
 
 }
 
-
-class SelectivePrototypeTargetSourceCreator extends AbstractBeanFactoryBasedTargetSourceCreator {
-
-	@Override
-	protected AbstractBeanFactoryBasedTargetSource createBeanFactoryBasedTargetSource(
-			Class<?> beanClass, String beanName) {
-		if (!beanName.startsWith("prototype")) {
-			return null;
-		}
-		return new PrototypeTargetSource();
-	}
-
-}
 
