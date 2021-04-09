@@ -24,6 +24,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
 
 /**
+ * 代表Spring IoC容器
+ *
  * Spring的核心接口，为应用程序提供上下文配置。
  * 一般情况下本接口是只读的，
  * 但是如果实现本接口就可以重载。

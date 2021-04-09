@@ -1151,7 +1151,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of BeanFactory interface
+	//  BeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1239,7 +1239,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ListableBeanFactory interface
+	// ListableBeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1314,7 +1314,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of HierarchicalBeanFactory interface
+	// HierarchicalBeanFactory接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1341,7 +1341,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of MessageSource interface
+	// MessageSource接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1384,7 +1384,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ResourcePatternResolver interface
+	// ResourcePatternResolver接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1394,7 +1394,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Implementation of Lifecycle interface
+	// 生命周期接口的实现
 	//---------------------------------------------------------------------
 
 	@Override
@@ -1416,7 +1416,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 	//---------------------------------------------------------------------
-	// Abstract methods that must be implemented by subclasses
+	// 子类必须实现的抽象方法
 	//---------------------------------------------------------------------
 
 	/**
