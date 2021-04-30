@@ -27,18 +27,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Standalone application context, accepting <em>component classes</em> as input &mdash;
- * in particular {@link Configuration @Configuration}-annotated classes, but also plain
- * {@link org.springframework.stereotype.Component @Component} types and JSR-330 compliant
- * classes using {@code javax.inject} annotations.
+ * 独立的ApplicationContext, 接受 component classes 作为输入
+ * 可以接受带{@link Configuration @Configuration}注解类,
+ * 并且接受带{@link org.springframework.stereotype.Component @Component} 注解的类
+ * 和使用{@code javax.inject}注解的符合JSR-330的兼容类。
  *
- * <p>Allows for registering classes one by one using {@link #register(Class...)}
- * as well as for classpath scanning using {@link #scan(String...)}.
+ * 允许使用{@link this.register(Class ...)}一对一地注册类，以及使用{@link this.scan(String ...)} 进行类路径扫描的方式注册。
  *
- * <p>In case of multiple {@code @Configuration} classes, {@link Bean @Bean} methods
- * defined in later classes will override those defined in earlier classes. This can
- * be leveraged to deliberately override certain bean definitions via an extra
- * {@code @Configuration} class.
+ * <p>如果有多个带{@code @Configuration}注解的类,
+ * 在更高级别的类中定义的{@link Bean @Bean}方法将覆盖在更高级别的类中定义的方法。
+ * 通过额外的{@code @Configuration}类，可以利用它来故意覆盖某些Bean定义。
  *
  * <p>See {@link Configuration @Configuration}'s javadoc for usage examples.
  *
@@ -146,9 +144,8 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	//---------------------------------------------------------------------
 
 	/**
-	 * Register one or more component classes to be processed.
-	 * <p>Note that {@link #refresh()} must be called in order for the context
-	 * to fully process the new classes.
+	 * 注册一个或多个要处理的组件类。
+	 * 请注意，必须调用refresh()才能使Spring容器完全处理该类。
 	 * @param componentClasses one or more component classes &mdash; for example,
 	 * {@link Configuration @Configuration} classes
 	 * @see #scan(String...)

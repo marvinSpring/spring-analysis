@@ -47,20 +47,11 @@ import org.springframework.lang.Nullable;
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
 	/**
-	 * Apply this BeanPostProcessor <i>before the target bean gets instantiated</i>.
-	 * The returned bean object may be a proxy to use instead of the target bean,
-	 * effectively suppressing default instantiation of the target bean.
-	 * <p>If a non-null object is returned by this method, the bean creation process
-	 * will be short-circuited. The only further processing applied is the
-	 * {@link #postProcessAfterInitialization} callback from the configured
-	 * {@link BeanPostProcessor BeanPostProcessors}.
-	 * <p>This callback will be applied to bean definitions with their bean class,
-	 * as well as to factory-method definitions in which case the returned bean type
-	 * will be passed in here.
-	 * <p>Post-processors may implement the extended
-	 * {@link SmartInstantiationAwareBeanPostProcessor} interface in order
-	 * to predict the type of the bean object that they are going to return here.
-	 * <p>The default implementation returns {@code null}.
+	 * 在实例化目标bean之前应用此BeanPostProcessor。 返回的bean对象可以是代替目标bean使用的代理，从而有效地抑制了目标bean的默认实例化。
+	 * 如果此方法返回一个非null对象，则Bean创建过程将被短路。 唯一应用的进一步处理是来自已配置BeanPostProcessors的postProcessAfterInitialization回调。
+	 * 此回调将应用于具有其bean类的bean定义以及工厂方法定义，在这种情况下，返回的bean类型将在此处传递。
+	 * 后处理器可以实现扩展的SmartInstantiationAwareBeanPostProcessor接口，以便预测它们将在此处返回的Bean对象的类型。
+	 * 默认实现返回null 。
 	 * @param beanClass the class of the bean to be instantiated
 	 * @param beanName the name of the bean
 	 * @return the bean object to expose instead of a default instance of the target bean,

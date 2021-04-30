@@ -66,45 +66,33 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
- * that autowires annotated fields, setter methods and arbitrary config methods.
- * Such members to be injected are detected through a Java 5 annotation: by default,
- * Spring's {@link Autowired @Autowired} and {@link Value @Value} annotations.
+ * org.springframework.beans.factory.config.BeanPostProcessor实现，
+ * 可自动连接带注解的字段，setter方法和任意config方法。 
+ * 通过Java 5注解检测要注入的此类成员：默认情况下，Spring的@Autowired和@Value注解。
+ * 还支持JSR-330的@Inject注解（如果可用）将直接替代Spring自己的@Autowired 。
+ * 
+ * 任何给定bean类的构造函数（最多）都只能使用“ required”参数设置为true来声明此注解，
+ * 以指示用作Spring bean时要自动装配的构造函数。
+ * 如果多个不需要的构造函数声明了注解，则它们将被视为自动装配的候选对象。
+ * 将选择通过匹配Spring容器中的bean可以满足的依赖项数量最多的构造函数。
+ * 如果没有一个候选者合适，则将使用主/默认构造函数（如果存在）。
+ * 如果一个类仅声明一个单一的构造函数开始，即使没有注解，也将始终使用它。
+ * 带注解的构造函数不必是public的。
  *
- * <p>Also supports JSR-330's {@link javax.inject.Inject @Inject} annotation,
- * if available, as a direct alternative to Spring's own {@code @Autowired}.
+ * 在构造任何bean之后，调用任何config方法之前，都将立即注入字段。
+ * 这样的配置字段不必是公共的。
+ * Config方法可以具有任意名称和任意数量的参数。
+ * 这些参数中的每个参数都将与Spring容器中的匹配bean自动连接。
+ * Bean属性设置器方法实际上只是这种常规config方法的特例。
+ * Config方法不必是公共的。
  *
- * <p>Only one constructor (at max) of any given bean class may declare this annotation
- * with the 'required' parameter set to {@code true}, indicating <i>the</i> constructor
- * to autowire when used as a Spring bean. If multiple <i>non-required</i> constructors
- * declare the annotation, they will be considered as candidates for autowiring.
- * The constructor with the greatest number of dependencies that can be satisfied by
- * matching beans in the Spring container will be chosen. If none of the candidates
- * can be satisfied, then a primary/default constructor (if present) will be used.
- * If a class only declares a single constructor to begin with, it will always be used,
- * even if not annotated. An annotated constructor does not have to be public.
  *
- * <p>Fields are injected right after construction of a bean, before any
- * config methods are invoked. Such a config field does not have to be public.
+ * 注意：默认的AutowiredAnnotationBeanPostProcessor将通过“ context：annotation-config”和“ context：component-scan” XML标签进行注册。
+ * 如果要指定自定义的AutowiredAnnotationBeanPostProcessor bean定义，请删除或关闭那里的默认注解配置。
  *
- * <p>Config methods may have an arbitrary name and any number of arguments; each of
- * those arguments will be autowired with a matching bean in the Spring container.
- * Bean property setter methods are effectively just a special case of such a
- * general config method. Config methods do not have to be public.
- *
- * <p>Note: A default AutowiredAnnotationBeanPostProcessor will be registered
- * by the "context:annotation-config" and "context:component-scan" XML tags.
- * Remove or turn off the default annotation configuration there if you intend
- * to specify a custom AutowiredAnnotationBeanPostProcessor bean definition.
- * <p><b>NOTE:</b> Annotation injection will be performed <i>before</i> XML injection;
- * thus the latter configuration will override the former for properties wired through
- * both approaches.
- *
- * <p>In addition to regular injection points as discussed above, this post-processor
- * also handles Spring's {@link Lookup @Lookup} annotation which identifies lookup
- * methods to be replaced by the container at runtime. This is essentially a type-safe
- * version of {@code getBean(Class, args)} and {@code getBean(String, args)},
- * See {@link Lookup @Lookup's javadoc} for details.
+ * 注意：注解注入将在XML注入之前执行； 因此，对于通过这两种方法连接的属性，后一种配置将覆盖前一种配置。
+ * 除了上面讨论的常规注入点之外， @Lookup处理器还处理Spring的@Lookup批注，该批注标识在运行时将由容器替换的查找方法。
+ * 这本质上是getBean(Class, args)和getBean(String, args)的类型安全版本，有关详细信息，请参见@Lookup's javadoc
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -415,9 +403,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz, @Nullable PropertyValues pvs) {
-		// Fall back to class name as cache key, for backwards compatibility with custom callers.
+		// 回退到类名作为缓存键，以实现与自定义调用程序的向后兼容性。
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
-		// Quick check on the concurrent map first, with minimal locking.
+		// 首先以最小的锁定快速检查并发映射。
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
@@ -434,27 +422,27 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		return metadata;
 	}
 
-	private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {
+	private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {//构建需要自动注入的元数据，，，
 		List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
-		Class<?> targetClass = clazz;
+		Class<?> targetClass = clazz;//需要处理的目标类
 
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
-
+			/*通过反射获取该类所有的字段，并遍历每一个字段，并通过方法findAutowiredAnnotation遍历每一个字段的所用注解，并如果用autowired修饰了，则返回auotowired相关属性*/
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
 				AnnotationAttributes ann = findAutowiredAnnotation(field);
-				if (ann != null) {
+				if (ann != null) {//校验autowired注解是否用在了static方法上
 					if (Modifier.isStatic(field.getModifiers())) {
 						if (logger.isInfoEnabled()) {
 							logger.info("Autowired annotation is not supported on static fields: " + field);
 						}
 						return;
-					}
+					}//判断是否指定了required
 					boolean required = determineRequiredStatus(ann);
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			});
-
+			//和上面一样的逻辑，但是是通过反射处理类的method
 			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
 				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 				if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
@@ -479,7 +467,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					currElements.add(new AutowiredMethodElement(method, required, pd));
 				}
 			});
-
+			//用@Autowired修饰的注解可能不止一个，因此都加在currElements这个容器里面，一起处理
 			elements.addAll(0, currElements);
 			targetClass = targetClass.getSuperclass();
 		}
@@ -578,9 +566,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			this.required = required;
 		}
 
-		@Override
+		@Override//反射注入需要依赖的对象
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
-			Field field = (Field) this.member;
+			Field field = (Field) this.member;//反射拿到的对象 从这里构建{@code this.buildAutowiringMetadata(Class<?> class)}
 			Object value;
 			if (this.cached) {
 				value = resolvedCachedArgument(beanName, this.cachedFieldValue);
@@ -619,7 +607,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				}
 			}
 			if (value != null) {
-				ReflectionUtils.makeAccessible(field);
+				ReflectionUtils.makeAccessible(field);//到这里可以看出Spring为了注入属性已经走火入魔了，好家伙直接暴力破解
 				field.set(bean, value);
 			}
 		}

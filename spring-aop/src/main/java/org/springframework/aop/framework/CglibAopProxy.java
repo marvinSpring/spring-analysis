@@ -57,18 +57,16 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * CGLIB-based {@link AopProxy} implementation for the Spring AOP framework.
+ * Spring AOP框架的基于CGLIB的{@link AopProxy}实现。
  *
- * <p>Objects of this type should be obtained through proxy factories,
- * configured by an {@link AdvisedSupport} object. This class is internal
- * to Spring's AOP framework and need not be used directly by client code.
+ * <p>这种类型的对象应该通过由{@link AdvisedSupport}对象配置的代理工厂获得。
+ * 此类在Spring的AOP框架内部，并且不需要由客户端代码直接使用。
  *
- * <p>{@link DefaultAopProxyFactory} will automatically create CGLIB-based
- * proxies if necessary, for example in case of proxying a target class
- * (see the {@link DefaultAopProxyFactory attendant javadoc} for details).
+ * <p> {@link DefaultAopProxyFactory}
+ * 将在必要时自动创建基于CGLIB的代理，
+ * 例如在代理目标类的情况下（有关详细信息，请参见 {@link DefaultAopProxyFactoryProxyjavadoc}）。
  *
- * <p>Proxies created using this class are thread-safe if the underlying
- * (target) class is thread-safe.
+ * <p>如果基础（目标）类是线程安全的，则使用此类创建的代理是线程安全的。
  *
  * @author Rod Johnson
  * @author Rob Harrop
@@ -81,6 +79,7 @@ import org.springframework.util.ObjectUtils;
  * @see DefaultAopProxyFactory
  */
 @SuppressWarnings("serial")
+//CGlib代理真正做事情的地方
 class CglibAopProxy implements AopProxy, Serializable {
 
 	// Constants for CGLIB callback array indices
@@ -647,8 +646,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
-	 * General purpose AOP callback. Used when the target is dynamic or when the
-	 * proxy is not frozen.
+	 * 通用AOP回调。当目标是动态的或代理未冻结时使用。
 	 */
 	private static class DynamicAdvisedInterceptor implements MethodInterceptor, Serializable {
 
@@ -660,6 +658,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 		@Override
 		@Nullable
+		//这个方法是执行AOP的拦截方法等
 		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
 			Object oldProxy = null;
 			boolean setProxyContext = false;
@@ -674,6 +673,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				// Get as late as possible to minimize the time we "own" the target, in case it comes from a pool...
 				target = targetSource.getTarget();
 				Class<?> targetClass = (target != null ? target.getClass() : null);
+//				获取拦截器链
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 				Object retVal;
 				// Check whether we only have one InvokerInterceptor: that is,
@@ -688,6 +688,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				}
 				else {
 					// We need to create a method invocation...
+//					方法递归调用
 					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
 				}
 				retVal = processReturnType(proxy, target, method, retVal);
