@@ -99,7 +99,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	public static final int VALIDATION_XSD = XmlValidationModeDetector.VALIDATION_XSD;
 
 
-	/** Constants instance for this class. */
+	/** 本类（XmlBeanDefinitionReader.class）的常数实例 */
 	private static final Constants constants = new Constants(XmlBeanDefinitionReader.class);
 
 	private int validationMode = VALIDATION_AUTO;
@@ -441,14 +441,15 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Determine the validation mode for the specified {@link Resource}.
-	 * If no explicit validation mode has been configured, then the validation
-	 * mode gets {@link #detectValidationMode detected} from the given resource.
-	 * <p>Override this method if you would like full control over the validation
-	 * mode, even when something other than {@link #VALIDATION_AUTO} was set.
+	 * 确定加载Resource的验证模式。
+	 * 如果未配置任何显式验证模式，则将从给定资源中detected验证模式。
+	 * 如果您希望完全控制验证模式，即使设置了VALIDATION_AUTO以外的其他方法，也可以重写此方法
 	 * @see #detectValidationMode
 	 */
+	//Spring需要确定使用哪种验证模式，一种是XSD，另一种是DTD。
+	//Spring将在本方法中确定出到底是用哪种模式来读取XML
 	protected int getValidationModeForResource(Resource resource) {
+		//获取到验证的模式并赋值给getValidationModeForResource
 		int validationModeToUse = getValidationMode();
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
@@ -457,18 +458,15 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
 		}
-		// Hmm, we didn't get a clear indication... Let's assume XSD,
-		// since apparently no DTD declaration has been found up until
-		// detection stopped (before finding the document's root tag).
+		// Spring没有得到明确的指示，他将假设是XSD，
+		// 因为在检测停止之前（找到文档的根标签之前）显然没有找到DTD声明。
 		return VALIDATION_XSD;
 	}
 
 	/**
-	 * Detect which kind of validation to perform on the XML file identified
-	 * by the supplied {@link Resource}. If the file has a {@code DOCTYPE}
-	 * definition then DTD validation is used otherwise XSD validation is assumed.
-	 * <p>Override this method if you would like to customize resolution
-	 * of the {@link #VALIDATION_AUTO} mode.
+	 * 检测对提供的Resource标识的XML文件执行哪种验证。
+	 * 如果文件具有DOCTYPE定义，则使用DTD验证，否则将使用XSD验证。
+	 * 如果要自定义VALIDATION_AUTO模式，请重写此方法。
 	 */
 	protected int detectValidationMode(Resource resource) {
 		if (resource.isOpen()) {

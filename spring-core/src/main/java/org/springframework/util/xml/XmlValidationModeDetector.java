@@ -33,6 +33,10 @@ import org.springframework.util.StringUtils;
  * @author Sam Brannen
  * @since 2.0
  */
+/*
+	Spring 中 XmlValidationModeDetector
+	对验证模式的确认是循环 xml 整个文件的每一行判断是否有 DOCTYPE 字符串， 包含就是 DTD 验证模式， 不包含就是 XSD 模式
+ */
 public class XmlValidationModeDetector {
 
 	/**
@@ -81,38 +85,38 @@ public class XmlValidationModeDetector {
 
 
 	/**
-	 * Detect the validation mode for the XML document in the supplied {@link InputStream}.
-	 * Note that the supplied {@link InputStream} is closed by this method before returning.
+	 * 在提供的输入流中检测XML文档的验证模式。
+	 * 请注意，返回之前，此方法将关闭提供的输入流 。
 	 * @param inputStream the InputStream to parse
 	 * @throws IOException in case of I/O failure
 	 * @see #VALIDATION_DTD
 	 * @see #VALIDATION_XSD
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
-		// Peek into the file to look for DOCTYPE.
+		// 将这个xml的输入流拿到，并且遍历这个xml，以确定本XML的验证模式
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		try {
 			boolean isDtdValidated = false;
 			String content;
 			while ((content = reader.readLine()) != null) {
 				content = consumeCommentTokens(content);
-				if (this.inComment || !StringUtils.hasText(content)) {
+				if (this.inComment || !StringUtils.hasText(content)) {//没有内容的
 					continue;
 				}
-				if (hasDoctype(content)) {
+				if (hasDoctype(content)) {//检查是否是DTD的验证模式
 					isDtdValidated = true;
 					break;
 				}
 				if (hasOpeningTag(content)) {
-					// End of meaningful data...
+					// 这里的标签说明是有实际意义的，比如说是<beans>等标签
 					break;
 				}
 			}
+			//这里进一步确定了Spring加载xml不是DTD就是XSD模式
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
-			// Choked on some character encoding...
-			// Leave the decision up to the caller.
+			//选择了某些字符编码...将决定权留给调用者。
 			return VALIDATION_AUTO;
 		}
 		finally {
@@ -122,7 +126,7 @@ public class XmlValidationModeDetector {
 
 
 	/**
-	 * Does the content contain the DTD DOCTYPE declaration?
+	 *  字符串是否包含 DOCTYPE 字符串
 	 */
 	private boolean hasDoctype(String content) {
 		return content.contains(DOCTYPE);
