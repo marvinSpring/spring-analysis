@@ -71,62 +71,32 @@ import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
 
 /**
- * Base servlet for Spring's web framework. Provides integration with
- * a Spring application context, in a JavaBean-based overall solution.
+ * Spring Web框架的最底层基础的servlet。
+ * 它是基于JavaBean的整体解决方案中提供与Spring ApplicationContext的集成。
  *
- * <p>This class offers the following functionality:
- * <ul>
- * <li>Manages a {@link org.springframework.web.context.WebApplicationContext
- * WebApplicationContext} instance per servlet. The servlet's configuration is determined
- * by beans in the servlet's namespace.
- * <li>Publishes events on request processing, whether or not a request is
- * successfully handled.
- * </ul>
+ * 本类提供以下功能：
+ * 每个servlet管理一个Web应用上下文实例。
+ * Servlet的配置由Servlet名称空间中的bean确定。
  *
- * <p>Subclasses must implement {@link #doService} to handle requests. Because this extends
- * {@link HttpServletBean} rather than HttpServlet directly, bean properties are
- * automatically mapped onto it. Subclasses can override {@link #initFrameworkServlet()}
- * for custom initialization.
+ * 发布有关请求处理的事件，无论是否成功处理了请求。
  *
- * <p>Detects a "contextClass" parameter at the servlet init-param level,
- * falling back to the default context class,
- * {@link org.springframework.web.context.support.XmlWebApplicationContext
- * XmlWebApplicationContext}, if not found. Note that, with the default
- * {@code FrameworkServlet}, a custom context class needs to implement the
- * {@link org.springframework.web.context.ConfigurableWebApplicationContext
- * ConfigurableWebApplicationContext} SPI.
+ * 子类必须实现doService来处理请求，因为这直接扩展了HttpServletBean而不是HttpServlet，所以bean属性会自动映射到到子类上。
+ * 子类可以重写initFrameworkServlet()进行自定义初始化Servlet。
+ * 如果未找到，则在servlet初始化参数级别检测“ contextClass”参数，并回退到默认上下文类XmlWebApplicationContext 。
  *
- * <p>Accepts an optional "contextInitializerClasses" servlet init-param that
- * specifies one or more {@link org.springframework.context.ApplicationContextInitializer
- * ApplicationContextInitializer} classes. The managed web application context will be
- * delegated to these initializers, allowing for additional programmatic configuration,
- * e.g. adding property sources or activating profiles against the {@linkplain
- * org.springframework.context.ConfigurableApplicationContext#getEnvironment() context's
- * environment}. See also {@link org.springframework.web.context.ContextLoader} which
- * supports a "contextInitializerClasses" context-param with identical semantics for
- * the "root" web application context.
+ * 请注意，使用默认的FrameworkServlet ，自定义上下文类需要实现ConfigurableWebApplicationContext SPI。
+ * 接受一个可选的“ contextInitializerClasses” Servlet初始化参数，该参数指定一个或多个ApplicationContextInitializer类。
+ * 托管的Web应用程序上下文将委派给这些初始化程序，从而允许进行其他编程配置，例如，添加属性源或针对上下文环境激活配置文件。
+ * 另请参阅ContextLoader ，它支持具有“ root” Web应用程序上下文相同语义的“ contextInitializerClasses”上下文参数。
+ * 将“ contextConfigLocation” Servlet初始化参数传递给上下文实例，将其解析为可能由多个逗号和空格分隔的多个文件路径，例如“ test-servlet.xml，myServlet.xml”。
+ * 如果未明确指定，则上下文实现应从Servlet的命名空间构建默认位置。
  *
- * <p>Passes a "contextConfigLocation" servlet init-param to the context instance,
- * parsing it into potentially multiple file paths which can be separated by any
- * number of commas and spaces, like "test-servlet.xml, myServlet.xml".
- * If not explicitly specified, the context implementation is supposed to build a
- * default location from the namespace of the servlet.
- *
- * <p>Note: In case of multiple config locations, later bean definitions will
- * override ones defined in earlier loaded files, at least when using Spring's
- * default ApplicationContext implementation. This can be leveraged to
- * deliberately override certain bean definitions via an extra XML file.
- *
- * <p>The default namespace is "'servlet-name'-servlet", e.g. "test-servlet" for a
- * servlet-name "test" (leading to a "/WEB-INF/test-servlet.xml" default location
- * with XmlWebApplicationContext). The namespace can also be set explicitly via
- * the "namespace" servlet init-param.
- *
- * <p>As of Spring 3.1, {@code FrameworkServlet} may now be injected with a web
- * application context, rather than creating its own internally. This is useful in Servlet
- * 3.0+ environments, which support programmatic registration of servlet instances. See
- * {@link #FrameworkServlet(WebApplicationContext)} Javadoc for details.
- *
+ * 注意：如果有多个配置位置，则至少在使用Spring的默认ApplicationContext实现时，较新的Bean定义将覆盖较早加载的文件中定义的定义。
+ * 可以利用它来通过一个额外的XML文件有意覆盖某些bean定义。
+ * 默认名称空间是“'servlet-name'-servlet”，例如，“-test-servlet”表示servlet-名称“ test”（通过XmlWebApplicationContext指向“ /WEB-INF/test-servlet.xml”默认位置）。
+ * 也可以通过“名称空间” servlet init-param显式设置名称空间。
+ * 从Spring 3.1开始，现在可以向FrameworkServlet注入Web应用程序上下文，而不是在内部创建它自己的上下文。
+ * 这在Servlet 3.0+环境中非常有用，该环境支持以编程方式注册Servlet实例。 有关详细信息，请参见FrameworkServlet(WebApplicationContext) Javadoc。
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -897,7 +867,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
-	 * Delegate POST requests to {@link #processRequest}.
+	 * 将POST请求委托给 {@link #processRequest}方法.
 	 * @see #doService
 	 */
 	@Override
@@ -979,9 +949,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
-	 * Process this request, publishing an event regardless of the outcome.
-	 * <p>The actual event handling is performed by the abstract
-	 * {@link #doService} template method.
+	 * 理此请求，发布事件，无论结果如何。
+	 * 实际的事件处理由抽象的{@link #doService} 模板方法执行.
 	 */
 	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

@@ -1057,8 +1057,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				dispatchException = ex;
 			}
 			catch (Throwable err) {
-				// As of 4.3, we're processing Errors thrown from handler methods as well,
-				// making them available for @ExceptionHandler methods and other scenarios.
+				// 从Spring4.3开始，它还处理从Handler方法引发的错误，使它们可用于@ExceptionHandler方法和其他情况。
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
 			//转发到目标页面
