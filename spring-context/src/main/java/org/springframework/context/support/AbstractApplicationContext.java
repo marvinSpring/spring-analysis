@@ -518,17 +518,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		synchronized (this.startupShutdownMonitor) {
 			//------------------------------ BeanFactory的创建及预准备工作  ------------------------------------------/
 			//1 刷新前的预处理
-			/*创建BeanFactory之前的一些准备工作，比如设置开启时间，激活状态，设置Environment，还可以扩展自定义子类实现等等*/
+			/*
+				创建BeanFactory之前的一些准备工作，比如设置开启时间，激活状态，设置Environment，还可以扩展自定义子类实现等等
+			*/
 			/*
 			   刷新前的预处理表示在真正做refresh操作之前需要准备做的事情：
-			   设置Spring容器的启动时间，开启活跃状态，撤销关闭状态验证环境信息里一些必须存在的属性等
+			   设置Spring容器的启动时间，开启活跃状态，撤销关闭状态，自定义实现一些环境变量以及验证环境信息里一些必须存在的属性等
 			 */
 			prepareRefresh();
 
 			//2 刷新内部bean工厂
 			//（1）获取BeanFactory；默认实现是DefaultListableBeanFactory
 			//（2）加载BeanDefinition 并注册到 BeanDefinitionRegistry
-			/* 获取一个新的BeanFactory,就是创建BeanDefinition对象的过程*/
+			/*
+				获取到一个新的BeanFactory,就是创建BeanDefinition对象的过程
+			*/
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			//3 BeanFactory的预准备工作
@@ -605,17 +609,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Prepare this context for refreshing, setting its startup date and
-	 * active flag as well as performing any initialization of property sources.
+	 * 准备Spring上下文以进行刷新、设置上下文的启动日期和活动标志以及执行任何属性源的初始化。
 	 */
 	//刷新前的预处理;
 	protected void prepareRefresh() {
-		// 设置开始时间，关闭状态为false，开启状态为true
+		// 设置开始时间，
 		this.startupDate = System.currentTimeMillis();
+		//设置关闭开启属性为激活状态
 		this.closed.set(false);
 		this.active.set(true);
-		//日志
+		//是否启用调试模式日志
 		if (logger.isDebugEnabled()) {
+			//日志是否启用追踪模式
 			if (logger.isTraceEnabled()) {
 				logger.trace("Refreshing " + this);
 			}
@@ -632,7 +637,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		/* 参见：ConfigurablePropertyResolver的setRequiredProperties();*/
 		getEnvironment().validateRequiredProperties();
 
-		// 储存预刷新 ApplicationListeners...
+		// 储存预刷新ApplicationListeners...
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
@@ -647,7 +652,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * <p>Replace any stub property sources with actual instances.
+	 * <p>用实际实例替换任何默认的属性源。
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */
@@ -665,6 +670,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	// 创建了一个BeanFactory
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		//创建了一个this.beanFactory = new DefaultListableBeanFactory();设置了序列化的ID
+		//刷新Bean工厂
 		refreshBeanFactory();//核心方法
 		return getBeanFactory();//返回刚才创建的DefaultListableBeanFactory
 	}
