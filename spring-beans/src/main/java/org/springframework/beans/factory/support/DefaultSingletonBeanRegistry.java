@@ -200,9 +200,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// 快速检查现有实例而无需锁定单例
 		Object singletonObject = this.singletonObjects.get(beanName);//1.先从一级缓存中找
-		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {//如果一级缓存中没有，但是当前bean正在创建中
+		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {//如果一级缓存中没有，并且当前bean正在创建中
 			singletonObject = this.earlySingletonObjects.get(beanName);//2.再从二级缓存中找
-			if (singletonObject == null && allowEarlyReference) {//如果二级缓存中也没有，但是允许循环依赖
+			if (singletonObject == null && allowEarlyReference) {//如果二级缓存中也没有，并且允许循环依赖
 				synchronized (this.singletonObjects) {//锁定当前bean
 					singletonObject = this.singletonObjects.get(beanName);/*再从一级缓存中找*/
 					if (singletonObject == null) {/*如果一级缓存中还没有*/
@@ -244,7 +244,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				//核心方法————将beanName放入singletonsCurrentlyInCreation容器中，表示当前bean正在被创建
+				//将beanName放入singletonsCurrentlyInCreation容器中，表示当前bean正在被创建
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -252,7 +252,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					//调用匿名类中的createBean方法
+					//核心方法————调用匿名类中的createBean方法,开始创建Bean对象
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -276,7 +276,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
-					//创建完实例，将singletonsCurrentlyInCreation容器中删除当前bean的beanName
+					//创建完实例，将实例对象从singletonsCurrentlyInCreation容器中删除,表示当前bean已经创建完成了
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {

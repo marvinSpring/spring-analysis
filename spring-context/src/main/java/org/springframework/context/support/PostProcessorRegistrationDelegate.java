@@ -59,8 +59,11 @@ final class PostProcessorRegistrationDelegate {
 		//这个集合中存的是已经处理过的bean
 		Set<String> processedBeans = new HashSet<>();
 
-		// 判断beanFactory的类型，如果beanFactory实现BeanDefinitionRegistry接口(默认创建的DefaultListableBeanFactory是实现了这个接口的)，
-		// 则调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法
+		/*
+		 * 	判断beanFactory的类型，如果beanFactory实现BeanDefinitionRegistry接口,
+		 * 	则调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法
+		 * 	ps:(默认创建的DefaultListableBeanFactory是实现了这个接口的)，
+ 		 */
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();

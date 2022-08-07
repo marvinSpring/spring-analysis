@@ -1,6 +1,12 @@
 package com.marvin.test.model;
 
-public class Dog {
+import org.springframework.beans.BeansException;
+import org.springframework.context.*;
+import org.springframework.core.env.Environment;
+
+public class Dog implements ApplicationContextAware, EnvironmentAware {
+
+	private ApplicationContext applicationContext;
 
 	private String size;
 
@@ -24,5 +30,19 @@ public class Dog {
 
 	public Dog(String size) {
 		this.size = size;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	public ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
+
+	@Override
+	public void setEnvironment(Environment environment) {
+
 	}
 }

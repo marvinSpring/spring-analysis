@@ -828,23 +828,30 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	@Override
-	//初始化剩下的单例bean
+	//初始化单例bean
 	public void preInstantiateSingletons() throws BeansException {
+		//日志
 		if (logger.isTraceEnabled()) {
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		//1）、获取容器中的所有Bean，依次进行初始化和创建对象
-		/* beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
-		   用于存放所有需要实例化的BeanDefinition的beanName*/
+		//1.获取容器中的所有Bean，依次对这些bean进行初始化和创建对象
+		/*
+			beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
+		   	用于存放所有需要实例化的BeanDefinition的beanName
+	    */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
+
 		// 实例化所有非懒加载的单例Bean
 		for (String beanName : beanNames) {
-			// 父子BeanDefinition合并
-			/*2）、获取Bean的定义信息；RootBeanDefinition*/
+			// 父子Bean定义信息的合并
+			/*
+				2.获取Bean的定义信息；RootBeanDefinition
+			*/
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			//3）、非抽象的，单实例的，非懒加载的Bean
+			//3.非抽象的，单实例的，非懒加载的Bean
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				//如果是工厂Bean则需要用&+beanName的方式获取Bean
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -866,7 +873,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					//核心方法————getBean
-					/*3.2）、不是工厂Bean。利用getBean(beanName);创建对象*/
+					/*
+						3.2非工厂Bean。使用getBean(beanName) 创建对象
+					*/
 					getBean(beanName);
 				}
 			}
