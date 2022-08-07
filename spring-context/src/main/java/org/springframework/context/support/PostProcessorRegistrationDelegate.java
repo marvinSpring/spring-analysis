@@ -209,7 +209,7 @@ final class PostProcessorRegistrationDelegate {
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
-		//1）、获取所有的 BeanPostProcessor;后置处理器都默认可以通过PriorityOrdered、Ordered接口来执行优先级
+		//1.获取所有的 BeanPostProcessor;后置处理器都默认可以通过PriorityOrdered、Ordered接口来执行优先级
 		/* 找到所有实现了BeanPostProcessor的类,将类名放入到postProcessorNames数组中*/
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
@@ -239,16 +239,17 @@ final class PostProcessorRegistrationDelegate {
 			}
 		}
 
-		// 注册实现PriorityOrdered接口的BeanPostProcessors实现类
-		/*  2）、先注册PriorityOrdered优先级接口的BeanPostProcessor；
+		// 2.注册实现PriorityOrdered接口的BeanPostProcessors实现类
+		/*
+			先注册PriorityOrdered优先级接口的BeanPostProcessor；
             把每一个BeanPostProcessor；添加到BeanFactory中
-            beanFactory.addBeanPostProcessor(postProcessor);*/
+            beanFactory.addBeanPostProcessor(postProcessor);
+         */
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
 		// 把对应的 BeanPostProcessor 对象注册到 BeanFactory 中，BeanFactory 中有一个 list 容器接收。
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
-		// 3）、再注册Ordered接口的
-		// 注册实现Ordered接口的BeanPostProcessors实现类
+		// 3.再注册实现Ordered接口的BeanPostProcessors实现类
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<>();
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -260,7 +261,7 @@ final class PostProcessorRegistrationDelegate {
 		sortPostProcessors(orderedPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
-		// 4）、最后注册没有实现任何优先级接口的
+		// 4.最后注册没有实现任何优先级接口的实现类
 		// 注册正常(普通的没有实现和继承任何其它奇奇怪怪的接口)的BeanPostProcessors实现类
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<>();
 		for (String ppName : nonOrderedPostProcessorNames) {
@@ -272,13 +273,13 @@ final class PostProcessorRegistrationDelegate {
 		}
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
-		// 5）、最终注册MergedBeanDefinitionPostProcessor；
+		// 5.最终注册MergedBeanDefinitionPostProcessor；
 		/* 最后，注册实现了MergedBeanDefinitionPostProcessor的BeanPostProcessors实现类*/
 		sortPostProcessors(internalPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
 		// 不重要
-		// 6）、注册一个ApplicationListenerDetector；判断创建完成的bean是否监听器
+		// 6.注册一个ApplicationListenerDetector；判断bean是否创建完成的监听器
 		/* 在Bean创建完成后ApplicationListenerDetector.postProcessAfterInitialization()中检查是否是ApplicationListener 类型，
 		   如果是applicationContext.addApplicationListener((ApplicationListener<?>) bean);从而添加到容器中 */
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
