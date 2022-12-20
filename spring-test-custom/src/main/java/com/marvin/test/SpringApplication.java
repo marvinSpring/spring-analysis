@@ -2,6 +2,7 @@ package com.marvin.test;
 
 import com.marvin.test.controller.TestController;
 import com.marvin.test.model.*;
+import com.marvin.test.self.tags.entity.Marvin;
 import com.marvin.test.service.TestService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -20,7 +21,7 @@ public class SpringApplication {
 
 	public static void main(String[] args) throws InterruptedException {
 		ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("applicationContext.xml");
-		System.out.println(applicationContext.getBean("testEntity"));
+		System.out.println(applicationContext.getBean("xxx", Marvin.class));
 //		ApplicationContext applicationContext = new AnnotationConfigApplicationContext("com.marvin.test.*");
 //		System.out.println(applicationContext.getBean(Log.class));
 //		ApplicationContext beanFactory = new ClassPathXmlApplicationContext("spring-${username}.xml");

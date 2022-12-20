@@ -130,6 +130,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			//自定义子类扩展实现
 			customizeBeanFactory(beanFactory);
 			//核心方法,解析各种方式配置的属性值（例如：xml、注解等方式配置bean）
+			//xml中1.默认命名空间的解析2.自定义格式的命名空间的解析
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}

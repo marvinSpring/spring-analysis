@@ -906,7 +906,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	// Implementation of BeanDefinitionRegistry interface
 	//---------------------------------------------------------------------
 
-	@Override
+	@Override//注册bean定义信息,key BeanName ,value beanDefinition
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
 
@@ -925,7 +925,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		//根据Bean名称获取BeanDefinition
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		//处理本次要被注册的bean已经注册的情况
 		if (existingDefinition != null) {
+			//如果本次要注册bean已经注册且在配置中配置了bean是否允许bean定义信息被覆盖,这里可以在customizeBeanFactory方法中自定义去指定是否允许
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			}
@@ -966,7 +968,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 			else {
-				// 核心方法————beanDefinitionMap放入键值对，beanDefinitionNames是个BeanName的list集合
+				// 核心方法-----注册beanDefinition----也就是注入到BeanFactory中————beanDefinitionMap放入键值对，beanDefinitionNames是个BeanName的list集合
 				// 这两个容器是DefaultListableFactory的，也就是属于最开始传入的BeanFactory容器中的两个属性
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
