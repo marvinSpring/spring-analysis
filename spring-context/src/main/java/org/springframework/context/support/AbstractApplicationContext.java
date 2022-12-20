@@ -160,14 +160,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 
-	//子类会使用这个日志
+	//创建日志,子类会用到这个日志处理器
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	//spring上下文的唯一id
+	//生成spring容器当前的id,容器对象的内存地址的hash值
 	private String id = ObjectUtils.identityToString(this);
 
 	/** Display name. */
-	//spring上下文的名称
+	//指定spring上下文的名称
 	private String displayName = ObjectUtils.identityToString(this);
 
 	/** Parent context. */
@@ -182,9 +182,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//BeanFactory的前置处理器
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
-	/** System time in milliseconds when this context started. */
 	//当前上下文启动的时间
 	private long startupDate;
+
 	//代表本上下文当前是否处于激活状态的状态
 	private final AtomicBoolean active = new AtomicBoolean();
 
@@ -225,13 +225,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
 
-	//创建一个没有父级的新AbstractApplicationContext。
+	//创建一个没有顶级的新AbstractApplicationContext。
 	public AbstractApplicationContext() {
+		//创建资源模式处理器
 		this.resourcePatternResolver = getResourcePatternResolver();
 	}
 
 	//使用给定的父上下文创建一个新的AbstractApplicationContext。
 	public AbstractApplicationContext(@Nullable ApplicationContext parent) {
+		/*
+			1.给容器创建一些初始化的对象设置
+			2.创建资源模式解析器
+			3.如果存在父级容器,则合并本容器和父级容器的环境配置(Environment)
+		 */
 		this();
 		setParent(parent);
 	}
@@ -450,10 +456,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getResources
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
-	//返回用于将路径解析为资源实例的ResourceLoader。
+	// 返回用于将路径解析为资源实例的ResourceLoader。
 	// 默认是一个 PathMatchingResourcePatternResolver
-	//支持ant表达式的路径。
+	// 支持ant表达式的路径。
 	protected ResourcePatternResolver getResourcePatternResolver() {
+		//用来解析xml文件
 		return new PathMatchingResourcePatternResolver(this);
 	}
 
@@ -536,7 +543,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 						1.2.创建空的DefaultListableBeanFactory
 						1.3.设置该工厂的序列号id
 						1.4.初始化工厂的属性（1.本工厂是否允许bean覆盖,2.本工厂是否允许bean中有循环依赖）
-						1.5.将各种方式配置的bean,从配置的状态加载成beanDefinition放在bean工厂中
+						1.5.将各种方式配置的bean,从配置的状态加载成beanDefinition放在bean工厂中--重要
 					2.获取bean工厂
 						2.1如果存在则返回该工厂对象
 			 */

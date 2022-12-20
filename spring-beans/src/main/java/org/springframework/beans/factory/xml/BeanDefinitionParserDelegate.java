@@ -516,7 +516,7 @@ public class BeanDefinitionParserDelegate {
 		try {
 			//创建GenericBeanDefinition对象
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-			//解析xml中的属性，将其包装到BeanDefinition对象中
+			//解析xml中的属性，将其属性填充到BeanDefinition对象对象的属性中
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
@@ -779,9 +779,9 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a constructor-arg element.
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
-		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
-		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
-		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
+		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);//获取构造方法参数的下标
+		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);//获取构造方法参数的类型
+		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);//获取钩子方法参数的名称
 		if (StringUtils.hasLength(indexAttr)) {
 			try {
 				int index = Integer.parseInt(indexAttr);
@@ -1382,11 +1382,11 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
-		String namespaceUri = getNamespaceURI(ele);
+		String namespaceUri = getNamespaceURI(ele);//获取这个自定义标签对应的命名空间
 		if (namespaceUri == null) {
 			return null;
 		}
-		//找到命名空间url对应的处理实例，且这个实例实现了NamespaceHandler接口，从当前类所在的jar包中的/META-INF中加载到spring.handler
+		//根据命名空间的url找到对应的处理实例，符合NamespaceHandler接口的实例，从当前类所在的jar包中的/META-INF中加载到spring.handler
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
