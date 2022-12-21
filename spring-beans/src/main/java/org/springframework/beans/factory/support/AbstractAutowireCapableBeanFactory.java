@@ -543,12 +543,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeanCreationException {
 
 		// bean的包装
+		//这个BeanWrapper是用来持有创建出来的Bean对象的包装容器
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
+			//如果该bean是单例,则将该bean从factoryBean的实力缓存中移除该bean的定义信息
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
 			//核心方法
+			//根据执行bean使用对应的策略创建新的bean实例，例如：工厂方法、构造函数、简单初始化
 			// 1）、【创建Bean实例】利用工厂方法或者对象的构造器创建出Bean实例；
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -1457,11 +1460,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+		//寻找beanWrapper中需要依赖注入的属性
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			if (containsBean(propertyName)) {
+				//递归(找到或者创建)到需要注入的被依赖的bean
 				Object bean = getBean(propertyName);
 				pvs.add(propertyName, bean);
+				//将被依赖的bean注册到本bean中
 				registerDependentBean(propertyName, beanName);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Added autowiring by name from bean name '" + beanName +

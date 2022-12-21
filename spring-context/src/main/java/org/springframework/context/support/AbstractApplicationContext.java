@@ -702,20 +702,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	*/
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		//1.为当前Bean工厂设置类加载器和SPEL表达式的解析器
-		/* 设置BeanFactory的类加载器：存在则直接设置/不存在则新建一个默认类加载器*/
+		/* 设置BeanFactory的类加载器为当前上下文的类加载器*/
 		beanFactory.setBeanClassLoader(getClassLoader());
 		/* 设置Spring EL表达式解析器（Bean初始化完成后填充属性时会用到）*/
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 
-		//2.设置属性注册解析器和BeanPostProcessor
-		/* 设置属性注册解析器PropertyEditor*/
+		//2.设置属性解析注册器和BeanPostProcessor
+		/* Bean工厂对Bean属性的管理(转换)的工具*/
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
-		//给当前beanFactory设置一个BeanPostProcessor为[ApplicationContextAwareProcessor]
+		//给当前beanFactory设置一个BeanPostProcessor为[ApplicationContextAwareProcessor 此类用于完成某些Aware对象的注入]
 		/* 将当前的ApplicationContext对象交给ApplicationContextAwareProcessor类来处理，从而可以在Aware接口实现类中注入applicationContext*/
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
 		//3.设置Bean工厂现在需要忽略的接口
-		//设置忽略的自动装配的接口EnvironmentAware、EmbeddedValueResolverAware、xxx；这些接口的实现类不能通过类型来自动注入
+		//设置忽略的自动装配的接口EnvironmentAware、EmbeddedValueResolverAware、xxx；这些接口的实现类不能通过类型来自动注入，因为它是被容器由set的方式注入的--ApplicationContextAwareProcessor已经将底下的aware处理了
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -731,6 +731,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				@Autowired
 				BeanFactory beanFactory
 		*/
+		//这里registerResolvableDependency意思是如果以下的这些key类出现了歧义，将优先使用value值，比如ResourceLoader就是this为优先推荐的，实现的功能相当于@Primary注解
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);

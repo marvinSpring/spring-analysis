@@ -1,5 +1,6 @@
 package com.marvin.test.model;
 
+import com.marvin.test.self.aware.MarvinAwarePostProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -20,6 +21,10 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 		setAllowBeanDefinitionOverriding(false);
 	}
 
+	@Override
+	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		beanFactory.addBeanPostProcessor(new MarvinAwarePostProcessor(this));
+	}
 
 
 	/*	@Override
