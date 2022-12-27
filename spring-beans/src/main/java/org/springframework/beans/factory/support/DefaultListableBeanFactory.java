@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.inject.Provider;
+//import javax.inject.Provider;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
@@ -1207,7 +1207,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return new DependencyObjectProvider(descriptor, requestingBeanName);
 		}
 		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
-			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
+//			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
+			return null;
 		}
 		else {
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
@@ -1993,22 +1994,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	private class Jsr330Factory implements Serializable {
 
-		public Object createDependencyProvider(DependencyDescriptor descriptor, @Nullable String beanName) {
-			return new Jsr330Provider(descriptor, beanName);
-		}
-
-		private class Jsr330Provider extends DependencyObjectProvider implements Provider<Object> {
-
-			public Jsr330Provider(DependencyDescriptor descriptor, @Nullable String beanName) {
-				super(descriptor, beanName);
-			}
-
-			@Override
-			@Nullable
-			public Object get() throws BeansException {
-				return getValue();
-			}
-		}
+//		public Object createDependencyProvider(DependencyDescriptor descriptor, @Nullable String beanName) {
+//			return new Jsr330Provider(descriptor, beanName);
+//		}
+//
+//		private class Jsr330Provider extends DependencyObjectProvider implements Provider<Object> {
+//
+//			public Jsr330Provider(DependencyDescriptor descriptor, @Nullable String beanName) {
+//				super(descriptor, beanName);
+//			}
+//
+//			@Override
+//			@Nullable
+//			public Object get() throws BeansException {
+//				return getValue();
+//			}
+//		}
 	}
 
 

@@ -66,12 +66,21 @@ import org.springframework.util.ClassUtils;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
 
 /**
- * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
- * {@link Configuration @Configuration} classes.
+ * ===================Warning你看到了一个===================
+ * 你看到了一个非常重要的一个BFPP哦
+ * =========================================================
  *
- * <p>Registered by default when using {@code <context:annotation-config/>} or
- * {@code <context:component-scan/>}. Otherwise, may be declared manually as
- * with any other BeanFactoryPostProcessor.
+ * 此类是拥有后置处理增强器能力的类,主要的功能是参与Bean工厂的构建,参与了Bean工厂所有配置类的解析,参见：
+ * 	1.解析@Configuration注解的配置类
+ * 	2.解析@ComponentScan注解 扫描的包
+ * 	3.解析@ComponentScans注解 扫描的包
+ * 	4.解析@Import注解
+ * 	5.解析@ImportSelector注解 自动注入类--SpringBoot的东西
+ *
+ * {@link BeanFactoryPostProcessor} 用于配置类注解 {@link Configuration @Configuration} 的引导处理。
+ *
+ * 使用 {@code <context：<p>annotation-config>} 或 {@code <context：component-scan>} 时默认注册。否
+ * 则，可以像使用任何其他 BeanFactoryPostProcessor 一样手动声明。
  *
  * <p>This post processor is priority-ordered as it is important that any
  * {@link Bean} methods declared in {@code @Configuration} classes have
@@ -133,7 +142,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	@Override
 	public int getOrder() {
-		return Ordered.LOWEST_PRECEDENCE;  // within PriorityOrdered
+		return Ordered.LOWEST_PRECEDENCE;  // 它是拥有 PriorityOrdered 层次能力的
 	}
 
 	/**

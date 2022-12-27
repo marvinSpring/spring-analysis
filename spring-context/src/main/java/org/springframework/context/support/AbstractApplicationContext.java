@@ -532,7 +532,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 					1.3获取环境对象,并加载当前系统的环境属性到Environment对象中
 					1.4设置监听器和对应事件的容器
 				*/
-			//spring容器-前戏
+			//-----------------------------[spring容器-前戏开始]------------------------
 			prepareRefresh();
 
 			//2 创建spring容器对象(DefaultListableBeanFactory) 同时加载配置文件的属性值到当前工厂中
@@ -548,22 +548,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 						2.1如果存在则返回该工厂对象
 			 */
 			//spring容器-初始化（创建）
+			//加载Bean的定义信息到内存中
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			//3 初始化bean工厂
 			/*对BeanFactory进行一些设置，比如设置spring容器的类加载器等*/
-			//spring容器-初始化（赋值）
+			//spring容器-初始化（赋值），对各种Bean工厂的属性进行公共的填充
 			prepareBeanFactory(beanFactory);
+			//-----------------------------[spring容器-前戏完成]------------------------
 
 			try {
 				//4 BeanFactory准备工作完成后的处理工作
 				/* 抽象方法，子类可以通过重写这个方法来在BeanFactory创建并准备完成以后做进一步的设置*/
-				//给bean工厂添加一些自定义的BeanFactoryPostProcessor
+				//使用  当前的   bean工厂的BeanFactoryPostProcessor的能力
 				postProcessBeanFactory(beanFactory);
 
-				//5 在上下文中调用BeanFactoryPostProcessor
-				/* 调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，从而对BeanDefinition和BeanFactory进行处理和管理*/
-				//大部分bean定义信息在这一步之后就已经注册成功了
+				//5 使用  所有的  已经注册好的BeanFactoryPostProcessor 能力
+				//调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，
+				//从而对Bean定义信息和Bean工厂进行处理和管理
+				/*大部分bean定义信息在这一步之后就已经注册成功了*/
 				invokeBeanFactoryPostProcessors(beanFactory);
 				//----------------------------------BeanFactory实例化+初始化完成---------------------------------------------------/
 
@@ -726,11 +729,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 4.注册可以解析的自动装配组件；可以直接在任何组件中自动注入：
 		/* BeanFactory、ResourceLoader、ApplicationEventPublisher、ApplicationContext*/
 		//注册后，这些接口功能可以在spring的任意组件中直接获取并使用
-		/*
-			其他组件中可以通过下面方式直接注册使用
-				@Autowired
-				BeanFactory beanFactory
-		*/
 		//这里registerResolvableDependency意思是如果以下的这些key类出现了歧义，将优先使用value值，比如ResourceLoader就是this为优先推荐的，实现的功能相当于@Primary注解
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
@@ -743,12 +741,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// 6.添加编译时的AspectJ；
+		//增加对aspectJ的支持，在Java中织入分为三种方式：1.编译器织入、2.类加载器织入、3.运行期织入，编译器织入指的是在Java编译器中采用特殊的编译器，将切面织入到Java类中
+		//类加载器方式则是通过特殊的类加载器，在类的字节码加载到jvm中的时候，织入切面，运行期织入则是采用cglib和jdk代理的方式进行切面的织入
+		//aspectJ提供了俩中织入方式，第一种是通过特殊的编译器，在编译器中，将aspectJ语言编写的切面类织入到Java类中，第二种则是在类加载期间织入，就是下面的load time weaving
 		if (beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
 			//添加一个[LoadTimeWeaverAwareProcessor]BeanPostProcessor
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			/* 设置一个临时的ClassLoader以进行类型匹配。*/
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
+
+
+		//将默认的系统环境的bean添加到BeanFactory的一级缓存中
 
 		// 7.给BeanFactory中注册一些能用的组件；
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {

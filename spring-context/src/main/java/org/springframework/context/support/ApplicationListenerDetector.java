@@ -30,6 +30,9 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 1.实例化完成后，如果bean是单例并且属于ApplicationListener的接口实现类、则加入到多播器里
+ * 2.bean销毁之前，如果bean是单例并且属于ApplicationListener的接口实现类、则从多播器中提前删除
+ *
  * {@code BeanPostProcessor} that detects beans which implement the {@code ApplicationListener}
  * interface. This catches beans that can't reliably be detected by {@code getBeanNamesForType}
  * and related operations which only work against top-level beans.

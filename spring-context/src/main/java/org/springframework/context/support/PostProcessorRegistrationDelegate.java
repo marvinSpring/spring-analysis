@@ -56,137 +56,183 @@ final class PostProcessorRegistrationDelegate {
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
-		//这个集合中存的是已经处理过的bean
+		//无论什么情况都会优先执行BeanDefinitionRegistryPostProcessor
+		//这个集合中存的是已经执行过的BFPP bean,防止重复执行
 		Set<String> processedBeans = new HashSet<>();
 
-		/*
-		 * 	判断beanFactory的类型，如果beanFactory实现BeanDefinitionRegistry接口,
-		 * 	则调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法
-		 * 	ps:(默认创建的DefaultListableBeanFactory是实现了这个接口的)，
- 		 */
+		//-----------
+		// 判断bean工厂是否支持bean定义信息的增删改查,如果当前bean工厂都不拥有bean定义信息的增删改查的能力的话,那去执行BDRPP也没有意义
+
+		//ps:(默认创建的DefaultListableBeanFactory是实现了这个接口的)，
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+			//此处的BeanDefinitionRegistryPostProcessor是BeanFactoryPostProcessor的子集、BeanFactoryPostProcessor主要增强操作的对象是bean工厂，
+			// 而BeanDefinitionRegistryPostProcessor主要增强操作的对象的Bean的定义信息
+			//存放BFPP的有规则,有等级的集合
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+			//存放BDRPP的集合
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
+
 			//得到所有的BeanFactoryPostProcessor  遍历
 			/* 在创建context时，通过调用#addBeanFactoryPostProcessor()方法，将实现了BeanFactoryPostProcessor的类实例化（通过new的方式），
 			   然后放入到集合中，在这里进行调用，如果用户不自己实现BeanFactoryPostProcessor(一般没有默认的实现类),则默认不会调用*/
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
+				//如果是BDRPP那么去执行BDRPP的逻辑
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
-					/* 调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法，对BeanDefinition进行增删改查*/
+					//调用实现BeanDefinitionRegistryPostProcessor接口的类的postProcessBeanDefinitionRegistry方法，对BeanDefinition进行增删改查
 					registryProcessor.postProcessBeanDefinitionRegistry(registry);
+					//添加到registryProcessor,用于在后续执行BFPP系列的方法
 					registryProcessors.add(registryProcessor);
 				}
 				else {
+					//否则,就是没有BDRPP能力而有BFPP能力的类,将这些类添加到regularPostProcessor中,也用于在后续执行BFPP系列的方法
 					regularPostProcessors.add(postProcessor);
 				}
 			}
 
 			// Do not initialize FactoryBeans here: We need to leave all regular beans
 			// uninitialized to let the bean factory post-processors apply to them!
-			// Separate between BeanDefinitionRegistryPostProcessors that implement
-			// PriorityOrdered, Ordered, and the rest.
+			// 分开 拥有PriorityOrdered、Ordered的BDRPP 和剩余没有排序能力的 BeanDefinitionRegistryPostProcessor
+			//用于本次要执行的BDRPP
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
-			// 从容器中获取所有的BeanDefinitionRegistryPostProcessor，
-			/* 首先，从beanFactory中找实现了BeanDefinitionRegistryPostProcessor的类*/
+			// 根据类型从容器中获取到所有的BeanDefinitionRegistryPostProcessor
+			/* 首先，从beanFactory中找所有有BeanDefinitionRegistryPostProcessor能力的类*/
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
-			//  第一步，先执行实现了PriorityOrdered接口的BeanDefinitionRegistryPostProcessor
+			//  第一步，先执行有PriorityOrdered排序能力的BeanDefinitionRegistryPostProcessor
 			for (String ppName : postProcessorNames) {
-				/* 判断类上是否存在实现了PriorityOrdered排序接口，如果存在，则调用getBean将其实例化放入currentRegistryProcessors中*/
-				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+				/* 判断类上是否存在实现了PriorityOrdered排序接口，如果存在，则调用getBean将其实例化后放入currentRegistryProcessors中*/
+				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {//判断当前这个每次的BDRPP是否有PriorityOrdered的能力
+					//获取有PriorityOrdered能力的BDRPP实例然后添加到 当前马上要增删改查的后置处理器 中
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
+					//将该名称标记在 执行后的后置处理器集合 中，表示该BDRPP对象已经马上要被执行过了,防止底下的人重复执行
 					processedBeans.add(ppName);
 				}
 			}
-			//排序
+			//对当前的这些有PriorityOrdered能力的BDRPP根据其优先级去排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
-			/* 排序后放入另外一个集合中，最后进行调用*/
+			// 将排序后的BDRPP放入另外一个registryProcessors集合中，用于最后执行BFPP的能力方法
 			registryProcessors.addAll(currentRegistryProcessors);
-			//执行BeanDefinitionRegistryPostProcessor的 postProcessor.postProcessBeanDefinitionRegistry(registry)
+			//遍历执行BDRPP的能力方法
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
-			/* 清空currentRegistryProcessors*/
+			//将当前要执行的currentRegistryProcessors集合清空，以便后面重复利用这个集合
 			currentRegistryProcessors.clear();
 
-			//在执行实现了Ordered顺序接口的BeanDefinitionRegistryPostProcessor；
+			//第二步，再执行拥有Ordered能力的BeanDefinitionRegistryPostProcessor
+			//这里再次去根据 类型 寻找的原因是在上面代码执行的过程中,在invokeBeanDefinitionRegistryPostProcessor方法中可能又新增了其他的BDRPP
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
-				//判断类上是否还实现了Ordered排序接口，如果存在，则调用getBean将其实例化放入currentRegistryProcessors中
+				//过滤拥有Ordered能力但是未被上面执行过的bean----->也就是拥有Ordered能力但是大概率不拥有PriorityOrdered能力,
+				// 如果在上面的invokeBeanDefinitionRegistryPostProcessor中才新增的PriorityOrdered能力者将在下面一并执行
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
+					//获取只有Ordered能力的BDRPP实例然后添加到 当前马上要增删改查的后置处理器 中
 					currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
+					//继续添加这些只有Ordered能力的BDRPP的bean到 已经马上要处理完成的后置处理器集合 中
 					processedBeans.add(ppName);
 				}
 			}
-			//排序
+			//这次按照Ordered能力去排序
 			sortPostProcessors(currentRegistryProcessors, beanFactory);
+			//添加当前这些Ordered能力者到 增删改查增强器集合 中,用于最后使用他们的BFPP能力
 			registryProcessors.addAll(currentRegistryProcessors);
-			//执行postProcessor.postProcessBeanDefinitionRegistry(registry)
+			//遍历执行他们拥有的BDRPP的能力
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
+			//继续清理当前的 增删改查增强器集合 以便后面继续循环利用
 			currentRegistryProcessors.clear();
 
-			// 最后执行没有实现任何优先级或者是顺序接口的BeanDefinitionRegistryPostProcessors；
+			// 第三步 执行不拥有任何优先级或者是顺序能力的 Bean定义信息增删改查器
+			//这个reiterate标记代表是否要继续迭代这个while
 			boolean reiterate = true;
 			while (reiterate) {
 				reiterate = false;
+				//找到剩下没有PriorityOrdered也没有Ordered能力的BDRPP
 				postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
-				/* 调用其他没有实现Ordered或者PriorityOrdered接口，只实现BeanDefinitionRegistryPostProcessor的类*/
+				//调用 其他没有Ordered或者PriorityOrdered能力，只是有BeanDefinitionRegistryPostProcessor的能力的方法
 				for (String ppName : postProcessorNames) {
+					//当然,上面这个根据类型找还是会把有PriorityOrdered能力者和Ordered能力者找出来,把他们skip掉,
+					// 也就是用上面的这个执行过的增强器集合去筛选剩下的无排序能力者的BDRPP
 					if (!processedBeans.contains(ppName)) {
+						//将这些没有能力的再次的加入到 当前马上要执行的Bean增删改查增强器集合 中
 						currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
+						//然后把这些 马上要被处理完成的继续标记到 即将处理完成的集合中
 						processedBeans.add(ppName);
+						//如果还能找到要处理的这些无能力者,那么就继续再次看看能不能找到更多的无能力者
+						// @see invokeBeanDefinitionRegistryPostProcessors,这里面可能被子类扩展出新的 无能力者,这样的话就又需要循环一次了
 						reiterate = true;
 					}
 				}
+				//按照优先级对他们进行排序,如果有的话,因为这里还是有可能被上面的invokeBeanDefinitionRegistryPostProcessors方法派生出有排序能力的BDRPP们
 				sortPostProcessors(currentRegistryProcessors, beanFactory);
+				//继续将 当前的这些Bean的增删改查增强器 加入 增删改查增强器集合中 以便后面统一他们的使用BFPP的能力
 				registryProcessors.addAll(currentRegistryProcessors);
+				//这里大概里只执行没有任何排序能力者的BDRPP能力
 				invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
+				//继续清理 当前的增删改查增强器集合 这里不是没意义的,因为有可能有下次循环
+				// @see reiterate
+				// 哪怕没有下次循环了,也清空掉比较合理,于程序设计来说这里清理是属于有头有尾,于GC来讲,也可以尽快将其加入老年代区域进行清理
 				currentRegistryProcessors.clear();
 			}
 
+			//使用上面层层获取到的BFPP能力
 			/* 调用所有实现BeanDefinitionRegistryPostProcessor中的postProcessBeanFactory方法*/
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
+			//当前bean工厂支持 增删改查器的 使用外部入参的BFPP能力
 			/* 调用在addBeanFactoryPostProcessor()中已经创建好的对象的postProcessBeanFactory方法*/
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
 		}
 
 		else {
-			//若ApplicationContext不是实现的BeanDefinitionRegistry，则直接调用提前创建好对象的postProcessBeanFactory方法
+			//当前bean工厂不支持 增删改查增强器的 使用外部入参的只有BFPP能力者的BFPP能力
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
 
-		// 再执行BeanFactoryPostProcessor的方法
-		// 1）、获取所有的BeanFactoryPostProcessor  和执行BeanDefinitionRegistryPostProcessors的接口逻辑一样
+		//-------------
+		//到此为止、入参中外部的BFPP和容器内的BDRPP能力者已经全部处理完成了,接下来要处理容器内的BFPP
+
+		// 再执行内部的BFPP的能力者的BFPP能力
+		// 1）、根据类型获取所有的BFPP者
+		// 和执行BDRPP的能力者的逻辑大致一样
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
-		//把BeanFactoryPostProcessor  分类
+		//把BFPP分类 分为:
+		//1.有优先级能力的实力派兼有背景BFPP
 		List<BeanFactoryPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
+		//2.只有Ordered能力的有背景的BFPP
 		List<String> orderedPostProcessorNames = new ArrayList<>();
+		//3.最后是啥几把能力没有 没有实力也没有背景的 小瘪三级别的BFPP
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+
+		//循环这些BFPP,过滤分配到上面的分类集合中
 		for (String ppName : postProcessorNames) {
+			//这些BFPP已经被上面的BDRPP能力者领域执行过就跳过,防止重复执行
 			if (processedBeans.contains(ppName)) {
 			}
-			/* 按PriorityOrdered和Ordered分组实例化（getBean）实现类*/
+			//判断是否是有实力的PriorityOrdered的BFPP能力者
 			else if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
 				priorityOrderedPostProcessors.add(beanFactory.getBean(ppName, BeanFactoryPostProcessor.class));
 			}
+			//判断是否是有背景的Ordered的BFPP能力者
 			else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
 				orderedPostProcessorNames.add(ppName);
 			}
+			//判断是不是啥也不是的小瘪三 BFPP能力者
 			else {
 				nonOrderedPostProcessorNames.add(ppName);
 			}
 		}
 
-		// 2）、看先执行实现了PriorityOrdered优先级接口的BeanFactoryPostProcessor、
+		// 2）、先对拥有优先级排序的BFPP能力者进行排序
 		/* 分组调用实现类(实现了PriorityOrdered和BeanFactoryPostProcessors的实现类)，和上边的逻辑一样*/
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+		//再根据排序后的BFPP能力者进行BFPP能力的使用
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 
-		// 3）、在执行实现了Ordered顺序接口的BeanFactoryPostProcessor；
+		// 3）、其次对拥有普通Ordered的BFPP能力者进行排序调用
+		//需要注意的是,上下文其实不确定这会是不是又被invokeBeanFactoryPostProcessors这个方法派生了新的BFPP出来,所以再往这个 orderedPostProcessors 集合里塞刚找到的新鲜的BFPP
 		/* 接下来，调用实现Ordered的BeanFactoryPostProcessors。*/
 		List<BeanFactoryPostProcessor> orderedPostProcessors = new ArrayList<>();
 		for (String postProcessorName : orderedPostProcessorNames) {
@@ -195,14 +241,19 @@ final class PostProcessorRegistrationDelegate {
 		sortPostProcessors(orderedPostProcessors, beanFactory);
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
 
-		// 4）、最后执行没有实现任何优先级或者是顺序接口的BeanFactoryPostProcessor；
+		// 4）、最后对这些普通的小瘪三BFPP进行能力使用,那他们也没有啥排序能力干脆就不排了
+		// 但是和第三步同样需要注意是不是上一步的 invokeBeanFactoryPostProcessors 这个方法又新增啥东西进去了,不知道,所以梅开二度,我再去找一遍呗
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<>();
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 
-		//清除缓存（postProcessor修改的数据）
+		//清除缓存（postProcessor修改的数据）,mergedBeanDefinitions、allBeanNamesByType、singletonBeanNameByType
+		//上面在执行后置处理器的过程中,派生的子类扩展可能把这些修改掉了,比如替换符中的占位符$改成个%,类似这样的
+
+		//ps:有头有尾,这里一般开发者想不到哦,因为这个头不是最开始开的,
+		//而是子类派发的扩展的方法执行出来的缓存,这个东西要开发者提前把spring的BFPP后置增强器能做什么,生命周期等提前想好
 		beanFactory.clearMetadataCache();
 	}
 
@@ -286,13 +337,21 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 	private static void sortPostProcessors(List<?> postProcessors, ConfigurableListableBeanFactory beanFactory) {
+		//如果集合只有一个或者一个都没有,没必要排序了,走吧
+		if (postProcessors.size() <=1 ){
+			return;
+		}
 		Comparator<Object> comparatorToUse = null;
+		//判断是否是可罗列的Bean工厂
 		if (beanFactory instanceof DefaultListableBeanFactory) {
+			//获取依赖的比较器
 			comparatorToUse = ((DefaultListableBeanFactory) beanFactory).getDependencyComparator();
 		}
 		if (comparatorToUse == null) {
+			//如果没设置依赖的比较器,则使用一个默认的比较器
 			comparatorToUse = OrderComparator.INSTANCE;
 		}
+		//使用 比较器 对 后置增强器 进行排序
 		postProcessors.sort(comparatorToUse);
 	}
 

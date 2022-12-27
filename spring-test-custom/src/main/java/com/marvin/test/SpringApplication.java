@@ -29,7 +29,7 @@ public class SpringApplication {
 //		Dog dog = beanFactory.getBean("dog", Dog.class);
 //		ApplicationContext applicationContext = dog.getApplicationContext();
 //		System.out.println(applicationContext);
-		ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("marvinEditorConfig.xml");
+		ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("applicationContext.xml");
 //		User user = applicationContext.getBean("user", User.class);
 //		System.out.println(user);
 		System.out.println(applicationContext.getDisplayName());

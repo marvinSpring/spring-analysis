@@ -10,8 +10,8 @@
        http://www.springframework.org/schema/context
 	   http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>
-
+<!--	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>-->
+	<context:component-scan base-package="com.marvin.*"/>
 <!--
 	<context:property-placeholder location="classpath:databse.properties"/>
 
