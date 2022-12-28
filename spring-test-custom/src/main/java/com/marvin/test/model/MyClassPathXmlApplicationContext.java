@@ -1,7 +1,7 @@
 package com.marvin.test.model;
 
 import com.marvin.test.self.aware.MarvinAwarePostProcessor;
-import com.marvin.test.self.bfpp.MarvinBeanFactoryPostProcessor;
+//import com.marvin.test.self.bfpp.MarvinBeanFactoryPostProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;

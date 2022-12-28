@@ -161,9 +161,12 @@ class ConfigurationClassParser {
 
 
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
+		//循环遍历 配置类 BeanDefinition
 		for (BeanDefinitionHolder holder : configCandidates) {
+			//从单例中获取Bean定义信息
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				//根据BeanDefinition类型的不同,调用不同的解析方法去解析Bean的定义信息,实际最终都会调到processConfigClass()方法
 				if (bd instanceof AnnotatedBeanDefinition) {
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
@@ -216,10 +219,12 @@ class ConfigurationClassParser {
 
 
 	protected void processConfigurationClass(ConfigurationClass configClass) throws IOException {
+		//判断是否应该跳过解析
 		if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
 			return;
 		}
 
+		//处理已经被导入的情况,当前类是否被别的类Import
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
 		if (existingClass != null) {
 			if (configClass.isImported()) {
@@ -238,12 +243,19 @@ class ConfigurationClassParser {
 		}
 
 		// Recursively process the configuration class and its superclass hierarchy.
+
+		//处理 配置类 ,由于配置类可能存在父类（如果父类的全类名是以Java开头,则排除）,所以需要将configClass变成sourceClass去解析,然后返回sourceClass的父类
+		//如果此时父类为空,则不会进行while循环,如果父类不为空,则会继续循环解析父类
+		//SourceClass的意义：简单的包装类、目的就是为了统一去处理带有注解的类，不管这些类是如果被加载的
+		//这里不是很重要的地方
 		SourceClass sourceClass = asSourceClass(configClass);
 		do {
+			//解析 配置类身上的这些注解
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass);
 		}
 		while (sourceClass != null);
 
+		//将解析的 配置类 存储起来,方便到parse方法的时候能方便的获取到这些配置类
 		this.configurationClasses.put(configClass, configClass);
 	}
 

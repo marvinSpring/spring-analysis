@@ -79,10 +79,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
+import org.springframework.util.*;
 
 /**
  *{@link org.springframework.context.ApplicationContext}接口的抽象实现。
@@ -785,7 +782,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 实例化并调用所有已经注册的BeanFactoryPostProcessorBean，
+	 * <p>实例化<p/> 并 <p>调用</p> 所有已经注册的BeanFactoryPostProcessorBean，
 	 * 如果给定的排序的话就遵循显式顺序，该方法在单例Bean被实例化之前被调用。
 	 */
 	//执行BeanFactoryPostProcessor的后置处理器方法
@@ -793,7 +790,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 执行BeanFactoryPostProcessor的方法
 		/* 调用所有实现了BeanDefinitionRegistryPostProcessor和 BeanFactoryPostProcessor接口的实现类方法*/
  		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
-
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		if (beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
