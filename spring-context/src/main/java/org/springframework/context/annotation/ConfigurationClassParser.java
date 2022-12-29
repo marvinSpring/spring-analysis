@@ -224,11 +224,17 @@ class ConfigurationClassParser {
 			return;
 		}
 
+		//第一次进入的时候configurationClasses的size为0，existingClass肯定为null，在此处理configuration重复import的问题
+		//如果同一个 配置类 被处理俩次，俩次都属于被import的注解合并导入类。返回，如果配置类不是被导入的，则移除旧的导入的类，使用新的配置类
+
 		//处理已经被导入的情况,当前类是否被别的类Import
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
 		if (existingClass != null) {
+			//判断配置类是否是被导入的
 			if (configClass.isImported()) {
+				//判断已经存在的配置类和新的配置类是否都是被导入的
 				if (existingClass.isImported()) {
+					//如果都是被导入的则合并这俩个配置类
 					existingClass.mergeImportedBy(configClass);
 				}
 				// Otherwise ignore new imported config class; existing non-imported class overrides it.
@@ -250,7 +256,7 @@ class ConfigurationClassParser {
 		//这里不是很重要的地方
 		SourceClass sourceClass = asSourceClass(configClass);
 		do {
-			//解析 配置类身上的这些注解
+			//解析 配置类身上的这些注解 如果当前配置类解析完成都没有子类是配置类的话那么这里返回null ，如果有那就再进入while继续解析当前配置类的子类配置类
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass);
 		}
 		while (sourceClass != null);
@@ -271,12 +277,16 @@ class ConfigurationClassParser {
 	protected final SourceClass doProcessConfigurationClass(ConfigurationClass configClass, SourceClass sourceClass)
 			throws IOException {
 
+		//判断当前配置类的注解元数据是否是@Component注解
+		//注意：@Configuration是继承了@Component注解的
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
 			// Recursively process any member (nested) classes first
+			//递归 调用 doProcessConfigurationClass方法 处理 成员内部类 如果内部类也是一个配置类的话
 			processMemberClasses(configClass, sourceClass);
 		}
 
 		// Process any @PropertySource annotations
+		//如果配置类上加了@PropertySource注解,那么就解析properties文件，并将其属性添加到Spring的上下文中的环境对象中
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
@@ -290,21 +300,36 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @ComponentScan annotations
+
+		//如果当前配置类有被@ComponentScan标识或者有被@ComponentScans标识、那么就将该注解标识的包下的bean扫描并转换成填充后的 configurationClass
+		//此处就是将自定义的Bean加入到IOC容器中，因为扫描到的类可能也被@ComponentScan或者@ComponentScans注解所标识，因此这里也是递归解析 当前配置类 的
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
 		if (!componentScans.isEmpty() &&
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
+
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+
+				//解析@ComponentScan或@ComponentScans注解配置的扫描的包所含的类
+				//比如 basePackages = com.marvin ,那么在这一步会扫描这个包及其子包下的Class,然后将其解析为BeanDefinition
+				//BeanDefinition 约等于 BeanDefinitionHolder
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
+
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
+
+				//通过上一步扫描到的com.marvin包,有可能扫描出来的Bean也被@ComponentScan或者@ComponentScans注解所标识,
+				//所以在这里需要遍历所有扫描出来的Bean,使用这里 parse的方法 进行递归解析 ,知道解析出来的类上面没有包含@ComponentScan或者@ComponentScans
 				for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
 					BeanDefinition bdCand = holder.getBeanDefinition().getOriginatingBeanDefinition();
 					if (bdCand == null) {
 						bdCand = holder.getBeanDefinition();
 					}
+
+					//判断当前配置类是否是一个配置类,并设置其full或者lite属性
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, this.metadataReaderFactory)) {
+						//使用方法点 parse 递归遍历解析这个配置类 @ComponentScan 或 s 注解扫描到的类
 						parse(bdCand.getBeanClassName(), holder.getBeanName());
 					}
 				}
@@ -312,9 +337,11 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		//处理当前类上面的 @Import注解
 		processImports(configClass, sourceClass, getImports(sourceClass), true);
 
 		// Process any @ImportResource annotations
+		//处理当前配置类上面的@ImportSource注解,导入spring的配置文件
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
 		if (importResource != null) {
@@ -327,26 +354,33 @@ class ConfigurationClassParser {
 		}
 
 		// Process individual @Bean methods
+
+		//处理当前配置类上面标识的@Bean注解,将@Bean标记的方法转化为BeanMethod对象,再将其保存到 configClass 集合中
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
 		// Process default methods on interfaces
+		//处理接口中默认的方法实现,JDK1.8中,接口中的方法被default修饰后可以有默认的实现,因此如果这个当前配置类是一个接口并且默认方法中标识了@Bean注解,我也要去处理解析
 		processInterfaces(configClass, sourceClass);
 
 		// Process superclass, if any
+		//解析当前配置类的父类,如果被解析的配置类继承了某个父类,那么当前配置类的父类也会尝试去被解析
 		if (sourceClass.getMetadata().hasSuperClass()) {
 			String superclass = sourceClass.getMetadata().getSuperClassName();
 			if (superclass != null && !superclass.startsWith("java") &&
 					!this.knownSuperclasses.containsKey(superclass)) {
 				this.knownSuperclasses.put(superclass, configClass);
+
 				// Superclass found, return its annotation metadata and recurse
+				//这里返回了当前配置类的父类,会被方法外面的do-while循环去循环解析父类
 				return sourceClass.getSuperClass();
 			}
 		}
 
 		// No superclass -> processing is complete
+		//直到这里,说明也没有父类了,父类的父类已经是java.lang.Object了，已经被榨干了,说明外面的方法可以走掉了
 		return null;
 	}
 
@@ -354,26 +388,43 @@ class ConfigurationClassParser {
 	 * Register member (nested) classes that happen to be configuration classes themselves.
 	 */
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass) throws IOException {
+
+		//找到当前配置类的 内部类们
 		Collection<SourceClass> memberClasses = sourceClass.getMemberClasses();
+
+		//如果有内部类的话
 		if (!memberClasses.isEmpty()) {
 			List<SourceClass> candidates = new ArrayList<>(memberClasses.size());
+
+			//循环判断是否是配置类,如果是配置类的话就加到 candidates 集合中
 			for (SourceClass memberClass : memberClasses) {
+				//判断当前内部类 是否是 配置类
 				if (ConfigurationClassUtils.isConfigurationCandidate(memberClass.getMetadata()) &&
 						!memberClass.getMetadata().getClassName().equals(configClass.getMetadata().getClassName())) {
 					candidates.add(memberClass);
 				}
 			}
+
+			//对内部类们进行一个排序
 			OrderComparator.sort(candidates);
+
+			//遍历找到所有符合规则的配置类
 			for (SourceClass candidate : candidates) {
+
+				//判断import的配置类是否被循环重复导入了
 				if (this.importStack.contains(configClass)) {
 					this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 				}
 				else {
+					//将配置类入栈
 					this.importStack.push(configClass);
 					try {
+
+						//调用 processConfigurationClass 方法进入递归解析,因为当前内部类中可能还有为配置类的内部类
 						processConfigurationClass(candidate.asConfigClass(configClass));
 					}
 					finally {
+						//配置类解析完成 出栈
 						this.importStack.pop();
 					}
 				}

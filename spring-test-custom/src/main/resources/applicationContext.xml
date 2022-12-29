@@ -11,7 +11,7 @@
 	   http://www.springframework.org/schema/context/spring-context.xsd">
 
 <!--	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>-->
-	<context:component-scan base-package="com.marvin.test.self.bfpp.configurationbfpp"/>
+	<context:component-scan base-package="com.marvin.test.self.anno"/>
 <!--
 	<context:property-placeholder location="classpath:databse.properties"/>
 

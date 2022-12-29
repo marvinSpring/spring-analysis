@@ -272,12 +272,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * {@link Configuration} classes.
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
-		//存放BeanDefinition的单例holder集合
+		//存放配置类的 BeanDefinition的单例holder集合
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
 		//当前registry就是DefaultListableBeanFactory，获取所有已经注册的BeanDefinition和BeanName
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
-		//遍历所有需要处理的beanName
+		//遍历所有需要处理的beanName,筛选出配置类的Bean定义信息存入 configCandidates集合中
 		for (String beanName : candidateNames) {
 			//根据beanName获取指定的BeanDefinition
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
@@ -288,7 +288,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
-			//判断当前BeanDefinition的元Bean对象的类上面是否有@Configuration或其他配置类标识（例如：@Bean、@Component、@ComponentScan、@Import、@ImportSource）
+			//判断当前BeanDefinition的元Bean对象的类上面是否有@Configuration或其他配置类标识
+			// （例如：@Bean、@Component、@ComponentScan、@Import、@ImportSource）
+			//如果Configuration配置proxyBeanMethods代理为true则为full
+			//如果加了@Bean、@Component、@ComponentScan、@Import、@ImportSource注解则为lite
+			//如果配置类被@Order注解修饰,则设置beanDefinition的order属性值
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				//将这些特殊的bean添加到 存放BeanDefinition的单例holder集合 中
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
@@ -300,7 +304,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return;
 		}
 
-		//如果该 配置类BeanDefinition 还有@Order注解 那么给它们排个序
+		//如果该 配置类BeanDefinition 还有@Order注解 那么给它们按照Order顺序的值 从小到大 排个序
 		// Sort by previously determined @Order value, if applicable
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());
@@ -312,10 +316,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		//判断当前的bean增删改查器 是否属于 SingletonBean的增删改查器
 		SingletonBeanRegistry sbr = null;
 		if (registry instanceof SingletonBeanRegistry) {
-			//属于就强转未SingletonBean增删改查器
+			//属于就强转为SingletonBean增删改查器
 			sbr = (SingletonBeanRegistry) registry;
 			//判断是否有自定义的BeanName生成器
-			if (!this.localBeanNameGeneratorSet) {
+			if (!this.localBeanNameGeneratorSet) {//如果检测到自定义的BeanName生成器,那就给他们重新起个自定义的名字
 				//获取自定义的BeanName生成器
 				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(CONFIGURATION_BEAN_NAME_GENERATOR);
 				//如果找到了BeanName生成器
@@ -347,6 +351,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 
 		do {
+			//================Warning===============
+			//恭喜你又闯了Boss的老窝了,这里的Spring的一些核心注解的解析工作
+
+
 			//解析符合配置类规范的Bean
 			// 例如：有这些标识描述的 (@Controller、@Import、@ImportSource、@ComponentScan、@Bean ) BeanDefinition
 			parser.parse(candidates);

@@ -272,26 +272,45 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+
+		//遍历所有的包
 		for (String basePackage : basePackages) {
-			//扫描到有注解的类，并封装成BeanDefinition类
+			//将当前包进行一个扫描,并将扫描到有注解的类封装成BeanDefinition类
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 
+			//遍历当前包下 所有 符合规范的bean
 			//填充BeanDefinition信息
 			for (BeanDefinition candidate : candidates) {
+
+				//解析当前bean的@Scope注解,包括scopeName和scopeProxy
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+
+				//使用bean名称生成器来获取beanName
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+
+				//如果当前bean是Spring默认的bean
 				if (candidate instanceof AbstractBeanDefinition) {
+					//处理BeanDefinition对象,例如,此bean是否可以被自动装配到其他的bean中
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+
+				//如果当前bean是注解注入的bean
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					//处理定义在bean上面的通用注解,例如：@Lazy、@Primary、@DependesOn、@Role、@Description
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+
+				//检查beanName是否已经被注册过,如果注册了,检查是否兼容
 				if (checkCandidate(beanName, candidate)) {
+					//将当前bean的beanDefinition和beanName封装成beanDefinitionHolder对象
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
+					//根据proxyMode的值,选择是否创建作用域代理对象
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+					//将该beanDefinitionHolder加到 beanDefinitions 集合中
 					beanDefinitions.add(definitionHolder);
+
 					//将BeanDefinition注册到BeanFactory中
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
