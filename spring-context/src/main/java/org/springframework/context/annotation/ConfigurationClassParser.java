@@ -570,8 +570,11 @@ class ConfigurationClassParser {
 	 * Returns {@code @Import} class, considering all meta-annotations.
 	 */
 	private Set<SourceClass> getImports(SourceClass sourceClass) throws IOException {
+		//存储 获取到的具体的每个@import注解最终要导入的类
 		Set<SourceClass> imports = new LinkedHashSet<>();
+		//存储 递归获取import的关系,为了递归去使用
 		Set<SourceClass> visited = new LinkedHashSet<>();
+		//真正获取并收集@import注解到上面俩个集合中
 		collectImports(sourceClass, imports, visited);
 		return imports;
 	}
@@ -584,17 +587,23 @@ class ConfigurationClassParser {
 	 * <p>For example, it is common for a {@code @Configuration} class to declare direct
 	 * {@code @Import}s in addition to meta-imports originating from an {@code @Enable}
 	 * annotation.
-	 * @param sourceClass the class to search
-	 * @param imports the imports collected so far
-	 * @param visited used to track visited classes to prevent infinite recursion
+	 * @param sourceClass 当前 配置类
+	 * @param imports 迄今为止收集到的类
+	 * @param visited 用于跟踪访问的类以防止无限递归
 	 * @throws IOException if there is any problem reading metadata from the named class
 	 */
 	private void collectImports(SourceClass sourceClass, Set<SourceClass> imports, Set<SourceClass> visited)
 			throws IOException {
 
+		//将当前 配置类 加到visited集合中，这里add是Set结构的，如果有重复的就跳过了,不会继续去重复收集注解
 		if (visited.add(sourceClass)) {
+			//获取当前 配置类中 所有标识的注解
 			for (SourceClass annotation : sourceClass.getAnnotations()) {
+				//获取当前 配置类 中所有注解的名称
 				String annName = annotation.getMetadata().getClassName();
+				//判断注解名称是否不是 @Import ,
+				// 因为如果不是@import那么就需要看当前注解里面是否有@import，
+				// 如果是@Import就将该注解要导入的类存放到 imports集合中
 				if (!annName.equals(Import.class.getName())) {
 					collectImports(annotation, imports, visited);
 				}
