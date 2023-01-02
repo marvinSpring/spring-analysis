@@ -22,10 +22,10 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 		setAllowBeanDefinitionOverriding(false);
 	}
 
-	@Override
-	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		beanFactory.addBeanPostProcessor(new MarvinAwarePostProcessor(this));
-	}
+//	@Override
+//	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+//		beanFactory.addBeanPostProcessor(new MarvinAwarePostProcessor(this));
+//	}
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 //		beanFactory.getBeanDefinition("teacher").setLazyInit(true);

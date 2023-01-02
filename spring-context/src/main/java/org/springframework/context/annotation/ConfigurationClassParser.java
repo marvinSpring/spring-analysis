@@ -186,6 +186,8 @@ class ConfigurationClassParser {
 			}
 		}
 
+		//上面 doProcessConfigurationClass 方法执行完成,所有的那几个注解标注的 配置类(除了@Import导入的 并且是有延期处理能力的类)都已经处理完成
+		//将上面 doProcessConfigurationClass 方法中@Import注解导入的 拥有DeferredImportSelector 延期处理能力的,也就是需要再所有配置类处理好之后才能开始处理的 配置类进行处理
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -266,6 +268,8 @@ class ConfigurationClassParser {
 	}
 
 	/**
+	 * 真正去处理@ComponentScan 、@ComponentScans、@Import、@Bean等注解的逻辑
+	 *
 	 * Apply processing and build a complete {@link ConfigurationClass} by reading the
 	 * annotations, members and methods from the source class. This method can be called
 	 * multiple times as relevant sources are discovered.
@@ -615,47 +619,73 @@ class ConfigurationClassParser {
 	private void processImports(ConfigurationClass configClass, SourceClass currentSourceClass,
 			Collection<SourceClass> importCandidates, boolean checkForCircularImports) {
 
+		//判断 当前配置类上面 的 @Import是否为空
 		if (importCandidates.isEmpty()) {
 			return;
 		}
 
+		//检查是否有循环import, A.class import B.class ,B.class import A.class
 		if (checkForCircularImports && isChainedImportOnStack(configClass)) {
 			this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 		}
 		else {
 			this.importStack.push(configClass);
 			try {
+				//遍历解析 当前配置类 身上的所有@Import注解 导入的配置类
 				for (SourceClass candidate : importCandidates) {
+					//导入的配置类 是否拥有ImportSelector的能力
 					if (candidate.isAssignable(ImportSelector.class)) {
-						// Candidate class is an ImportSelector -> delegate to it to determine imports
+
+						// 导入的配置类是一个 ImportSelector -> 委托给其 ImportSelector的能力以确定导入
 						Class<?> candidateClass = candidate.loadClass();
+
+						//实例化当前导入的配置类->ImportSelector ，换句话说就是将ImportSelector的角色 委托给 当前导入的配置类,让其拥有对应返回选择的Class的能力
 						ImportSelector selector = BeanUtils.instantiateClass(candidateClass, ImportSelector.class);
+
+						//如果他们有Aware ,则执行其Aware的方法们
 						ParserStrategyUtils.invokeAwareMethods(
 								selector, this.environment, this.resourceLoader, this.registry);
+						//如果当前importSelector导入的配置类拥有延期导入的能力,那么就让他先去延期导入
 						if (selector instanceof DeferredImportSelector) {
+							/**
+							 *	这里将导入需要延期导入的类先存入 延期导入集合deferredImportSelectors,等这里面所有的正常的selector处理完成后 直到本方法栈和上个方法栈都完成后 ，
+							 *  直到{@link ConfigurationClassParser#parse(Set<BeanDefinitionHolder> )} 的最后一行,也就是所有的配置类都被解析完成之后,才开始处理这些需要被延期处理的配置类
+							 */
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
+							//获取导入的类名
 							String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());
+							//根据导入的类名称包装成SourceClass们
 							Collection<SourceClass> importSourceClasses = asSourceClasses(importClassNames);
+							//再将这些SourceClass们递归处理,因为被导入进来的 配置类 身上同样有可能有标注 @Import注解 以期望去导入其额外的 配置类
 							processImports(configClass, currentSourceClass, importSourceClasses, false);
 						}
 					}
+
+					//导入的配置类 是否拥有注册BeanDefinition的能力
 					else if (candidate.isAssignable(ImportBeanDefinitionRegistrar.class)) {
-						// Candidate class is an ImportBeanDefinitionRegistrar ->
-						// delegate to it to register additional bean definitions
+
+						// 导入的配置类是一个 ImportBeanDefinitionRegistrar ->委托给其 ImportBeanDefinitionRegistrar能力 以让其注册其他 BeanDefinition
 						Class<?> candidateClass = candidate.loadClass();
+
+						//实例化当前导入的配置类->ImportBeanDefinitionRegistrar ，
+						// 换句话说就是将ImportBeanDefinitionRegistrar的角色 委托给 当前导入的配置类,让其拥有对应注册BeanDefinition的能力
 						ImportBeanDefinitionRegistrar registrar =
 								BeanUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class);
+
+						//如果他们有Aware ,则执行其Aware的方法们
 						ParserStrategyUtils.invokeAwareMethods(
 								registrar, this.environment, this.resourceLoader, this.registry);
 						configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
 					}
 					else {
-						// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
-						// process it as an @Configuration class
+
+						// 导入的配置类 没有 ImportSelector 或 ImportBeanDefinitionRegistrar能力 -> 处理能力 其普通的 @Configuration 能力
 						this.importStack.registerImport(
 								currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());
+
+						//递归去解析这些被导入进来的配置类 ,他们身上同样可能有一些@Configuration注解 ，@ComponentScan注解等等
 						processConfigurationClass(candidate.asConfigClass(configClass));
 					}
 				}
@@ -867,10 +897,17 @@ class ConfigurationClassParser {
 		}
 
 		public void processGroupImports() {
+			//获取register方法注册进来的import导入的类
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
-				grouping.getImports().forEach(entry -> {
+
+				//获取 需要延期处理的类上面的配置类
+				//Spring-Boot框架就是这里加载的spring.factories文件中的配置类
+				grouping.getImports()
+						//遍历所有需要延期处理的类
+						.forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
 					try {
+						//被注入的这些配置类又有可能是被@Import注解标注,所以,递归再去处理@Import注解所标注的配置类的导入的解析问题
 						processImports(configurationClass, asSourceClass(configurationClass),
 								asSourceClasses(entry.getImportClassName()), false);
 					}
@@ -938,6 +975,7 @@ class ConfigurationClassParser {
 		 * @return each import with its associated configuration class
 		 */
 		public Iterable<Group.Entry> getImports() {
+			//遍历所有需要延期处理的配置类,获取其对应的import能力,然后对其进行处理
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
 				this.group.process(deferredImport.getConfigurationClass().getMetadata(),
 						deferredImport.getImportSelector());

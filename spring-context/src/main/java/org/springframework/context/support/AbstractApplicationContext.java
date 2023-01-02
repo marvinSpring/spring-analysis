@@ -40,6 +40,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -563,12 +564,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				//5 使用  所有的  已经注册好的BeanFactoryPostProcessor 能力
 				//调用实现BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor接口的实现类，
 				//从而对Bean定义信息和Bean工厂进行处理和管理
-				/*大部分bean定义信息在这一步之后就已经注册成功了*/
+				/**
+					大部分bean定义信息在这一步之后就已经注册成功了
+
+					一个小点：@ComponentScan @Component @Configuration @Bean
+				    @Import @PropertySource @ImportSource @ComponentScans 等注解也是在这一步解析的
+					SpringBoot的自动装配也是在这一步做的,
+					而这些事主要都是
+					{@link org.springframework.context.annotation.ConfigurationClassPostProcessor#postProcessBeanDefinitionRegistry(BeanDefinitionRegistry)}中干的
+				*/
 				invokeBeanFactoryPostProcessors(beanFactory);
 				//----------------------------------BeanFactory实例化+初始化完成---------------------------------------------------/
 
 				//6 注入所有的BeanPostProcessor到容器中
-				/* 将BeanPostProcessors的实现类实例化后放入BeanFactory容器中,他们将在创建bean的前后执行*/
+				/* 将BPP的实现类实例化后放入BeanFactory容器中,他们将在创建bean的前后执行*/
 				registerBeanPostProcessors(beanFactory);
 
 				//7 初始化MessageSource组件（做国际化功能；消息绑定，消息解析）；

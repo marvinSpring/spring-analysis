@@ -352,12 +352,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 		do {
 			//================Warning===============
-			//恭喜你又闯了Boss的老窝了,这里的Spring的一些核心注解的解析工作
-
-
-			//解析符合配置类规范的Bean
-			// 例如：有这些标识描述的 (@Controller、@Import、@ImportSource、@ComponentScan、@Bean ) BeanDefinition
+			/**
+			 * 恭喜你又闯了Boss的老窝了,这里的Spring的一些核心注解的核心的解析工作
+			  *解析符合配置类规范的Bean
+			  *例如：有这些标识描述的 (@Controller、@Import、@ImportSource、@ComponentScan、@Bean ) BeanDefinition
+			 */
+			//开始解析 当前配置类身上的 所有注解
 			parser.parse(candidates);
+
+			//校验
 			parser.validate();
 
 			//移除掉已经解析过的 配置类
