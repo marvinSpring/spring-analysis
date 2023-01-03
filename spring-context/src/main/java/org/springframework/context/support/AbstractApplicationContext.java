@@ -349,12 +349,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Publish the given event to all listeners.
-	 * <p>Note: Listeners get initialized after the MessageSource, to be able
-	 * to access it within listener implementations. Thus, MessageSource
-	 * implementations cannot publish events.
-	 * @param event the event to publish (may be application-specific or a
-	 * standard framework event)
+	 * 将给定事件发布到所有监听器。
+	 * <p>注意：监听器在 MessageSource 之后进行初始化，
+	 * 以便能够在侦听器实现中访问它。因此，消息源实现无法发布事件。
+	 * @param event 要发布的事件（可能是特定于应用程序的事件，也可能是标准框架事件）
 	 */
 	@Override
 	public void publishEvent(ApplicationEvent event) {
@@ -385,11 +383,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		Assert.notNull(event, "Event must not be null");
 
 		// Decorate event as an ApplicationEvent if necessary
+		//如有必要，将事件装饰为应用程序事件
 		ApplicationEvent applicationEvent;
+		//判断传进来的事件是否是一个本地事件,如果是就强转
 		if (event instanceof ApplicationEvent) {
 			applicationEvent = (ApplicationEvent) event;
 		}
 		else {
+			//如果不是本地事件，那么就包装当前事件->本地事件
 			applicationEvent = new PayloadApplicationEvent<>(this, event);
 			if (eventType == null) {
 				eventType = ((PayloadApplicationEvent<?>) applicationEvent).getResolvableType();
@@ -397,19 +398,23 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Multicast right now if possible - or lazily once the multicaster is initialized
+		//如果可能的话，现在进行多播 - 或者在初始化组播器后懒惰地进行多播
 		if (this.earlyApplicationEvents != null) {
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
 		else {
+			//获取Spring当前上下文中的多播器，并将当前事件类型发布到多播器中所有的监听器中
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
-		// Publish event via parent context as well...
+		// 也会通过父上下文发布事件...
 		if (this.parent != null) {
+			//如果当前Spring上下文有父级上下文，并且是抽象层次的父级上下文，那么就用父级的抽象上下文进行发布事件
 			if (this.parent instanceof AbstractApplicationContext) {
 				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
 			}
 			else {
+				//如果有父级上下文，但不是抽象层次的父级上下文，那么就直接发布
 				this.parent.publishEvent(event);
 			}
 		}
@@ -923,20 +928,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//检查和注册本地监听器
 	//将所有项目里面的ApplicationListener注册到容器中
 	protected void registerListeners() {
-		//1.从容器中拿到所有的ApplicationListener
+		//1.从当前Spring上下文中拿到所有的ApplicationListener
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
-			//1.1将每个监听器添加到事件派发器中；
+			//1.1将获取到的每个监听器添加到Spring上下文的事件派发器的监听器集合中
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
-		// 2.从容器中获取所有的ApplicationListener
+		// 2.根据类型从Spring上下文中的 bean工厂中 匹配到所有的ApplicationListener类型的bean名称
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
-			//2.1将每个监听器添加到事件派发器中；
+			//2.1将每个监听器添加到事件派发器的监听器bean的集合中
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
-		// earlyApplicationEvents 中保存之前的事件，
+		// prepareRefresh方法中 earlyApplicationEvents 中保存之前的事件，
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {

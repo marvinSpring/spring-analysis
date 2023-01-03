@@ -46,12 +46,14 @@ public interface ApplicationEventMulticaster {
 	 * Add a listener bean to be notified of all events.
 	 * @param listenerBeanName the name of the listener bean to add
 	 */
+	//添加监听器bean，他们会被注册的时候将bean的名称转换成监听器的bean对象 去被所有事件所通知
 	void addApplicationListenerBean(String listenerBeanName);
 
 	/**
 	 * Remove a listener from the notification list.
 	 * @param listener the listener to remove
 	 */
+	//从当前上下文中移除对应的监听器
 	void removeApplicationListener(ApplicationListener<?> listener);
 
 	/**
@@ -68,19 +70,20 @@ public interface ApplicationEventMulticaster {
 	void removeAllListeners();
 
 	/**
-	 * Multicast the given application event to appropriate listeners.
-	 * <p>Consider using {@link #multicastEvent(ApplicationEvent, ResolvableType)}
-	 * if possible as it provides a better support for generics-based events.
-	 * @param event the event to multicast
+	 * 将给定的应用程序事件多播到适当的监听器中。
+	 * <p>如果可能，请考虑使用
+	 * {@link multicastEvent(ApplicationEvent， ResolvevableType)}，
+	 * 因为它为基于泛型的事件提供了更好的支持。
+	 *
+	 * @param event 要被多播的事件
 	 */
 	void multicastEvent(ApplicationEvent event);
 
 	/**
-	 * Multicast the given application event to appropriate listeners.
-	 * <p>If the {@code eventType} is {@code null}, a default type is built
-	 * based on the {@code event} instance.
-	 * @param event the event to multicast
-	 * @param eventType the type of event (can be null)
+	 * 将给定的 本地应用事件 多播到 对应事件类型的监听器集合中的监听器中。
+	 * <p>如果 {@code eventType} 为 {@code null}，则基于 {@code event} 实例生成默认类型。
+	 * @param event 要被多播的事件
+	 * @param eventType 事件类型（可以为空）
 	 * @since 4.2
 	 */
 	void multicastEvent(ApplicationEvent event, @Nullable ResolvableType eventType);
