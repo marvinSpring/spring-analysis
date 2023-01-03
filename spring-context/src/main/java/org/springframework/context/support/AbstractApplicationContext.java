@@ -208,6 +208,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private MessageSource messageSource;
 
 	/** Helper class used in event publishing. */
+	//事件发布器
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -576,11 +577,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 				//----------------------------------BeanFactory实例化+初始化完成---------------------------------------------------/
 
-				//6 注入所有的BeanPostProcessor到容器中
+				//6 注册BeanPostProcessor到Spring容器中
 				/* 将BPP的实现类实例化后放入BeanFactory容器中,他们将在创建bean的前后执行*/
 				registerBeanPostProcessors(beanFactory);
 
-				//7 初始化MessageSource组件（做国际化功能；消息绑定，消息解析）；
+				//7 为Spring上下文初始化MessageSource组件（做国际化功能；消息绑定，消息解析）；SpringMVC有具体实现
 				initMessageSource();
 
 				//8 初始化本地事件派发器
@@ -591,7 +592,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				onRefresh();
 
 				//10 注册本地监听器。就是注册实现了ApplicationListener接口的监听器bean
-				/* 将容器中所有的ApplicationListener注册到容器中*/
+				//在所有注册的beanDefinition中查找listener bean,并将其注册到本地事件派发器中
 				registerListeners();
 
 				//11 实例化Bean，核心方法
@@ -823,14 +824,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	//初始化MessageSource组件
 	protected void initMessageSource() {
-		// 1.获取BeanFactory
+		// 1.从Spring当前上下文中获取Bean工厂
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		//2.看容器中是否有MessageSource的组件，如果有则将该组件设置到容器的消息源中
+		//2.判断当前bean工厂的beanDefinition中是否有自定义的MessageSource的beanDefinition，
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
+			//如果有则从bean工厂中获取到自定义的一个消息源的beanDefinition对应的bean对象
+			//再将该自定义的消息源bean对象设置到当前bean工厂的消息源组件中
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
+			//当父级bean工厂不为空,并且这个消息源组件是一个有层级的消息源组件
 			if (this.parent != null && this.messageSource instanceof HierarchicalMessageSource) {
 				HierarchicalMessageSource hms = (HierarchicalMessageSource) this.messageSource;
+				//然后判断当前父级的消息源组件是否为空
 				if (hms.getParentMessageSource() == null) {
+					//如果为空，则将当前bean工厂的父级消息源组件赋值给这个有层级的消息源的父级消息源
 					hms.setParentMessageSource(getInternalParentMessageSource());
 				}
 			}
@@ -839,11 +845,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
-			//3.如果没有自己创建一个DelegatingMessageSource；MessageSource作用：取出国际化配置文件中的某个key的值；能按照区域信息获取；
+			//3.如果没有自定义的消息源组件，则默认创建一个DelegatingMessageSource，并应用到当前bean工厂的消息源组件中
+			// MessageSource作用：取出国际化配置文件中的某个key的值；能按照区域信息获取；
 			DelegatingMessageSource dms = new DelegatingMessageSource();
+			//设置父级消息源组件为当前bean工厂的父级消息源组件
 			dms.setParentMessageSource(getInternalParentMessageSource());
+			//将这里new出来的消息源应用给当前上下文的bean工厂的消息源组件中
 			this.messageSource = dms;
-			//把创建好的messageSource注册到容器中，以后获取国际化配置文件的值的时候，可以自动注入MessageSource；
+
+			//将创建好的消息源组件注册到bean工厂中
+			//把创建好的messageSource注册到容器中，以后获取国际化配置文件的值的时候，可以将注入MessageSource到使用的地方；
 			//注入后通过这个方法使用MessageSource.getMessage(String code, Object[] args, String defaultMessage, Locale locale);
 			beanFactory.registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.messageSource);
 			if (logger.isTraceEnabled()) {
@@ -854,9 +865,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	//初始化事件派发器
 	protected void initApplicationEventMulticaster() {
-		//1.获取BeanFactory
+		//1.获取要刷新的Spring容器当前的BeanFactory
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		//2.判断容器中是否有applicationEventMulticaster 的这个bean ,如果有就从容器中获取，没有就去创建并注册到容器中
+		//2.判断Bean工厂中是否有applicationEventMulticaster 的这个beanDefinition ,
+		// 如果有就从容器中获取，没有就去创建一个默认的事件派发器并注册到容器中的事件派发器中
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			//2.1从BeanFactory中获取applicationEventMulticaster的ApplicationEventMulticaster；
 			this.applicationEventMulticaster =
@@ -866,9 +878,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
-			//2.2给SimpleApplicationEventMulticaster 类型的 applicationEventMulticaster
+			//2.2创建默认的SimpleApplicationEventMulticaster 类型的本地应用的事件派发器
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
-			//2.3将创建的ApplicationEventMulticaster添加到BeanFactory中，以后其他组件就可以直接自动注入
+			//2.3将刚刚创建的事件派发器应用到Spring的bean工厂中，以后其他组件就可以直接自动注入
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + APPLICATION_EVENT_MULTICASTER_BEAN_NAME + "' bean, using " +

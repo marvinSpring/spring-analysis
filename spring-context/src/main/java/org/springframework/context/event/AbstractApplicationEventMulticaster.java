@@ -62,8 +62,10 @@ import org.springframework.util.ObjectUtils;
 public abstract class AbstractApplicationEventMulticaster
 		implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
 
+	//监听器的帮助类，类似于自己的util，用于存放程序中的监听器集合，preFiltered标识是否需要预过滤监听器
 	private final ListenerRetriever defaultRetriever = new ListenerRetriever(false);
 
+	//ListenerCacheKey是基于事件类型和源类型的类作为Key用来存储不同事件类型对应的监听器帮助类,不同事件类型会有不同的一些监听器集合
 	final Map<ListenerCacheKey, ListenerRetriever> retrieverCache = new ConcurrentHashMap<>(64);
 
 	@Nullable
@@ -72,6 +74,7 @@ public abstract class AbstractApplicationEventMulticaster
 	@Nullable
 	private BeanFactory beanFactory;
 
+	//互斥的监听器帮助类
 	private Object retrievalMutex = this.defaultRetriever;
 
 
@@ -101,16 +104,21 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 
+	//添加本地应用监听器到监听器集合中
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
+		//锁定当前监听器帮助类,防止其他线程这会给这个监听器帮助类中赛监听器
 		synchronized (this.retrievalMutex) {
 			// Explicitly remove target for a proxy, if registered already,
 			// in order to avoid double invocations of the same listener.
+			//如果当前需要添加的监听器被已经注册了,则显示的将旧的注册过的监听器移除掉
 			Object singletonTarget = AopProxyUtils.getSingletonTarget(listener);
 			if (singletonTarget instanceof ApplicationListener) {
 				this.defaultRetriever.applicationListeners.remove(singletonTarget);
 			}
+			//新增需要添加的监听器
 			this.defaultRetriever.applicationListeners.add(listener);
+			//清空监听器助手缓存Map
 			this.retrieverCache.clear();
 		}
 	}
@@ -359,31 +367,49 @@ public abstract class AbstractApplicationEventMulticaster
 
 
 	/**
+	 * 监听器帮助类、用于封装(不同事件类型或者不同源类型的)目标监听器的助手类，它被允许有效的检索过滤器去预过滤监听器，
+	 *
 	 * Helper class that encapsulates a specific set of target listeners,
 	 * allowing for efficient retrieval of pre-filtered listeners.
 	 * <p>An instance of this helper gets cached per event type and source type.
 	 */
 	private class ListenerRetriever {
 
+		//存放应用程序事件监听器
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
+		//存放应用程序监听器的bean名称
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
+		//是否预过滤监听器
 		private final boolean preFiltered;
 
 		public ListenerRetriever(boolean preFiltered) {
 			this.preFiltered = preFiltered;
 		}
 
+		//获取 this 对应事件类型的 应用程序的事件监听器
 		public Collection<ApplicationListener<?>> getApplicationListeners() {
+
+			//创建指定空间大小的本地应用程序监听器集合
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
 					this.applicationListeners.size() + this.applicationListenerBeans.size());
+
+			//将this对应事件类型的所有本地应用程序监听器的集合存入该集合
 			allListeners.addAll(this.applicationListeners);
+
+			//如果本地应用程序监听器的bean名称不为空
 			if (!this.applicationListenerBeans.isEmpty()) {
+
+				//获取当前bean工厂
 				BeanFactory beanFactory = getBeanFactory();
+
+				//将当前的这些本地应用程序监听器实例化并初始化
 				for (String listenerBeanName : this.applicationListenerBeans) {
 					try {
 						ApplicationListener<?> listener = beanFactory.getBean(listenerBeanName, ApplicationListener.class);
+
+						//也添加到allListeners集合中
 						if (this.preFiltered || !allListeners.contains(listener)) {
 							allListeners.add(listener);
 						}
@@ -394,6 +420,7 @@ public abstract class AbstractApplicationEventMulticaster
 					}
 				}
 			}
+			//如果这个事件类型对应的监听器助手不需要预过滤处理并且对应的事件监听器的bean名称不为空,则给这些监听器进行一个排序
 			if (!this.preFiltered || !this.applicationListenerBeans.isEmpty()) {
 				AnnotationAwareOrderComparator.sort(allListeners);
 			}

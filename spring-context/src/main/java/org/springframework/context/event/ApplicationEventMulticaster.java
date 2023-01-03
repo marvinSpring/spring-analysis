@@ -39,6 +39,7 @@ public interface ApplicationEventMulticaster {
 	 * Add a listener to be notified of all events.
 	 * @param listener the listener to add
 	 */
+	//添加监听器去被所有事件所通知
 	void addApplicationListener(ApplicationListener<?> listener);
 
 	/**

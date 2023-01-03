@@ -21,16 +21,18 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
- * Strategy interface for resolving messages, with support for the parameterization
- * and internationalization of such messages.
  *
- * <p>Spring provides two out-of-the-box implementations for production:
- * <ul>
- * <li>{@link org.springframework.context.support.ResourceBundleMessageSource}: built
- * on top of the standard {@link java.util.ResourceBundle}, sharing its limitations.
- * <li>{@link org.springframework.context.support.ReloadableResourceBundleMessageSource}:
- * highly configurable, in particular with respect to reloading message definitions.
- * </ul>
+ * 当前接口提供了用于处理消息的策略，包含了信息的国际化和参数信息的替换。
+ *
+ * <p>Spring 为生产提供了两个开箱即用的实现：
+ *  	<ul>
+ *  		<li>
+ *  		    {@link org.springframework.context.support.ResourceBundleMessageSource}:
+ *  		    建立在标准{@link java.util.ResourceBundle}之上，共享其局限性。
+ *  		<li>
+ *  		     {@link org.springframework.context.support.ReloadableResourceBundleMessageSource}:
+ *  		     高度可配置，特别是在重新加载消息定义方面。
+ *  	</ul>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -40,13 +42,18 @@ import org.springframework.lang.Nullable;
 public interface MessageSource {
 
 	/**
-	 * Try to resolve the message. Return default message if no message was found.
-	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
-	 * MessageSource users are encouraged to base message names on qualified class
-	 * or package names, avoiding potential conflicts and ensuring maximum clarity.
-	 * @param args an array of arguments that will be filled in for params within
-	 * the message (params look like "{0}", "{1,date}", "{2,time}" within a message),
-	 * or {@code null} if none
+	 * 解析{code}对应的信息进行返回，如果对应的code不能被解析，则返回defaultMessage，
+	 * code：需要被解析的编码，对应资源文件中一个属性的名称
+	 * args：需要用来替换的code，对应信息中包含参数的内容
+	 * defaultMessage：当没有从对应资源文件中获取到code对应的信息的时候需要返回的一个默认值
+	 * locale：对应的Locale对象，用于执行查找的区域设置，比如查找中国、英国、意大利等国家对应的语言
+	 *
+	 * 尝试解决该消息。如果未找到消息，则返回默认消息。
+	 * @param code，例如“calculator.noRateSet”。
+	 * 建议 MessageSource 用户将消息名称基于限定的类或包名称，
+	 * 以避免潜在的冲突并确保最大程度的清晰度。
+	 * @param args，这些参数将为消息中的参数填充（参数在消息中看起来像“{0}”、“{1，date}”、“{2，time}”），如果没有，则为 {@code null}
+	 *
 	 * @param defaultMessage a default message to return if the lookup fails
 	 * @param locale the locale in which to do the lookup
 	 * @return the resolved message if the lookup was successful, otherwise
@@ -58,6 +65,11 @@ public interface MessageSource {
 	String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale);
 
 	/**
+	 * 	 * 解析{code}对应的信息进行返回
+	 * 	 * code：需要被解析的编码，对应资源文件中一个属性的名称
+	 * 	 * args：需要用来替换的code，对应信息中包含参数的内容
+	 * 	 * locale：对应的Locale对象，用于执行查找的区域设置，比如查找中国、英国、意大利等国家对应的语言
+	 *
 	 * Try to resolve the message. Treat as an error if the message can't be found.
 	 * @param code the message code to look up, e.g. 'calculator.noRateSet'.
 	 * MessageSource users are encouraged to base message names on qualified class
@@ -74,6 +86,8 @@ public interface MessageSource {
 	String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException;
 
 	/**
+	 * 通过MessageSourceResolvable来对不同Locale这个进行消息解析
+	 *
 	 * Try to resolve the message using all the attributes contained within the
 	 * {@code MessageSourceResolvable} argument that was passed in.
 	 * <p>NOTE: We must throw a {@code NoSuchMessageException} on this method
