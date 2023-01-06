@@ -27,21 +27,19 @@ import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.lang.Nullable;
 
 /**
- * A factory providing convenient access to a ConversionService configured with
- * converters appropriate for most environments. Set the
- * {@link #setConverters "converters"} property to supplement the default converters.
+ * 提供对转换服务的便捷访问的工厂，该转换服务配置了适用于大多数环境的转换器。
+ * 设置 {@link setConverters “converters”} 属性以补充默认转换器。
  *
- * <p>This implementation creates a {@link DefaultConversionService}.
- * Subclasses may override {@link #createConversionService()} in order to return
- * a {@link GenericConversionService} instance of their choosing.
+ *<p>此实现创建一个 {@link DefaultConversionService}。子
+ * 类可以覆盖 {@link createConversionService()}
+ * 以返回他们选择的 {@link GenericConversionService} 实例。
  *
- * <p>Like all {@code FactoryBean} implementations, this class is suitable for
- * use when configuring a Spring application context using Spring {@code <beans>}
- * XML. When configuring the container with
- * {@link org.springframework.context.annotation.Configuration @Configuration}
- * classes, simply instantiate, configure and return the appropriate
- * {@code ConversionService} object from a {@link
- * org.springframework.context.annotation.Bean @Bean} method.
+ * <p>与所有 {@code FactoryBean} 实现一样，
+ * 此类适合在使用 Spring {@code } XML 配置 Spring 应用程序上下文时使用<beans>。
+ * 使用 配置容器时
+ * {@link org.springframework.context.annotation.Configuration @Configuration} 类，
+ * 只需从 {@link org.springframework.context.annotation.Bean @Bean} 方法实例化、
+ * 配置并返回相应的 {@code ConversionService} 对象。
  *
  * @author Keith Donald
  * @author Juergen Hoeller
@@ -50,9 +48,11 @@ import org.springframework.lang.Nullable;
  */
 public class ConversionServiceFactoryBean implements FactoryBean<ConversionService>, InitializingBean {
 
+	//自定义的转换器们
 	@Nullable
 	private Set<?> converters;
 
+	//如果没有自定义的ConversionService，将采用默认的GenericConversionService
 	@Nullable
 	private GenericConversionService conversionService;
 
@@ -67,6 +67,7 @@ public class ConversionServiceFactoryBean implements FactoryBean<ConversionServi
 		this.converters = converters;
 	}
 
+	//bean初始化完成后，将自定义的转换器注册到转换器工厂中
 	@Override
 	public void afterPropertiesSet() {
 		this.conversionService = createConversionService();

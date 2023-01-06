@@ -178,7 +178,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	private volatile String[] frozenBeanDefinitionNames;
 
-	/** Whether bean definition metadata may be cached for all beans. */
+	/** 是否可以为所有 Bean 缓存 BeanDefinition元数据. */
 	private volatile boolean configurationFrozen;
 
 
@@ -483,15 +483,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+		//配置还未被冻结的或者类型为空或者不允许早期初始化
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
 			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
 		}
+
+		//不管type是否为空，是否允许早期初始化
+		//只要当前bean工厂允许为所有bean缓存bean的定义信息，
+		//就会走到这里，如果不允许，也就是后面的执行过程中还有可能会更改工厂中的beanDefinition
+		//所以不能进行缓存
+
+		//如果允许非单例的bean，那么就将所有的bean的集合中获取到bean名称并将其beanDefintion进行保存，否则就只取单例bean集合中的bean名称
 		Map<Class<?>, String[]> cache =
 				(includeNonSingletons ? this.allBeanNamesByType : this.singletonBeanNamesByType);
 		String[] resolvedBeanNames = cache.get(type);
 		if (resolvedBeanNames != null) {
 			return resolvedBeanNames;
 		}
+		//如果缓存中没有获取到，那么就重新获取一遍，获取到后就将其缓存
 		resolvedBeanNames = doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, true);
 		if (ClassUtils.isCacheSafe(type, getBeanClassLoader())) {
 			cache.put(type, resolvedBeanNames);
@@ -835,23 +844,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		//1.获取容器中的所有Bean，依次对这些bean进行初始化和创建对象
+		//1.获取容器中的所有Bean，依次对这些bean名称对应的Bean进行初始化和创建对象
 		/*
 			beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
 		   	用于存放所有需要实例化的BeanDefinition的beanName
 	    */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
-		// 实例化所有非懒加载的单例Bean
+		// 实例化并初始化所有非懒加载的单例Bean
 		for (String beanName : beanNames) {
-			// 父子Bean定义信息的合并
+			// 合并父子的Bean定义信息
 			/*
 				2.获取Bean的定义信息；RootBeanDefinition
 			*/
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			//3.非抽象的，单实例的，非懒加载的Bean
+			//3.如果是 非抽象的，单实例的，非懒加载的Bean
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				//如果是工厂Bean则需要用&+beanName的方式获取Bean
+				//如果是工厂Bean则需要用 &+beanName的方式获取Bean
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {

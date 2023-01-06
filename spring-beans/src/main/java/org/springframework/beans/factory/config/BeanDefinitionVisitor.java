@@ -70,23 +70,33 @@ public class BeanDefinitionVisitor {
 
 
 	/**
-	 * Traverse the given BeanDefinition object and the MutablePropertyValues
-	 * and ConstructorArgumentValues contained in them.
-	 * @param beanDefinition the BeanDefinition object to traverse
+	 * 遍历给定的 BeanDefinition 对象以及其中包含的 MutablePropertyValues 和 ConstructorArgumentValues。
+	 * @param beanDefinition 要遍历的 BeanDefinition 对象
 	 * @see #resolveStringValue(String)
 	 */
 	public void visitBeanDefinition(BeanDefinition beanDefinition) {
+		//解析当前bean定义信息的父级名称
 		visitParentName(beanDefinition);
+		//解析当前bean定义信息的类名称
 		visitBeanClassName(beanDefinition);
+		//解析工厂bean名称
 		visitFactoryBeanName(beanDefinition);
+		//解析工厂bean方法名称
 		visitFactoryMethodName(beanDefinition);
+		//解析bean的作用域中的字符
 		visitScope(beanDefinition);
+		//如果bean定义信息所含bean有属性值
 		if (beanDefinition.hasPropertyValues()) {
+			//解析bean的属性值
 			visitPropertyValues(beanDefinition.getPropertyValues());
 		}
+		//如果bean定义信息中所含bean有构造方法的参数值
 		if (beanDefinition.hasConstructorArgumentValues()) {
+			//获取bean的构造方法
 			ConstructorArgumentValues cas = beanDefinition.getConstructorArgumentValues();
+			//按照下标解析构造方法参数
 			visitIndexedArgumentValues(cas.getIndexedArgumentValues());
+			//解析生成的构造方法参数
 			visitGenericArgumentValues(cas.getGenericArgumentValues());
 		}
 	}

@@ -132,7 +132,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;
 
-	/** Spring ConversionService to use instead of PropertyEditors. */
+	/** Spring ConversionService 代替 PropertyEditors 使用. */
 	@Nullable
 	private ConversionService conversionService;
 
@@ -1244,10 +1244,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	//将父子类Bean的定义信息合并到一个BeanDefinition中
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
+		//检查bean名称 对应的 mergedBeanDefinition 是否存在于 合并的bean定义信息缓存中 ，这个缓存中的信息是在BFPP中添加的
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
 		if (mbd != null) {
+			//如果已经被合并过了，那么直接返回合并后的beanDefinition
 			return mbd;
 		}
+		//缓存中未找到，那么就去根据beanName和beanDefinition去获取合并后的beanDefinition
 		return getMergedBeanDefinition(beanName, getBeanDefinition(beanName));
 	}
 

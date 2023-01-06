@@ -19,7 +19,7 @@ package org.springframework.core.convert.converter;
 import org.springframework.lang.Nullable;
 
 /**
- * A converter converts a source object of type {@code S} to a target of type {@code T}.
+ * 转换器将 {@code S} 类型的源对象转换为 {@code T} 类型的目标。
  *
  * <p>Implementations of this interface are thread-safe and can be shared.
  *
@@ -39,6 +39,7 @@ public interface Converter<S, T> {
 	 * @return the converted object, which must be an instance of {@code T} (potentially {@code null})
 	 * @throws IllegalArgumentException if the source cannot be converted to the desired target type
 	 */
+	//s->t
 	@Nullable
 	T convert(S source);
 

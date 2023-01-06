@@ -965,7 +965,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
-		// 1.2给容器添加值解析器,用来处理注解中的${xxx}
+		// 1.2给容器添加值解析器,用来处理注解中的${xxx}，如果没有自定义属性解析器，将会创建一个默认的解析器应用在bean工厂中
 		/*
 		   如果之前没有任何beanPostProcessor进行过注册，
 		   则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：
@@ -975,19 +975,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
-		//1.3处理aop织入的东西
+		//1.3处理aop织入的东西，尽早初始化loadTimeWeaverAware，以便尽早注册他们的转换器
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
 		}
 
-		//1.4设置容器的临时类加载器
+		//1.4设置容器的临时类加载器，禁止使用临时类加载器进行类型匹配
 		beanFactory.setTempClassLoader(null);
 
-		//1.5锁定容器不会再修改的配置
+		//1.5锁定容器不会再修改的配置，冻结所有的额beanDefinition，因为底下要开始用这些bean的定义信息了，他们不能在被用的时候被修改了
 		beanFactory.freezeConfiguration();
 
-		// 2.初始化单例bean
+		// 2.实例化以及初始化 剩下单例bean
 		// 核心方法————实例化Bean
 		beanFactory.preInstantiateSingletons();
 	}
