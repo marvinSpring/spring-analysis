@@ -38,10 +38,10 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
-
+	//当前上下文配置文件的地址们
 	@Nullable
 	private String[] configLocations;
-
+	//setId方法是否被回调，也就是当前上下文的id有没有被修改
 	private boolean setIdCalled = false;
 
 
@@ -67,8 +67,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Set the config locations for this application context.
-	 * <p>If not set, the implementation may use a default as appropriate.
+	 * 设置当前 应用程序上下文的配置文件的位置。
+	 * <p>如果没有自定义位置，可以适当地实现-->使用默认值。
 	 * @param locations 配置文件的位置
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
@@ -76,7 +76,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
-				//对当前配置文件的路径进行解析处理
+				//对当前配置文件们的路径进行解析处理
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
 		}
@@ -84,7 +84,6 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			this.configLocations = null;
 		}
 	}
-
 	/**
 	 * Return an array of resource locations, referring to the XML bean definition
 	 * files that this context should be built with. Can also include location
@@ -114,13 +113,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
-	 * Resolve the given path, replacing placeholders with corresponding
-	 * environment property values if necessary. Applied to config locations.
-	 * @param path the original file path
-	 * @return the resolved file path
+	 * 解析给定的路径，有需要的时候用相应的 环境属性值 替换 占位符。
+	 * 然后将其应用于配置位置。
+	 * @param path 原始文件路径
+	 * @return 解析后的文件路径
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
+		//解析路径中必要的占位符
 		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
 

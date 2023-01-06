@@ -11,6 +11,7 @@
 	   http://www.springframework.org/schema/context/spring-context.xsd">
 
 <!--	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>-->
+	<context:component-scan base-package="com.marvin.test"/>
 <!--	<context:component-scan base-package="com.marvin.test.self.anno"/>-->
 	<bean id="marvinConverter" class="com.marvin.test.self.converter.MarvinConverter"/>
 	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">

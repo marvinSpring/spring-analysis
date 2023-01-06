@@ -168,7 +168,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//指定spring上下文的名称
 	private String displayName = ObjectUtils.identityToString(this);
 
-	/** Parent context. */
+	/** 当前上下文的父级上下文. */
 	@Nullable
 	private ApplicationContext parent;
 
@@ -177,19 +177,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private ConfigurableEnvironment environment;
 
-	//BeanFactory的前置处理器
+	//存储BeanFactory的前置处理器
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
-	//当前上下文启动的时间
+	//当前上下文启动的时间戳
 	private long startupDate;
 
-	//代表本上下文当前是否处于激活状态的状态
+	//当前上下文当前是否处于激活状态的状态位
 	private final AtomicBoolean active = new AtomicBoolean();
 
-	//代表本上下文当前是否处于已经被关闭的状态
+	//当前上下文当前是否处于已经被关闭的状态位   它与active属性具有互斥性
 	private final AtomicBoolean closed = new AtomicBoolean();
 
-	//初始化一个同步监听器（该监听器用来监听spring容器的刷新和销毁）
+	//初始化一个同步监听器（该监听器用来监听Spring上下文的刷新和销毁）
 	private final Object startupShutdownMonitor = new Object();
 
 	/** Reference to the JVM shutdown hook, if registered. */
@@ -197,34 +197,34 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private Thread shutdownHook;
 
 	//当前上下文中使用的ResourcePatternResolver
-	private ResourcePatternResolver resourcePatternResolver;
+	private final ResourcePatternResolver resourcePatternResolver;
 
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
 	@Nullable
 	private LifecycleProcessor lifecycleProcessor;
 
-	/** MessageSource we delegate our implementation of this interface to. */
+	/** 消息源. */
 	@Nullable
 	private MessageSource messageSource;
 
 	/** Helper class used in event publishing. */
-	//事件发布器
+	//应用程序本地事件多播器
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
-	/** Statically specified listeners. */
+	/** 统计特殊的监听器. */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
-	/** Local listeners registered before refresh. */
+	/** 在refresh之前注册的本地监听器. */
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
 
-	/** ApplicationEvents published before the multicaster setup. */
+	/** 在多播器被设置之前完成的事件发布的事件. */
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
 
-	//创建一个没有顶级的新AbstractApplicationContext。
+	//创建一个抽象层次的AbstractApplicationContext
 	public AbstractApplicationContext() {
 		//创建资源模式处理器
 		this.resourcePatternResolver = getResourcePatternResolver();
@@ -310,10 +310,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Return the {@code Environment} for this application context in configurable
-	 * form, allowing for further customization.
-	 * <p>If none specified, a default environment will be initialized via
-	 * {@link #createEnvironment()}.
+	 * 以可配置的形式返回此应用程序上下文的环境 {@code Environment}，
+	 * 允许进一步自定义。
+	 * 如果没有自定义的可配置的环境，当前上下文的默认环境将通过{@link #createEnvironment()}方法进行初始化设置。
+	 *
 	 */
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
@@ -325,7 +325,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * 创建并返回一个新的{@link StandardEnvironment}。
-	 * <p>子类可以重写此方法，以提供自定义的{@link ConfigurableEnvironment}实现。
+	 * <p>子类可以重写此方法，以提供自定义的可配置形式的环境->{@link ConfigurableEnvironment}实现。
 	 */
 	protected ConfigurableEnvironment createEnvironment() {
 		return new StandardEnvironment();
@@ -481,7 +481,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * its environment is an instance of {@link ConfigurableEnvironment}.
 	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
 	 */
-	//如果父级不是 null,并且其环境是ConfigurableEnvironment的实例,则设置当前ApplicationContext的父级。
+	//如果父级不是 null,并且其环境是ConfigurableEnvironment的实例,则设置当前ApplicationContext的父级。并 合并当前上下文的环境和父级上下文的环境
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
 		this.parent = parent;
@@ -526,7 +526,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//Spring容器的核心方法
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
-		synchronized (this.startupShutdownMonitor) {
+		synchronized (this.startupShutdownMonitor) {//同步当前上下文的刷新，以保证其在刷新时是线程安全的
 			//------------------------------ BeanFactory的创建及预准备工作  ------------------------------------------/
 			//1 做容器刷新前的准备工作
 			/*
@@ -638,8 +638,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Prepare this context for refreshing, setting its startup date and
-	 * active flag as well as performing any initialization of property sources.
+	 * 准备当前上下文的一些属性以便刷新例如：
+	 * 设置它的启动日期和活动标志，以及执行属性源的任何初始化。
 	 */
 	//刷新前的预处理;
 	protected void prepareRefresh() {
@@ -661,7 +661,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// 初始化一些属性设置;
-		/* 子类自定义的属性设置方法；*/
+		/* 子类自定义的 属性源 方法；*/
 		initPropertySources();
 
 		/* 参见：ConfigurablePropertyResolver的setRequiredProperties();*/
@@ -686,7 +686,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * <p>Replace any stub property sources with actual instances.
+	 * <p>用实际实例 替换任何 本身存在的属性源。
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */

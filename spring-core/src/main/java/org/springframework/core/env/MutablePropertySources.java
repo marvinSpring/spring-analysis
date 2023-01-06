@@ -26,12 +26,12 @@ import java.util.stream.Stream;
 import org.springframework.lang.Nullable;
 
 /**
- * {@link PropertySources}接口的默认实现。允许操纵包含的属性源，
+ * {@link PropertySources}接口的默认实现。允许操作包含的属性源，
  * 并提供用于复制现有{@code PropertySources}实例的构造函数。
  *
- * <p>Where <em>precedence</em> is mentioned in methods such as {@link #addFirst}
- * and {@link #addLast}, this is with regard to the order in which property sources
- * will be searched when resolving a given property with a {@link PropertyResolver}.
+ * <p>在{@link #addFirst}和{@link #addLast}等方法中提到的
+ * <em>precedence<em>优先级，
+ * 这与使用{@link PropertyResolver}解析给定属性时搜索属性源的时顺序有关。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

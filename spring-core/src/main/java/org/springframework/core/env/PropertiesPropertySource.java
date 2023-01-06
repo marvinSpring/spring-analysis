@@ -20,14 +20,12 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * {@link PropertySource} implementation that extracts properties from a
- * {@link java.util.Properties} object.
+ * {@link PropertySource}实现，从一个{@link java.util.Properties}对象中提取属性对象。
  *
- * <p>Note that because a {@code Properties} object is technically an
- * {@code <Object, Object>} {@link java.util.Hashtable Hashtable}, one may contain
- * non-{@code String} keys or values. This implementation, however is restricted to
- * accessing only {@code String}-based keys and values, in the same fashion as
- * {@link Properties#getProperty} and {@link Properties#setProperty}.
+ * 注意，因为{@code Properties}对象在技术上是一个
+ * {@code < object, object >} {@link java.util.Hashtable}哈希表，
+ * 一个对象可以包含非{@code String}键或值。
+ * 然而，这个实现仅限于访问基于{@code String}的键和值，与{@link Properties#getProperty}方法和{@link Properties#setProperty}方法的方式相同。
  *
  * @author Chris Beams
  * @author Juergen Hoeller

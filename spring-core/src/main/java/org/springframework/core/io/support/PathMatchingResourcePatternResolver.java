@@ -181,7 +181,7 @@ import org.springframework.util.StringUtils;
  * @see ClassLoader#getResources(String)
  */
 public class PathMatchingResourcePatternResolver implements ResourcePatternResolver {
-
+	//资源模式匹配解析器的日志
 	private static final Log logger = LogFactory.getLog(PathMatchingResourcePatternResolver.class);
 
 	@Nullable

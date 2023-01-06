@@ -100,24 +100,24 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 */
 	protected static final String RESERVED_DEFAULT_PROFILE_NAME = "default";
 
-
+	//当前环境所属日志
 	protected final Log logger = LogFactory.getLog(getClass());
-
+	//记录启用的配置文件
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
-
+	//记录默认的配置文件
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
-
+	//可变的属性资源
 	private final MutablePropertySources propertySources = new MutablePropertySources();
-
+	//可配置的属性解析器，以复合模式将 属性解析器包含在抽象的环境中
 	private final ConfigurablePropertyResolver propertyResolver =
 			new PropertySourcesPropertyResolver(this.propertySources);
 
 
 	/**
-	 * Create a new {@code Environment} instance, calling back to
-	 * {@link #customizePropertySources(MutablePropertySources)} during construction to
-	 * allow subclasses to contribute or manipulate {@link PropertySource} instances as
-	 * appropriate.
+	 * 创建一个新的{@code Environment}抽象的环境实例，
+	 * 在构造该环境的过程中将回调{@link #customizePropertySources(MutablePropertySources)}方法，
+	 * 以允许子类根据需要提供或对{@link PropertySource}实例进行操作。
+	 *
 	 * @see #customizePropertySources(MutablePropertySources)
 	 */
 	public AbstractEnvironment() {

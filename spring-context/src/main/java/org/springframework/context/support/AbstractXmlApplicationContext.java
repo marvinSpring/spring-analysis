@@ -27,15 +27,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
- * Convenient base class for {@link org.springframework.context.ApplicationContext}
- * implementations, drawing configuration from XML documents containing bean definitions
- * understood by an {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}.
+ * 便利的方便的 {@link org.springframework.context.ApplicationContext}的实现类,
+ * 由{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}能理解的 包含bean定义的XML文档中，解析其中的信息进行配置。
  *
- * <p>Subclasses just have to implement the {@link #getConfigResources} and/or
- * the {@link #getConfigLocations} method. Furthermore, they might override
- * the {@link #getResourceByPath} hook to interpret relative paths in an
- * environment-specific fashion, and/or {@link #getResourcePatternResolver}
- * for extended pattern resolution.
+ * <p>子类只需要实现 {@link #getConfigResources} 或 {@link #getConfigLocations} 方法.
+ * 此外，它们可能复写{@link #getResourceByPath}钩子方法，以在特定于环境的方式解释相对路径，
+ * 或腹泻{@link #getResourcePatternResolver}方法用于扩展模式的解析。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -45,7 +42,7 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
-	//设置xml配置文件的验证标志,默认是true
+	//设置xml配置文件的验证标志，标明当前上下文中的xml读取后是否进行必要的校验,默认是true
 	private boolean validating = true;
 
 
@@ -76,6 +73,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #loadBeanDefinitions
 	 */
 	@Override
+	//通过 XmlBeanDefinitionReader 加载 bean的定义。
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		//为BeanFactory创建一个XmlBeanDefinitionReader。
 		//委托模式：为BeanFactory创建一个Xml的解析器———用于解析配置文件的解析器

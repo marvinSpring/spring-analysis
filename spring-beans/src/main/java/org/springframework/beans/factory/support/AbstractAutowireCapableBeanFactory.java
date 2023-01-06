@@ -114,53 +114,53 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
 		implements AutowireCapableBeanFactory {
 
-	/** Strategy for creating bean instances. */
+	/** 创建bean实例的策略. */
 	private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
-	/** Resolver strategy for method parameter names. */
+	/** 方法参数名的解析器策略. */
 	@Nullable
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
-	/** Whether to automatically try to resolve circular references between beans. *///是否spring去自动允许循环依赖
+	/** 是否自动尝试解析bean之间的循环引用 *///是否spring去自动允许循环依赖
 	private boolean allowCircularReferences = true;
 
 	/**
-	 * Whether to resort to injecting a raw bean instance in case of circular reference,
-	 * even if the injected bean eventually got wrapped.
+	 * 是否在循环引用的情况下注入一个原始bean实例，
+	 * 即使注入的bean最终被包装。
 	 */
 	private boolean allowRawInjectionDespiteWrapping = false;
 
 	/**
-	 * Dependency types to ignore on dependency check and autowire, as Set of
-	 * Class objects: for example, String. Default is none.
+	 * 要在依赖项检查和自动装配时忽略的依赖项类型，
+	 * 如类对象的集合:例如，字符串。默认值为none。
 	 */
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<>();
 
 	/**
-	 * Dependency interfaces to ignore on dependency check and autowire, as Set of
-	 * Class objects. By default, only the BeanFactory interface is ignored.
+	 * 在依赖项检查和自动装配时忽略的依赖项接口，
+	 * 如类对象集。缺省情况下，只有BeanFactory接口被忽略。
 	 */
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
 
 	/**
-	 * The name of the currently created bean, for implicit dependency registration
-	 * on getBean etc invocations triggered from a user-specified Supplier callback.
+	 * 当前创建的bean的名称，
+	 * 用于从用户指定的Supplier回调触发的getBean等调用上的隐式依赖注册。
 	 */
 	private final NamedThreadLocal<String> currentlyCreatedBean = new NamedThreadLocal<>("Currently created bean");
 
-	/** Cache of unfinished FactoryBean instances: FactoryBean name to BeanWrapper. */
+	/**  未完成的FactoryBean实例的缓存:key:FactoryBean名称,val:BeanWrapper. */
 	private final ConcurrentMap<String, BeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<>();
 
-	/** Cache of candidate factory methods per factory class. */
+	/** 每个工厂类的候选工厂方法缓存.,key:工厂类,val:候选工厂方法 */
 	private final ConcurrentMap<Class<?>, Method[]> factoryMethodCandidateCache = new ConcurrentHashMap<>();
 
-	/** Cache of filtered PropertyDescriptors: bean Class to PropertyDescriptor array. */
+	/** 过滤后的PropertyDescriptors缓存:key:bean的类,value:PropertyDescriptor数组. */
 	private final ConcurrentMap<Class<?>, PropertyDescriptor[]> filteredPropertyDescriptorsCache =
 			new ConcurrentHashMap<>();
 
 
 	/**
-	 * Create a new AbstractAutowireCapableBeanFactory.
+	 * 构造一个新的有能力去自动装配的bean工厂 AbstractAutowireCapableBeanFactory。
 	 */
 	public AbstractAutowireCapableBeanFactory() {
 		super();

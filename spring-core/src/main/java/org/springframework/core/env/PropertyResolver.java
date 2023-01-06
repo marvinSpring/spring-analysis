@@ -102,12 +102,15 @@ public interface PropertyResolver {
 	String resolvePlaceholders(String text);
 
 	/**
+	 * 解决${...}中的占位符，将它们替换为由{@link #getProperty}解析的相应属性值。
+	 * 没有默认值的 不可解析的占位符 将导致抛出IllegalArgumentException异常。
+	 *
 	 * Resolve ${...} placeholders in the given text, replacing them with corresponding
 	 * property values as resolved by {@link #getProperty}. Unresolvable placeholders with
 	 * no default value will cause an IllegalArgumentException to be thrown.
-	 * @return the resolved String (never {@code null})
-	 * @throws IllegalArgumentException if given text is {@code null}
-	 * or if any placeholders are unresolvable
+	 * @return 解析后的字符串(never {@code null})
+	 * @throws IllegalArgumentException 如果给定的文本是{@code null}
+	 * 或者文本中的任何 占位符 无法被解析
 	 */
 	String resolveRequiredPlaceholders(String text) throws IllegalArgumentException;
 

@@ -116,45 +116,45 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private BeanFactory parentBeanFactory;
 
-	/** ClassLoader to resolve bean class names with, if necessary. */
+	/** ClassLoader来解析bean类名，如果需要的话. */
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	/** ClassLoader to temporarily resolve bean class names with, if necessary. */
+	/** ClassLoader来临时解析bean类名，如果需要的话. */
 	@Nullable
 	private ClassLoader tempClassLoader;
 
-	/** Whether to cache bean metadata or rather reobtain it for every access. */
+	/** 是缓存bean元数据，还是为每次访问重新获取它,默认是缓存bean元数据. */
 	private boolean cacheBeanMetadata = true;
 
-	/** Resolution strategy for expressions in bean definition values. */
+	/** bean定义值中表达式的解析策略. */
 	//Bean 定义值中表达式的解析策略
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;
 
-	/** Spring ConversionService 代替 PropertyEditors 使用. */
+	/** Spring ConversionService来代替propertyeditor. */
 	@Nullable
 	private ConversionService conversionService;
 
-	/** Custom PropertyEditorRegistrars to apply to the beans of this factory. */
+	/** 应用于此工厂的自定义PropertyEditorRegistrar的bean. */
 	//自定义PropertyEditorRegistrars适用于该工厂中的bean
 	private final Set<PropertyEditorRegistrar> propertyEditorRegistrars = new LinkedHashSet<>(4);
 
-	/** Custom PropertyEditors to apply to the beans of this factory. */
-	//自定义属性编辑器应用于此工厂中的bean的
+	/**自定义PropertyEditor以应用于此工厂的bean. */
+	//自定义属性编辑器应用于此工厂中的bean的 key是bean类型,val是该类型对应的PropertyEditor
 	private final Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new HashMap<>(4);
 
-	/** A custom TypeConverter to use, overriding the default PropertyEditor mechanism. */
+	/** 要使用的自定义TypeConverter，覆盖默认的PropertyEditor机制。. */
 	//自定义类型转换器，覆盖默认的属性编辑器机制。
 	@Nullable
 	private TypeConverter typeConverter;
 
-	/** String resolvers to apply e.g. to annotation attribute values. */
-	//字符串解析器应用于解析属性值
+	/** 应用于注解的属性值中的字符串解析器. */
+	//字符串解析器应用于解析注解中属性值 比如@Value("${xxx.xxx.xxx}")
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/** BeanPostProcessors to apply. */
-	//BeanPostProcess们
+	//存放所有的BeanPostProcess们
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
 	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
@@ -163,14 +163,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** Indicates whether any DestructionAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasDestructionAwareBeanPostProcessors;
 
-	/** Map from scope identifier String to corresponding Scope. */
+	/** 从范围标识符字符串映射到相应的范围。 */
 	private final Map<String, Scope> scopes = new LinkedHashMap<>(8);
 
 	/** Security context used when running with a SecurityManager. */
 	@Nullable
 	private SecurityContextProvider securityContextProvider;
 
-	/** Map from bean name to merged RootBeanDefinition. */
+	/** 从bean名称映射到父子beanDefintion合并后的RootBeanDefinition。 */
 	private final Map<String, RootBeanDefinition> mergedBeanDefinitions = new ConcurrentHashMap<>(256);
 
 	/** Names of beans that have already been created at least once. */
@@ -186,6 +186,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Create a new AbstractBeanFactory.
 	 */
+	//创建一个新的 AbstractAutowireCapableBeanFactory。
 	public AbstractBeanFactory() {
 	}
 
@@ -1244,13 +1245,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	//将父子类Bean的定义信息合并到一个BeanDefinition中
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
-		//检查bean名称 对应的 mergedBeanDefinition 是否存在于 合并的bean定义信息缓存中 ，这个缓存中的信息是在BFPP中添加的
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
 		if (mbd != null) {
-			//如果已经被合并过了，那么直接返回合并后的beanDefinition
 			return mbd;
 		}
-		//缓存中未找到，那么就去根据beanName和beanDefinition去获取合并后的beanDefinition
 		return getMergedBeanDefinition(beanName, getBeanDefinition(beanName));
 	}
 

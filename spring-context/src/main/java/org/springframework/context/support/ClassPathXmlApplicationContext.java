@@ -134,7 +134,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 		 */
 		//使用父类构造函数,进行容器相关对象的创建和设置等
 		super(parent);
-		//设置Spring容器的配置文件的路径
+		//因为当前上下文的类路径下xml配置为文件方式类型的上下文，所以需要设置Spring容器的配置文件的路径
 		setConfigLocations(configLocations);
 		if (refresh) {
 			//spring容器的核心方法

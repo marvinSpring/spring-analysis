@@ -97,14 +97,14 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 	@Nullable
 	private ResourceLoader resourceLoader;
-
+	//自定义的资源加载器
 	private boolean customClassLoader = false;
-
+	//spring容器是否已经刷新的标志
 	private final AtomicBoolean refreshed = new AtomicBoolean();
 
 
 	/**
-	 * Create a new GenericApplicationContext.
+	 * 创建一个新的 GenericApplicationContext。
 	 * @see #registerBeanDefinition
 	 * @see #refresh
 	 */
