@@ -24,16 +24,17 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.lang.Nullable;
 
 /**
- * Configuration interface to be implemented by most listable bean factories.
- * In addition to {@link ConfigurableBeanFactory}, it provides facilities to
- * analyze and modify bean definitions, and to pre-instantiate singletons.
+ * 本接口是一个可配置并且拥有罗列能力的bean工厂
  *
- * <p>This subinterface of {@link org.springframework.beans.factory.BeanFactory}
- * is not meant to be used in normal application code: Stick to
- * {@link org.springframework.beans.factory.BeanFactory} or
- * {@link org.springframework.beans.factory.ListableBeanFactory} for typical
- * use cases. This interface is just meant to allow for framework-internal
- * plug'n'play even when needing access to bean factory configuration methods.
+ * 配置接口将由大多数可罗列的bean工厂实现。
+ * 除了{@link ConfigurableBeanFactory}，
+ * 它还提供了 分析和修改bean定义 以及 预实例化单例 的工具。
+ *
+ * {@link org.springframework.beans.factory.BeanFactory}的子接口
+ * 并不用于正常的应用程序代码中:
+ * 坚持使用{@link org.springframework.beans.factory.BeanFactory}
+ * 或{@link org.springframework.beans.factory。ListableBeanFactory}用于典型用例。
+ * 这个接口只是为了允许框架内部的即插即用，即其拥有可以访问bean工厂配置方法的能力。
  *
  * @author Juergen Hoeller
  * @since 03.11.2003

@@ -25,7 +25,7 @@ import org.springframework.lang.Nullable;
  *
  *
  * spring的根接口
- * This is the basic client view of a bean container;
+ * 这是基于客户端试图的bean容器
  * 还有其他接口，例如{@link ListableBeanFactory}
  * 和{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}可发挥特殊作用。
  *
@@ -37,11 +37,11 @@ import org.springframework.lang.Nullable;
  * <p>实现上面方法的重点是BeanFactory是应用程序组件的中央注册表，
  * 并且集中了ApplicationComponent的配置（例如，不再需要单个对象读取属性文件）。
  *
- * <p>Note that it is generally better to rely on Dependency Injection
- * ("push" configuration) to configure application objects through setters
- * or constructors, rather than use any form of "pull" configuration like a
- * BeanFactory lookup. Spring's Dependency Injection functionality is
- * implemented using this BeanFactory interface and its subinterfaces.
+ * <p>注意，
+ * 通常最好依靠依赖注入(“push”配置)通过设置器或构造函数来配置应用程序对象，
+ * 而不是使用任何形式的“pull”配置，
+ * 如BeanFactory查找。
+ * Spring的依赖注入功能是使用这个BeanFactory接口及其子接口实现的。
  *
  * <p>通常，BeanFactory将加载存储在配置源（例如XML文档）中的bean定义，
  * 并使用{@code org.springframework.beans}包来配置bean。
@@ -53,11 +53,11 @@ import org.springframework.lang.Nullable;
  * {@link ListableBeanFactory}让bean的定义是可罗列的，有列表形式的
  * {@link HierarchicalBeanFactory}提供父子容器关系的容器
  *
- * <p>In contrast to the methods in {@link ListableBeanFactory}, all of the
- * operations in this interface will also check parent factories if this is a
- * {@link HierarchicalBeanFactory}. If a bean is not found in this factory instance,
- * the immediate parent factory will be asked. Beans in this factory instance
- * are supposed to override beans of the same name in any parent factory.
+ * <p>与{@link ListableBeanFactory}中的方法相反，
+ * 如果这是一个{@link HierarchicalBeanFactory}，
+ * 该接口中的所有操作也将检查父工厂。
+ * 如果在这个工厂实例中没有找到bean，就会询问直接的父工厂。
+ * 这个工厂实例中的bean应该覆盖任何父工厂中同名的bean
  *
  * <p>Bean工厂实现应尽可能支持标准Bean生命周期接口。完整的初始化方法及其标准顺序为：
  * <ol>
@@ -86,7 +86,7 @@ import org.springframework.lang.Nullable;
  * <ol>
 	 * <li>{@code postProcessBeforeDestruction} methods of DestructionAwareBeanPostProcessors
 	 * <li>DisposableBean's {@code destroy}
-	 * <li>a custom destroy-method definition
+	 * <li>自定义销毁方法定义
  * </ol>
  *
  * @author Rod Johnson
@@ -205,8 +205,9 @@ public interface BeanFactory {
 	/**
 	 * Return a provider for the specified bean, allowing for lazy on-demand retrieval
 	 * of instances, including availability and uniqueness options.
-	 * @param requiredType type the bean must match; can be an interface or superclass
-	 * @return a corresponding provider handle
+	 * 返回指定bean的提供者，允许按需 延迟检索实例，包括可用性和惟一性选项。
+	 * @param requiredType bean必须匹配的类型;可以是接口还是超类
+	 * @return 对应的提供者处理
 	 * @since 5.1
 	 * @see #getBeanProvider(ResolvableType)
 	 */
@@ -230,18 +231,14 @@ public interface BeanFactory {
 	<T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType);
 
 	/**
-	 * Does this bean factory contain a bean definition or externally registered singleton
-	 * instance with the given name?
-	 * <p>If the given name is an alias, it will be translated back to the corresponding
-	 * canonical bean name.
-	 * <p>If this factory is hierarchical, will ask any parent factory if the bean cannot
-	 * be found in this factory instance.
-	 * <p>If a bean definition or singleton instance matching the given name is found,
-	 * this method will return {@code true} whether the named bean definition is concrete
-	 * or abstract, lazy or eager, in scope or not. Therefore, note that a {@code true}
-	 * return value from this method does not necessarily indicate that {@link #getBean}
-	 * will be able to obtain an instance for the same name.
-	 * @param name the name of the bean to query
+	 * 判断当前bean工厂是否包含bean定义或外部注册的具有给定名称的单例实例?
+	 * <p>如果给定的名称是别名，它将被翻译回相应的规范bean名称。
+	 * <p>如果这个工厂是分层的，如果在这个工厂实例中找不到bean，将询问任何当前工厂的父工厂是否有该bean
+	 * <p>如果找到与给定名称匹配的bean定义或单例实例,
+	 * 无论命名bean定义是具体的还是抽象的，这个方法都会返回{@code true},
+	 * 懒惰或急切渴望的，是否在作用域内。
+	 * 所以，请注意，该方法的{@code true}返回值并不一定表明{@link #getBean}将能够获得相同名称的实例。
+	 * @param name 要在bean工厂中查询的bean名称
 	 * @return whether a bean with the given name is present
 	 */
 	//判断Spring容器中是否有bean名称为name的这个bean

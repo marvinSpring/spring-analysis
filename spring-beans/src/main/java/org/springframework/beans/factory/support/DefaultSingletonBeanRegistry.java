@@ -38,10 +38,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Generic registry for shared bean instances, implementing the
- * {@link org.springframework.beans.factory.config.SingletonBeanRegistry}.
- * Allows for registering singleton instances that should be shared
- * for all callers of the registry, to be obtained via bean name.
+ * 共享bean实例的通用注册中心，
+ * 实现{@link org.springframework.beans.factory.config.SingletonBeanRegistry}。
+ * 允许注册单例实例，
+ * 该实例应该为注册中心的所有调用者共享，通过bean名称获得。
  *
  * <p>Also supports registration of
  * {@link org.springframework.beans.factory.DisposableBean} instances,
@@ -98,14 +98,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
-	/** Set of registered singletons, containing the bean names in registration order. */
+	/** 已注册单例的集合，包含按注册顺序排列的bean名称. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	/** Names of beans that are currently in creation. */
+	/** 当前正在创建的bean的名称. */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-	/** Names of beans currently excluded from in creation checks. */
+	/** 当前在创建检查中排除的bean名称. */
 	private final Set<String> inCreationCheckExclusions =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
@@ -122,10 +122,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-	/** Map between dependent bean names: bean name to Set of dependent bean names. */
+	/** 依赖bean名称之间的映射:bean名称到依赖bean名称集. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
+	/** 依赖bean名称之间的映射:bean名称到bean依赖项的bean名称集. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
 

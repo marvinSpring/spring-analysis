@@ -18,7 +18,7 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 	@Override
 	protected void initPropertySources() {
 		System.out.println("自定义扩展，初始化属性资源");
-		getEnvironment().setRequiredProperties("java.xxx.aaa");
+//		getEnvironment().setRequiredProperties("java.xxx.aaa");
 		setAllowBeanDefinitionOverriding(false);
 	}
 
