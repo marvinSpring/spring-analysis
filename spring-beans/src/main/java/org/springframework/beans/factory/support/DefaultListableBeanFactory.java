@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.inject.Provider;
+//import javax.inject.Provider;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
@@ -154,7 +154,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/** Map from dependency type to corresponding autowired value. */
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
-	/** Map of bean definition objects, keyed by bean name. */
+	/** Map of bean definition objects, keyed by bean name.  key:{@link #beanDefinitionNames},value:{@link BeanDefinition}*/
 	//BeanDefinition真正存放的地方————相当于BeanFactory的容器（装配Bean的地方）——————IOC容器
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
@@ -828,23 +828,30 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	@Override
-	//初始化剩下的单例bean
+	//初始化单例bean
 	public void preInstantiateSingletons() throws BeansException {
+		//日志
 		if (logger.isTraceEnabled()) {
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		//1）、获取容器中的所有Bean，依次进行初始化和创建对象
-		/* beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
-		   用于存放所有需要实例化的BeanDefinition的beanName*/
+		//1.获取容器中的所有Bean，依次对这些bean进行初始化和创建对象
+		/*
+			beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
+		   	用于存放所有需要实例化的BeanDefinition的beanName
+	    */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
+
 		// 实例化所有非懒加载的单例Bean
 		for (String beanName : beanNames) {
-			// 父子BeanDefinition合并
-			/*2）、获取Bean的定义信息；RootBeanDefinition*/
+			// 父子Bean定义信息的合并
+			/*
+				2.获取Bean的定义信息；RootBeanDefinition
+			*/
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			//3）、非抽象的，单实例的，非懒加载的Bean
+			//3.非抽象的，单实例的，非懒加载的Bean
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				//如果是工厂Bean则需要用&+beanName的方式获取Bean
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -866,7 +873,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					//核心方法————getBean
-					/*3.2）、不是工厂Bean。利用getBean(beanName);创建对象*/
+					/*
+						3.2非工厂Bean。使用getBean(beanName) 创建对象
+					*/
 					getBean(beanName);
 				}
 			}
@@ -897,6 +906,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	// Implementation of BeanDefinitionRegistry interface
 	//---------------------------------------------------------------------
 
+	//注册bean定义信息,key BeanName ,value beanDefinition
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
@@ -916,7 +926,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		//根据Bean名称获取BeanDefinition
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		//处理本次要被注册的bean已经注册的情况
 		if (existingDefinition != null) {
+			//如果本次要注册bean已经注册且在配置中配置了bean是否允许bean定义信息被覆盖,这里可以在customizeBeanFactory方法中自定义去指定是否允许
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			}
@@ -957,7 +969,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 			else {
-				// 核心方法————beanDefinitionMap放入键值对，beanDefinitionNames是个BeanName的list集合
+				// 核心方法-----注册beanDefinition----也就是注入到BeanFactory中————beanDefinitionMap放入键值对，beanDefinitionNames是个BeanName的list集合
 				// 这两个容器是DefaultListableFactory的，也就是属于最开始传入的BeanFactory容器中的两个属性
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
@@ -1196,7 +1208,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return new DependencyObjectProvider(descriptor, requestingBeanName);
 		}
 		else if (javaxInjectProviderClass == descriptor.getDependencyType()) {
-			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
+//			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
+			return null;
 		}
 		else {
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
@@ -1982,22 +1995,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	private class Jsr330Factory implements Serializable {
 
-		public Object createDependencyProvider(DependencyDescriptor descriptor, @Nullable String beanName) {
-			return new Jsr330Provider(descriptor, beanName);
-		}
-
-		private class Jsr330Provider extends DependencyObjectProvider implements Provider<Object> {
-
-			public Jsr330Provider(DependencyDescriptor descriptor, @Nullable String beanName) {
-				super(descriptor, beanName);
-			}
-
-			@Override
-			@Nullable
-			public Object get() throws BeansException {
-				return getValue();
-			}
-		}
+//		public Object createDependencyProvider(DependencyDescriptor descriptor, @Nullable String beanName) {
+//			return new Jsr330Provider(descriptor, beanName);
+//		}
+//
+//		private class Jsr330Provider extends DependencyObjectProvider implements Provider<Object> {
+//
+//			public Jsr330Provider(DependencyDescriptor descriptor, @Nullable String beanName) {
+//				super(descriptor, beanName);
+//			}
+//
+//			@Override
+//			@Nullable
+//			public Object get() throws BeansException {
+//				return getValue();
+//			}
+//		}
 	}
 
 

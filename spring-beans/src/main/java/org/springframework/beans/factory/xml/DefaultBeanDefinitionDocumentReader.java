@@ -150,11 +150,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-		//前置方法，对xml做前置处理，没用
+		//前置方法，对xml做前置处理，钩子函数,可以自定义进行扩展实现
 		preProcessXml(root);
 		//核心方法————解析BeanDefinition
 		parseBeanDefinitions(root, this.delegate);
-		//前置方法，对xml做后置处理，没用
+		//前置方法，对xml做后置处理，钩子函数,可以自定义进行扩展实现
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -184,7 +184,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				//判断该节点是不是一个Element元素
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					//判断当前节点是否为默认的Bean标签（默认命名空间）
+					//判断当前节点是否为默认的Bean标签（默认命名空间）,是否是beans下默认的标签,如果是自定义导入的则需要自定义解析
 					if (delegate.isDefaultNamespace(ele)) {
 						//默认的Bean标签解析方法
 						parseDefaultElement(ele, delegate);

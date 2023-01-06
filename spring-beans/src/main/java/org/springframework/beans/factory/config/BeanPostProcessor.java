@@ -51,6 +51,7 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
+	//在bean实例化之后、初始化之前调用该方法
 	@Nullable
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
@@ -74,6 +75,7 @@ public interface BeanPostProcessor {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
+	//在bean注册destroy之前、实例化之后调用该方法
 	@Nullable
 	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;

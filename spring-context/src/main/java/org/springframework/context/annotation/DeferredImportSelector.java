@@ -20,16 +20,18 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.Nullable;
 
 /**
- * A variation of {@link ImportSelector} that runs after all {@code @Configuration} beans
- * have been processed. This type of selector can be particularly useful when the selected
- * imports are {@code @Conditional}.
  *
- * <p>Implementations can also extend the {@link org.springframework.core.Ordered}
- * interface or use the {@link org.springframework.core.annotation.Order} annotation to
- * indicate a precedence against other {@link DeferredImportSelector DeferredImportSelectors}.
+ * 延期的ImportSelector
  *
- * <p>Implementations may also provide an {@link #getImportGroup() import group} which
- * can provide additional sorting and filtering logic across different selectors.
+ * {@link ImportSelector} 的变体，在处理完所有 {@code @Configuration} bean 后运行。
+ * 当所选导入为 {@link  Conditional} 时，这种类型的选择器特别有用。
+ *
+ * <p>实现还可以扩展 {@link org.springframework.core.Ordered} 接口
+ * 或使用 {@link org.springframework.core.annotation.Order} 注释来指示
+ * 相对于其他 {@link DeferredImportSelector DeferredImportSelectors} 的优先级
+ *
+ * <p>实现还可以提供一个 {@link getImportGroup（） import group}，
+ * 它可以跨不同的选择器提供额外的排序和过滤逻辑。
  *
  * @author Phillip Webb
  * @author Stephane Nicoll
@@ -50,7 +52,11 @@ public interface DeferredImportSelector extends ImportSelector {
 
 
 	/**
-	 * Interface used to group results from different import selectors.
+	 * 这里的接口就是对@Import注解导入进来的类进行特殊处理的地方,每个@Import注解导入进来的都可以是不同类型的解析处理
+	 * 比如SpringBoot框架中,{@link AutoCOnfigurationImportSeletor#process()} 方法就是来自于这里,
+	 * 它是SpringBoot自动装配实现的地方,
+	 *
+	 * 用于对来自不同导入选择器的结果进行分组的接口。
 	 * @since 5.0
 	 */
 	interface Group {

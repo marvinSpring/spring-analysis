@@ -17,6 +17,8 @@
 package org.springframework.context;
 
 /**
+ * 事件源,发布事件
+ *
  * 封装事件发布功能的接口。
  *
  * <p>用作以下内容的超级接口 {@link ApplicationContext}.

@@ -64,7 +64,8 @@ public class StandardEnvironment extends AbstractEnvironment {
 	 * @see AbstractEnvironment#customizePropertySources(MutablePropertySources)
 	 * @see #getSystemProperties()
 	 * @see #getSystemEnvironment()
-	 *///就是说操作系统属性的优先级高于JVM系统的属性
+	 */
+	//就是说操作系统属性的优先级高于JVM系统的属性
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
 		propertySources.addLast(

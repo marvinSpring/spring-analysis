@@ -74,17 +74,25 @@ public class OrderComparator implements Comparator<Object> {
 	}
 
 	private int doCompare(@Nullable Object o1, @Nullable Object o2, @Nullable OrderSourceProvider sourceProvider) {
+		//判断o1有没有优先级能力
 		boolean p1 = (o1 instanceof PriorityOrdered);
+		//判断o2有没有优先级能力
 		boolean p2 = (o2 instanceof PriorityOrdered);
+		//如果o1有优先级的能力,那么o1在前面
 		if (p1 && !p2) {
 			return -1;
 		}
+		//如果o2有优先级的能力,那么o2在前面
 		else if (p2 && !p1) {
 			return 1;
 		}
 
+		//o1,o2都没有优先级的能力
+		//看看o1有没有ordered能力,如果有,就用o1的排序值,如果没有就用Ordered.LOWEST_PRECEDENCE,也就是排到最后面去
 		int i1 = getOrder(o1, sourceProvider);
+		//o2同理可得一个排序的值
 		int i2 = getOrder(o2, sourceProvider);
+		//用Integer的比较函数去比较哪个大
 		return Integer.compare(i1, i2);
 	}
 

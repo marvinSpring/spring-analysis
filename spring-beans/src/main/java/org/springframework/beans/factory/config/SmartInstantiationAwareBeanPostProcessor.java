@@ -46,6 +46,7 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * @return the type of the bean, or {@code null} if not predictable
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
+	//探测bean的类型，主要用于在bean没有被显示的创建的时候我们需要获取bean的类型的时候用的
 	@Nullable
 	default Class<?> predictBeanType(Class<?> beanClass, String beanName) throws BeansException {
 		return null;
@@ -59,6 +60,7 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * @return the candidate constructors, or {@code null} if none specified
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
+	//在反射构造出对象之前----------完成对构造方法的解析和推断
 	@Nullable
 	default Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName)
 			throws BeansException {
@@ -87,6 +89,8 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * (typically with the passed-in bean instance as default)
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
+	//通过此方法获取一个提前暴露的对象,提前的Bean的关联对象
+	//获取提前暴露的对象--用于解决循环依赖的问题
 	default Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		return bean;
 	}

@@ -121,7 +121,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Nullable
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
-	/** Whether to automatically try to resolve circular references between beans. */
+	/** Whether to automatically try to resolve circular references between beans. *///是否spring去自动允许循环依赖
 	private boolean allowCircularReferences = true;
 
 	/**
@@ -543,12 +543,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeanCreationException {
 
 		// bean的包装
+		//这个BeanWrapper是用来持有创建出来的Bean对象的包装容器
 		BeanWrapper instanceWrapper = null;
 		if (mbd.isSingleton()) {
+			//如果该bean是单例,则将该bean从factoryBean的实力缓存中移除该bean的定义信息
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
 			//核心方法
+			//根据执行bean使用对应的策略创建新的bean实例，例如：工厂方法、构造函数、简单初始化
 			// 1）、【创建Bean实例】利用工厂方法或者对象的构造器创建出Bean实例；
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -583,10 +586,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			//用来解决循环依赖问题,将创建好但没实例化的对象放到三级缓存中,等依赖的对象吧这个对象依赖上之后再将三级缓存中的这个对象进行初始化赋值操作
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));//添加bean到三级缓存中
 		}
 
 		// 初始化bean实例。
+		//提前暴露的bean
 		Object exposedObject = bean;
 		try {
 			//为bean 赋值
@@ -632,8 +637,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		//  5）、注册实现了DisposableBean 接口Bean的销毁方法；只是注册没有去执行，容器关闭之后才去调用的
+		//  5.注册实现了DisposableBean 接口Bean的销毁方法；只是注册没有去执行，容器关闭之后才去调用的
 		try {
+			//注册destroy方法
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -941,6 +947,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param bean the raw bean instance
 	 * @return the object to expose as bean reference
 	 */
+	//获取提前暴露的Bean依赖
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
 		Object exposedObject = bean;
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
@@ -1453,11 +1460,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+		//寻找beanWrapper中需要依赖注入的属性
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			if (containsBean(propertyName)) {
+				//递归(找到或者创建)到需要注入的被依赖的bean
 				Object bean = getBean(propertyName);
 				pvs.add(propertyName, bean);
+				//将被依赖的bean注册到本bean中
 				registerDependentBean(propertyName, beanName);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Added autowiring by name from bean name '" + beanName +
@@ -1778,12 +1788,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			//2）、【执行后置处理器BeanPostProcessor初始化之前】 执行所有的 BeanPostProcessor.postProcessBeforeInitialization();
+			//2）、【执行后置处理器BeanPostProcessor:before】 执行所有的 BeanPostProcessor.postProcessBeforeInitialization();
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
-			//3）、【执行初始化方法】——核心方法
+			//3）、【执行init-method方法】——核心方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1791,7 +1801,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					(mbd != null ? mbd.getResourceDescription() : null),
 					beanName, "Invocation of init method failed", ex);
 		}
-		//4）、【执行后置处理器初始化之后】 执行所有的beanProcessor.postProcessAfterInitialization(result, beanName);方法
+		//4）、【执行后置处理器BeanPostProcessor:after】 执行所有的beanProcessor.postProcessAfterInitialization(result, beanName);方法
 		if (mbd == null || !mbd.isSynthetic()) {
 			//AOP代理的地方————从这里可以看出AOP其实也是Spring容器的后置处理器实现的
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);

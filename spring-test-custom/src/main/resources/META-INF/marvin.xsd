@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema
+		xmlns="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.marvin.com/schema/marvin"
+			elementFormDefault="qualified">
+	<element name="marvin">
+		<complexType>
+			<attribute name="id" type="string"/>
+			<attribute name="username" type="string"/>
+			<attribute name="password" type="string"/>
+			<attribute name="age" type="integer"/>
+		</complexType>
+	</element>
+
+</schema>

@@ -45,6 +45,7 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
+	//设置xml配置文件的验证标志,默认是true
 	private boolean validating = true;
 
 
@@ -86,7 +87,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
-		//允许子类提供阅读器的自定义初始化
+		//允许子类提供读取器的自定义初始化
 		initBeanDefinitionReader(beanDefinitionReader);
 		//核心方法————根据BeanDefinitionReader加载beanDefinition
 		loadBeanDefinitions(beanDefinitionReader);

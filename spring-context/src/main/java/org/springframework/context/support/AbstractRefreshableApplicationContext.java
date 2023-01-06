@@ -116,7 +116,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	//刷新BeanFactory(因为再SpringMVC中可能会在第一次创建BeanFactory之前存在BeanFactory)
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		//若存在旧的bean工厂，销毁
+		//若存在旧的bean工厂，销毁并关闭
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
@@ -128,7 +128,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			beanFactory.setSerializationId(getId());
 			//自定义子类实现扩展接口
 			customizeBeanFactory(beanFactory);
-			//核心方法，根据BeanFactory加载BeanDefinition
+			//核心方法,解析各种方式配置的属性值（例如：xml、注解等方式配置bean）
+			//xml中1.默认命名空间的解析2.自定义格式的命名空间的解析
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
@@ -196,7 +197,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
 	 */
 	protected DefaultListableBeanFactory createBeanFactory() {
-		return new DefaultListableBeanFactory(getInternalParentBeanFactory());//DefaultListableBeanFactory（重要的类）它是用来创建BeanFactory的
+		//DefaultListableBeanFactory（重要的类）它是用来创建BeanFactory的
+		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
 	}
 
 	/**

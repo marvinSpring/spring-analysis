@@ -66,12 +66,21 @@ import org.springframework.util.ClassUtils;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
 
 /**
- * {@link BeanFactoryPostProcessor} used for bootstrapping processing of
- * {@link Configuration @Configuration} classes.
+ * ===================Warning你看到了一个===================
+ * 你看到了一个非常重要的一个BFPP哦
+ * =========================================================
  *
- * <p>Registered by default when using {@code <context:annotation-config/>} or
- * {@code <context:component-scan/>}. Otherwise, may be declared manually as
- * with any other BeanFactoryPostProcessor.
+ * 此类是拥有后置处理增强器能力的类,主要的功能是参与Bean工厂的构建,参与了Bean工厂所有配置类的解析,参见：
+ * 	1.解析@Configuration注解的配置类
+ * 	2.解析@ComponentScan注解 扫描的包
+ * 	3.解析@ComponentScans注解 扫描的包
+ * 	4.解析@Import注解
+ * 	5.解析@ImportSelector注解 自动注入类--SpringBoot的东西
+ *
+ * {@link BeanFactoryPostProcessor} 用于配置类注解 {@link Configuration @Configuration} 的引导处理。
+ *
+ * 使用 {@code <context：<p>annotation-config>} 或 {@code <context：component-scan>} 时默认注册。否
+ * 则，可以像使用任何其他 BeanFactoryPostProcessor 一样手动声明。
  *
  * <p>This post processor is priority-ordered as it is important that any
  * {@link Bean} methods declared in {@code @Configuration} classes have
@@ -133,7 +142,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	@Override
 	public int getOrder() {
-		return Ordered.LOWEST_PRECEDENCE;  // within PriorityOrdered
+		return Ordered.LOWEST_PRECEDENCE;  // 它是拥有 PriorityOrdered 层次能力的
 	}
 
 	/**
@@ -214,7 +223,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 
 	/**
-	 * Derive further bean definitions from the configuration classes in the registry.
+	 * 从注册表中的配置类派生更多 Bean 定义。
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
@@ -227,8 +236,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			throw new IllegalStateException(
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
+		//将马上要处理的registry对象的id放入已经处理过的集合对象中
 		this.registriesPostProcessed.add(registryId);
 
+		//处理 属于配置类的bean的定义信息
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -255,31 +266,45 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
-	 * Build and validate a configuration model based on the registry of
+	 * 构建和验证类是否呗@Configuration注解修饰，并对该类的bean定义信息作相关的处理工作
+	 *
+	 * 构建并验证一个基于注册器的配置模型在配置上中
 	 * {@link Configuration} classes.
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
+		//存放配置类的 BeanDefinition的单例holder集合
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+		//当前registry就是DefaultListableBeanFactory，获取所有已经注册的BeanDefinition和BeanName
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
+		//遍历所有需要处理的beanName,筛选出配置类的Bean定义信息存入 configCandidates集合中
 		for (String beanName : candidateNames) {
+			//根据beanName获取指定的BeanDefinition
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
+			//如果beanDefinition中的configurationClass的属性不是空,也就代表这个类是配置类并且已经处理过了,打印个日志
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef) ||
 					ConfigurationClassUtils.isLiteConfigurationClass(beanDef)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
+			//判断当前BeanDefinition的元Bean对象的类上面是否有@Configuration或其他配置类标识
+			// （例如：@Bean、@Component、@ComponentScan、@Import、@ImportSource）
+			//如果Configuration配置proxyBeanMethods代理为true则为full
+			//如果加了@Bean、@Component、@ComponentScan、@Import、@ImportSource注解则为lite
+			//如果配置类被@Order注解修饰,则设置beanDefinition的order属性值
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
+				//将这些特殊的bean添加到 存放BeanDefinition的单例holder集合 中
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
 
-		// Return immediately if no @Configuration classes were found
+		// 如果任何配置类都没找到就即刻返回,不要在我这里浪费时间了,赶紧去处理其他的BFPP
 		if (configCandidates.isEmpty()) {
 			return;
 		}
 
+		//如果该 配置类BeanDefinition 还有@Order注解 那么给它们按照Order顺序的值 从小到大 排个序
 		// Sort by previously determined @Order value, if applicable
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());
@@ -288,33 +313,57 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		});
 
 		// Detect any custom bean name generation strategy supplied through the enclosing application context
+		//判断当前的bean增删改查器 是否属于 SingletonBean的增删改查器
 		SingletonBeanRegistry sbr = null;
 		if (registry instanceof SingletonBeanRegistry) {
+			//属于就强转为SingletonBean增删改查器
 			sbr = (SingletonBeanRegistry) registry;
-			if (!this.localBeanNameGeneratorSet) {
+			//判断是否有自定义的BeanName生成器
+			if (!this.localBeanNameGeneratorSet) {//如果检测到自定义的BeanName生成器,那就给他们重新起个自定义的名字
+				//获取自定义的BeanName生成器
 				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(CONFIGURATION_BEAN_NAME_GENERATOR);
+				//如果找到了BeanName生成器
 				if (generator != null) {
+					//设置组件扫描的BeanName生成策略
 					this.componentScanBeanNameGenerator = generator;
+					//设备import BeanName的生成策略
 					this.importBeanNameGenerator = generator;
 				}
 			}
 		}
 
+		//如果此时的环境对象不存在就创建一个新的标准的环境对象
 		if (this.environment == null) {
 			this.environment = new StandardEnvironment();
 		}
 
 		// Parse each @Configuration class
+		//实例化 配置类解析器,并初始化相关的参数,以便后面 配置类解析器的解析工作
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 
+		//创建俩个重要的集合
+
+		//将之前的 配置类bean 进行一个去重
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
+		//一个可以用于判断是否已经解析过的集合,防止配置类被重复解析
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
+
 		do {
+			//================Warning===============
+			/**
+			 * 恭喜你又闯了Boss的老窝了,这里的Spring的一些核心注解的核心的解析工作
+			  *解析符合配置类规范的Bean
+			  *例如：有这些标识描述的 (@Controller、@Import、@ImportSource、@ComponentScan、@Bean ) BeanDefinition
+			 */
+			//开始解析 当前配置类身上的 所有注解
 			parser.parse(candidates);
+
+			//校验
 			parser.validate();
 
+			//移除掉已经解析过的 配置类
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
 			configClasses.removeAll(alreadyParsed);
 

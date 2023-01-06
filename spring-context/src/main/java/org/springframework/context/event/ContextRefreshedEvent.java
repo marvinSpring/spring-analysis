@@ -19,7 +19,7 @@ package org.springframework.context.event;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Event raised when an {@code ApplicationContext} gets initialized or refreshed.
+ * 初始化或刷新完成 {@code ApplicationContext} 的时候引发的事件。
  *
  * @author Juergen Hoeller
  * @since 04.03.2003

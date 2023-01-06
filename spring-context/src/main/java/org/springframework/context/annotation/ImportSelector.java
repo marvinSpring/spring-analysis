@@ -19,6 +19,15 @@ package org.springframework.context.annotation;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
+ * 本接口是Spring中导入外部配置的核心接口,根据给定的条件(条件一般是一个或者多个的注解),通过该条件判断
+ * 要导入哪个配置类。
+ *
+ * 如果实现本接口的同时还实现了一些Aware接口,那么这些Aware能力方法 的生命周期 将在
+ * 本接口能力 selectImports方法 之前被陆续调用 {@link ConfigurationClassParser#processImports} into {@see if (candidate.isAssignable(ImportSelector.class)) }'s contents
+ *
+ * 如果实现本接口的能力类 需要再所有的@Configuration配置类都处理完成后再导入 , 可以实现 {@link DeferredImportSelector}
+ *
+ *
  * Interface to be implemented by types that determine which @{@link Configuration}
  * class(es) should be imported based on a given selection criteria, usually one or
  * more annotation attributes.
@@ -48,9 +57,8 @@ import org.springframework.core.type.AnnotationMetadata;
 public interface ImportSelector {
 
 	/**
-	 * Select and return the names of which class(es) should be imported based on
-	 * the {@link AnnotationMetadata} of the importing @{@link Configuration} class.
-	 * @return the class names, or an empty array if none
+	 * 根据导入 @{@link 配置} 类的 {@link 注释元数据} 选择并返回应导入的类的名称
+	 * @return 要导入的 配置类 类名，如果没有，则为空数组
 	 */
 	String[] selectImports(AnnotationMetadata importingClassMetadata);
 

@@ -1,15 +1,22 @@
 package com.marvin.test;
 
 import com.marvin.test.controller.TestController;
-import com.marvin.test.model.MyClassPathXmlApplicationContext;
-import com.marvin.test.model.StudentService;
-import com.marvin.test.model.Teacher;
+import com.marvin.test.model.*;
+import com.marvin.test.self.bfpp.MarvinBean;
+import com.marvin.test.self.bfpp.MarvinExtendsBeanDefinitionRegistryPostProcessor;
+import com.marvin.test.self.edtior.entity.User;
+import com.marvin.test.self.tags.entity.Marvin;
 import com.marvin.test.service.TestService;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
+import org.springframework.objenesis.instantiator.util.ClassUtils;
 
 /**
  * @author Marvin
@@ -19,12 +26,18 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SpringApplication {
 
 	public static void main(String[] args) throws InterruptedException {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext();
-		ac.register(TestService.class);
-		ac.register(TestController.class);
-		ac.refresh();
-		TestController testController = ac.getBean("testController", TestController.class);
-		testController.test();
+//		ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("applicationContext.xml");
+//		System.out.println(applicationContext.getBean("xxx", Marvin.class));
+//		ApplicationContext applicationContext = new AnnotationConfigApplicationContext("com.marvin.test.*");
+//		System.out.println(applicationContext.getBean(Log.class));
+//		ApplicationContext beanFactory = new ClassPathXmlApplicationContext("spring-${username}.xml");
+//		Dog dog = beanFactory.getBean("dog", Dog.class);
+//		ApplicationContext applicationContext = dog.getApplicationContext();
+//		System.out.println(applicationContext);
+		ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("applicationContext.xml");
+//		User user = applicationContext.getBean("user", User.class);
+//		System.out.println(user);
+		System.out.println(applicationContext.getDisplayName());
 	}
 
 }

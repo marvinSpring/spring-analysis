@@ -18,6 +18,7 @@ package org.springframework.context;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.Aware;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * 希望由希望在其运行{@link ApplicationContext}的时候收到通知的任何对象实现的接口。
@@ -49,9 +50,9 @@ public interface ApplicationContextAware extends Aware {
 	 * 设置该对象在其中运行的ApplicationContext。
 	 * 通常，此调用将用于初始化该对象。
 	 * <p>在填充正常的bean属性之后但在初始化回调之前调用，
-	 * 例如{@link org.springframework.beans.factory.InitializingBeanafterPropertiesSet（）}
+	 * 例如{@link  InitializingBean#afterPropertiesSet()}
 	 * 或自定义的初始化方法。
-	 * 如果适用，在{@link ResourceLoaderAwaresetResourceLoader}，{@link ApplicationEventPublisherAwaresetApplicationEventPublisher}和{@link MessageSourceAware}之后调用。
+	 * 如果适用，在{@link ResourceLoaderAware#setResourceLoader}，{@link ApplicationEventPublisherAwaresetApplicationEventPublisher}和{@link MessageSourceAware}之后调用。
 	 * @param applicationContext the ApplicationContext object to be used by this object
 	 * @throws ApplicationContextException in case of context initialization errors
 	 * @throws BeansException if thrown by application context methods

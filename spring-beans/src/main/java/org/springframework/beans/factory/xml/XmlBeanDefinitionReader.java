@@ -391,7 +391,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 
-		try {//此处获取Xml中的document对象，从String[]—>String->Resources[]->Resource
+		try {//此处获取Xml中的document对象，从一开始的String[]—>String->Resources[]->直到Resource，到resource获取xml中的document文档，再根据文档的节点获取封装成一个个的beanDefinition对象
 			Document doc = doLoadDocument(inputSource, resource);
 			//核心方法————将BeanDefinition对象进行注册
 			int count = registerBeanDefinitions(doc, resource);

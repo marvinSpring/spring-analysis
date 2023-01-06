@@ -129,13 +129,20 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
+		//获取要发布的 事件的类型
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+
+		//获取当前多播器 当前执行程序的任务
 		Executor executor = getTaskExecutor();
+		//遍历当前事件类型对应的监听器
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			//如果程序执行器不为空
 			if (executor != null) {
+				//使用程序执行器去提交一个调用监听器处理事件的任务
 				executor.execute(() -> invokeListener(listener, event));
 			}
 			else {
+				//调用监听器处理事件
 				invokeListener(listener, event);
 			}
 		}
@@ -146,9 +153,9 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	}
 
 	/**
-	 * Invoke the given listener with the given event.
-	 * @param listener the ApplicationListener to invoke
-	 * @param event the current event to propagate
+	 * 使用给定事件类型调用指定的监听器。
+	 * @param listener 要调用的应用程序监听器
+	 * @param event 要传播的当前事件
 	 * @since 4.1
 	 */
 	protected void invokeListener(ApplicationListener<?> listener, ApplicationEvent event) {
@@ -169,6 +176,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void doInvokeListener(ApplicationListener listener, ApplicationEvent event) {
 		try {
+			//触发监听器身上的onApplicationEvent方法，参数为指定的事件类型，根据泛型去匹配对应的监听器
 			listener.onApplicationEvent(event);
 		}
 		catch (ClassCastException ex) {

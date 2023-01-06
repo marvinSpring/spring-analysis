@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:marvin="http://www.marvin.com/schema/marvin"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.marvin.com/schema/marvin
+       http://www.marvin.com/schema/marvin.xsd
+       http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context.xsd">
 
+<!--	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>-->
+	<context:component-scan base-package="com.marvin.test.self.anno"/>
+<!--
+	<context:property-placeholder location="classpath:databse.properties"/>
+
+	<bean id="testEntity" class="com.marvin.test.model.TestEntity">
+		<property name="id" value="1"/>
+	</bean>
+	<bean id="testEntity2" class="com.marvin.test.model.TestEntity">
+		<constructor-arg index="0" value="1"/>
+		<constructor-arg index="1" value="hah"/>
+	</bean>-->
 </beans>
