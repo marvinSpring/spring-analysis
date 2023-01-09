@@ -176,7 +176,7 @@ final class PostProcessorRegistrationDelegate {
 				currentRegistryProcessors.clear();
 			}
 
-			//使用上面层层获取到的BFPP能力
+			//使用上面 层层获取到的BFPP能力
 			/* 调用所有实现BeanDefinitionRegistryPostProcessor中的postProcessBeanFactory方法*/
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			//当前bean工厂支持 增删改查器的 使用外部入参的BFPP能力

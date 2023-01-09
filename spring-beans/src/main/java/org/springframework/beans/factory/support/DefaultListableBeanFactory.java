@@ -844,7 +844,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		//1.获取容器中的所有Bean，依次对这些bean名称对应的Bean进行初始化和创建对象
+		//1.获取SpringBean工厂中之前通过loadBeanDefinition方法注入的所有Bean名称，依次对这些bean名称对应的BeanDefinition进行getBean这样的伪检索->初始化->创建bean对象
 		/*
 			beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
 		   	用于存放所有需要实例化的BeanDefinition的beanName
@@ -854,9 +854,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// 实例化并初始化所有非懒加载的单例Bean
 		for (String beanName : beanNames) {
 			// 合并父子的Bean定义信息
-			/*
-				2.获取Bean的定义信息；RootBeanDefinition
-			*/
+			//2.获取Bean的定义信息；RootBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			//3.如果是 非抽象的，单实例的，非懒加载的Bean
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
@@ -866,6 +864,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
+						//是否是一个只能的工厂Bean
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
@@ -875,6 +874,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
+						//如果factoryBean中要创建的bean渴望被初始化到一级缓存中-那么就先对factoryBean能生产的bean进行初始化，并放入一级缓存
 						if (isEagerInit) {
 							getBean(beanName);
 						}
@@ -882,15 +882,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					//核心方法————getBean
-					/*
-						3.2非工厂Bean。使用getBean(beanName) 创建对象
-					*/
+					//3.2非FactoryBean的普通bean。使用getBean(beanName) 创建对象
 					getBean(beanName);
 				}
 			}
 		}
 
-		// 循环所有的bean
+		// 循环所有的bean，将bean中有SmartInitializingSingleton能力的进行能力使用
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			//判断bean是否实现了SmartInitializingSingleton 接口如果是；就执行afterSingletonsInstantiated()；

@@ -11,11 +11,16 @@ package com.marvin.test.self.converter;
 import com.marvin.test.self.tags.entity.Marvin;
 import org.springframework.core.convert.converter.Converter;
 
-public class MarvinConverter implements Converter<String, Marvin> {
+public class ObjectSourceToMarvinConverter implements Converter<ObjectSource, Marvin> {
 
+	/**
+	 * convert source to marvin
+	 * @param source the source object to convert, which must be an instance of {@code S} (never {@code null})
+	 * @return marvin
+	 */
 	@Override
-	public Marvin convert(String source) {
-		String[] strings = source.split("_");
+	public Marvin convert(ObjectSource source) {
+		String[] strings = source.getValue().split("_");
 		Marvin marvin = new Marvin();
 		marvin.setAge(Integer.parseInt(strings[0]));;
 		marvin.setUsername(strings[1]);

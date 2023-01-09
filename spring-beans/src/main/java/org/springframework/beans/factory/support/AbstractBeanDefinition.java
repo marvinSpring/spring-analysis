@@ -274,6 +274,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	/**
+	 * 从给定的 Bean 定义（可能是子定义）中覆盖此 Bean 定义中的设置（可能是从父子继承关系复制的父项）。
+	 *
 	 * Override settings in this bean definition (presumably a copied parent
 	 * from a parent-child inheritance relationship) from the given bean
 	 * definition (presumably the child).
@@ -470,8 +472,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this a <b>Singleton</b>, with a single shared instance
-	 * returned from all calls.
+	 * 返回这是否为<b>单例bean<b>，
+	 * 并从所有调用返回单个共享实例。
 	 * @see #SCOPE_SINGLETON
 	 */
 	@Override
@@ -500,8 +502,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean is "abstract", i.e. not meant to be instantiated
-	 * itself but rather just serving as parent for concrete child bean definitions.
+	 * 返回此 bean 是否是“抽象的”，即不打算实例化本身，
+	 * 而只是充当具体子 bean 定义的父级。
 	 */
 	@Override
 	public boolean isAbstract() {
@@ -519,8 +521,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean should be lazily initialized, i.e. not
-	 * eagerly instantiated on startup. Only applicable to a singleton bean.
+	 * 返回此 Bean 是否应该延迟初始化，即在Spring启动时不急切地实例化。
+	 * 仅适用于单例Bean对象，懒加载的bean对象将在使用的时候才会被注入一级缓存。
 	 * @return whether to apply lazy-init semantics ({@code false} by default)
 	 */
 	@Override
@@ -967,8 +969,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean definition is 'synthetic', that is,
-	 * not defined by the application itself.
+	 * 返回此 Bean 定义是否为“终端用户自己创建的”，
+	 * 即不是由应用程序本身定义的。
 	 */
 	public boolean isSynthetic() {
 		return this.synthetic;

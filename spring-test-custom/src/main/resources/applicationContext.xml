@@ -11,9 +11,9 @@
 	   http://www.springframework.org/schema/context/spring-context.xsd">
 
 <!--	<marvin:marvin id="xxx" username="小马" password="123456" age="18"/>-->
-	<context:component-scan base-package="com.marvin.test"/>
+	<context:component-scan base-package="com.marvin.test.self"/>
 <!--	<context:component-scan base-package="com.marvin.test.self.anno"/>-->
-	<bean id="marvinConverter" class="com.marvin.test.self.converter.MarvinConverter"/>
+	<bean id="marvinConverter" class="com.marvin.test.self.converter.ObjectSourceToMarvinConverter"/>
 	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
 		<property name="converters">
 			<set>
@@ -21,6 +21,12 @@
 			</set>
 		</property>
 	</bean>
+<!--	<bean id="subClass" class="com.marvin.test.self.merged.SubClass" parent="superClass">-->
+<!--		<property name="name" value="2"/>-->
+<!--	</bean>-->
+<!--	<bean id="superClass" class="com.marvin.test.self.merged.SuperClass">-->
+<!--		<property name="id" value="1"/>-->
+<!--	</bean>-->
 <!--
 	<context:property-placeholder location="classpath:databse.properties"/>
 
