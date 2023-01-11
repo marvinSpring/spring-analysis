@@ -99,6 +99,8 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// 根据类型从容器中获取到所有的BeanDefinitionRegistryPostProcessor
+			// ------>拥有这个BeanDefinitionRegistryPostProcessor能力的beanDefinition
+			// mergedLocalBeanDefinition第一次将在这里被初始化到
 			/* 首先，从beanFactory中找所有有BeanDefinitionRegistryPostProcessor能力的类*/
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);

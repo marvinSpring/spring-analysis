@@ -511,17 +511,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 		List<String> result = new ArrayList<>();
 
-		// Check all bean definitions.
+		// 检查所有被加载到缓存中的 Bean 定义信息.
 		for (String beanName : this.beanDefinitionNames) {
-			// Only consider bean as eligible if the bean name is not defined as alias for some other bean.
+			//仅当 Bean 名称未定义为其他某个 Bean 的别名时，才将 Bean 视为合格。
 			if (!isAlias(beanName)) {
 				try {
+					//这里将根据bean名称将父子bean定义信息合并并将非RootBeanDefinition转为RootBeanDefinition
+					// 存入mergedLocalBeanDefinition缓存集合中并返回
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-					// Only check bean definition if it is complete.
+					// 仅检查 Bean 定义是否完整。
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
-						// In case of FactoryBean, match object created by FactoryBean.
+						// 如果是 FactoryBean，匹配对应的 FactoryBean 去创建的对象。
 						boolean isFactoryBean = isFactoryBean(beanName, mbd);
 						BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 						boolean matchFound =
@@ -531,7 +533,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 										(dbd != null ? mbd.isSingleton() : isSingleton(beanName))) &&
 								isTypeMatch(beanName, type);
 						if (!matchFound && isFactoryBean) {
-							// In case of FactoryBean, try to match FactoryBean instance itself next.
+							//如果是 FactoryBean，接下来尝试匹配 FactoryBean 派生的Bean实例本身。
 							beanName = FACTORY_BEAN_PREFIX + beanName;
 							matchFound = (includeNonSingletons || mbd.isSingleton()) && isTypeMatch(beanName, type);
 						}
@@ -566,26 +568,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
-		// Check manually registered singletons too.
+		// 也检查手动注册的Bean单例。
 		for (String beanName : this.manualSingletonNames) {
 			try {
-				// In case of FactoryBean, match object created by FactoryBean.
+				// 如果是 FactoryBean，请匹配 FactoryBean 创建的对象。
 				if (isFactoryBean(beanName)) {
 					if ((includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type)) {
 						result.add(beanName);
-						// Match found for this bean: do not match FactoryBean itself anymore.
+						// 找到此 bean 的匹配项：不再匹配 FactoryBean 本身。
 						continue;
 					}
-					// In case of FactoryBean, try to match FactoryBean itself next.
+					// 如果是 FactoryBean，接下来尝试匹配 FactoryBean 本身。
 					beanName = FACTORY_BEAN_PREFIX + beanName;
 				}
-				// Match raw bean instance (might be raw FactoryBean).
+				// 匹配原始 Bean 实例（可能是原始 FactoryBean）。
 				if (isTypeMatch(beanName, type)) {
 					result.add(beanName);
 				}
 			}
 			catch (NoSuchBeanDefinitionException ex) {
-				// Shouldn't happen - probably a result of circular reference resolution...
+				// 不应该发生 - 可能是循环引用的结果......
 				if (logger.isTraceEnabled()) {
 					logger.trace("Failed to check manually registered singleton with name '" + beanName + "'", ex);
 				}

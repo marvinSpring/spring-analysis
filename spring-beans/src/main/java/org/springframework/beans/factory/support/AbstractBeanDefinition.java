@@ -38,13 +38,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for concrete, full-fledged {@link BeanDefinition} classes,
- * factoring out common properties of {@link GenericBeanDefinition},
- * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
+ * 具体的、成熟的 {@link BeanDefinition} 类的基类，
+ * 分解出 {@link GenericBeanDefinition}、
+ * {@link RootBeanDefinition} 和
+ * {@link ChildBeanDefinition} 的常见属性。
  *
- * <p>The autowire constants match the ones defined in the
- * {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
- * interface.
+ * <p>自动注入常量与 {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory} 接口中定义的常量匹配。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -716,7 +715,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return a callback for creating an instance of the bean, if any.
+	 * 返回用于创建 Bean 实例的回调（如果有）。
 	 * @since 5.0
 	 */
 	@Nullable
@@ -1079,25 +1078,26 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Validate and prepare the method overrides defined for this bean.
-	 * Checks for existence of a method with the specified name.
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 验证并准备为当前 Bean 定义的方法覆盖。
+	 * 检查是否存在具有指定名称的方法。
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exist and determine their overloaded status.
+		// 检查查找方法是否存在并确定其重载状态。
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
 	}
 
 	/**
-	 * Validate and prepare the given method override.
-	 * Checks for existence of a method with the specified name,
-	 * marking it as not overloaded if none found.
-	 * @param mo the MethodOverride object to validate
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 验证并准备给定的方法重写。
+	 * 检查是否存在具有指定名称的方法，
+	 * 如果未找到，则将其标记为未重载。
+	 * @param mo 要验证的方法重写对象
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		//获取
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
@@ -1105,7 +1105,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 					"' on class [" + getBeanClassName() + "]");
 		}
 		else if (count == 1) {
-			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			//将覆盖标记为未重载，以避免 arg 类型检查的开销
 			mo.setOverloaded(false);
 		}
 	}

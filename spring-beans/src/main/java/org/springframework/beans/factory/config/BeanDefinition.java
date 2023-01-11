@@ -22,13 +22,12 @@ import org.springframework.core.AttributeAccessor;
 import org.springframework.lang.Nullable;
 
 /**
- * A BeanDefinition describes a bean instance, which has property values,
- * constructor argument values, and further information supplied by
- * concrete implementations.
+ * BeanDefinition 描述了一个 Bean 实例，
+ * 该实例具有属性值、构造函数参数值以及具体实现提供的其他信息。
  *
- * <p>This is just a minimal interface: The main intention is to allow a
- * {@link BeanFactoryPostProcessor} such as {@link PropertyPlaceholderConfigurer}
- * to introspect and modify property values and other bean metadata.
+ * <p>这只是一个最小的接口：
+ * 主要目的是允许 {@link BeanFactoryPostProcessor}（
+ * 如 {@link PropertyPlaceholderConfigurer}）自检和修改属性值和其他 Bean 元数据。
  *
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -79,7 +78,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	int ROLE_INFRASTRUCTURE = 2;
 
 
-	// Modifiable attributes
+	// 允许被修改的属性
 
 	/**
 	 * Set the name of the parent definition of this bean definition, if any.

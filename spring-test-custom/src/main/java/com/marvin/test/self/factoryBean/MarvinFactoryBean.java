@@ -22,6 +22,10 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class MarvinFactoryBean implements FactoryBean<Marvin>, InitializingBean {
 
+	public MarvinFactoryBean() {
+		System.out.println(2);
+	}
+
 	private final ConcurrentMap<String,Marvin> marvinConcurrentMap = new ConcurrentHashMap<>();
 
 	@Override

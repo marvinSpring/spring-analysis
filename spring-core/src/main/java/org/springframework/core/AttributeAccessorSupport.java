@@ -25,10 +25,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Support class for {@link AttributeAccessor AttributeAccessors}, providing
- * a base implementation of all methods. To be extended by subclasses.
+ * 支持 {@link AttributeAccessor AttributeAccessors} 的类，
+ * 提供所有方法的基本实现。由子类扩展。
  *
- * <p>{@link Serializable} if subclasses and all attribute values are {@link Serializable}.
+ * <p>{@link Serializable} 如果子类和所有属性值都是 {@link Serializable}.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller

@@ -19,7 +19,7 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 
 /**
- * 定义一个工厂，该工厂在调用时可以返回Object实例（可能是共享的或独立的）。
+ * 定义一个对象工厂，该对象工厂在被调用时可以返回Object实例（可能是共享的或独立的）。
  *
  * <p>此接口通常用于封装通用工厂，该通用工厂在每次调用时返回某个目标对象的新实例（prototype）。
  *
@@ -36,9 +36,9 @@ import org.springframework.beans.BeansException;
 public interface ObjectFactory<T> {
 
 	/**
-	 * 返回此工厂管理的对象的实例（可能是共享的或独立的）。
-	 * @return the resulting instance
-	 * @throws BeansException in case of creation errors
+	 * 返回此对象工厂管理的对象的实例（可能是共享的或独立的）。
+	 * @return 生成的实例
+	 * @throws BeansException 在创建错误的情况下
 	 */
 	T getObject() throws BeansException;
 
