@@ -479,6 +479,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			//预处理方法重载？？？
 			mbdToUse.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -1211,34 +1212,44 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Obtain a bean instance from the given supplier.
-	 * @param instanceSupplier the configured supplier
-	 * @param beanName the corresponding bean name
-	 * @return a BeanWrapper for the new instance
+	 * 从给定Supplier中获取 Bean 实例。
+	 * @param instanceSupplier 已配置的 supplier
+	 * @param beanName 对应的 Bean 名称
+	 * @return 新实例的 BeanWrapper
 	 * @since 5.0
 	 * @see #getObjectForBeanInstance
 	 */
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
 
+		//获取当前正在创建的对象，如果有的话就将其拿出来，放在外面暂时挂起，
+		// 因为下面我要用方法参数中的bean名称作为正在被创建的对象
 		String outerBean = this.currentlyCreatedBean.get();
+		//将当前bean置为当前正在创建的对象属性
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			//从实例supplier中获取实例
 			instance = instanceSupplier.get();
 		}
 		finally {
+			//如果在方法参数中的bean对象处理完了并且之前存在被挂起的正在创建的bean对象，那么将其恢复到当前正在被创建的对象属性中
 			if (outerBean != null) {
 				this.currentlyCreatedBean.set(outerBean);
 			}
 			else {
+				//如果之前挂起一个null的话，那么就直接清空当前创建中的，其实也不会情况啥，就是为了统一
 				this.currentlyCreatedBean.remove();
 			}
 		}
 
+		//如果supplier中获取到的是空对象
 		if (instance == null) {
+			//赋值为空
 			instance = new NullBean();
 		}
+		//将supplier中获取到的bean对象进行一个包装
 		BeanWrapper bw = new BeanWrapperImpl(instance);
+		//对该包装对象的真实对象进行成员属性的自定义编辑
 		initBeanWrapper(bw);
 		return bw;
 	}
@@ -1354,11 +1365,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Populate the bean instance in the given BeanWrapper with the property values
-	 * from the bean definition.
-	 * @param beanName the name of the bean
-	 * @param mbd the bean definition for the bean
-	 * @param bw the BeanWrapper with bean instance
+	 * 使用来自 Bean 定义的属性值填充给定 BeanWrapper 中的 Bean 实例。
+	 * @param beanName bean name
+	 * @param mbd bean definition
+	 * @param bw 带有 Bean 实例的 BeanWrapper
 	 */
 	@SuppressWarnings("deprecation")
 	//创建bean后属性赋值
@@ -1369,7 +1379,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
 			}
 			else {
-				// Skip property population phase for null instance.
+				// 跳过NullBean的属性填充阶段。
 				return;
 			}
 		}
@@ -1420,7 +1430,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);//Autowired注解就是在这里注入的
+					//Autowired注解就是在这里注入的
+					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
 							filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);

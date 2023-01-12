@@ -1,9 +1,14 @@
 package com.marvin.test;
 
 import com.marvin.test.model.MyClassPathXmlApplicationContext;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.*;
 
 @ComponentScan("com.marvin.test.*")
 @EnableAspectJAutoProxy
@@ -21,6 +26,7 @@ public class Test {
         ApplicationContext applicationContext = new MyClassPathXmlApplicationContext("applicationContext.xml");
 //		User user = applicationContext.getBean("user", User.class);
 //		System.out.println(user);
-        System.out.println(applicationContext.getDisplayName());
+        System.out.println(applicationContext.getBean("marvinFactoryBean"));
+
     }
 }

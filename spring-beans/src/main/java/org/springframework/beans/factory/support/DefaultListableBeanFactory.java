@@ -178,7 +178,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	private volatile String[] frozenBeanDefinitionNames;
 
-	/** Whether bean definition metadata may be cached for all beans. */
+	/** 是否可以为所有 Bean 缓存 BeanDefinition元数据. */
 	private volatile boolean configurationFrozen;
 
 
@@ -483,15 +483,24 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+		//配置还未被冻结的或者类型为空或者不允许早期初始化
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
 			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
 		}
+
+		//不管type是否为空，是否允许早期初始化
+		//只要当前bean工厂允许为所有bean缓存bean的定义信息，
+		//就会走到这里，如果不允许，也就是后面的执行过程中还有可能会更改工厂中的beanDefinition
+		//所以不能进行缓存
+
+		//如果允许非单例的bean，那么就将所有的bean的集合中获取到bean名称并将其beanDefintion进行保存，否则就只取单例bean集合中的bean名称
 		Map<Class<?>, String[]> cache =
 				(includeNonSingletons ? this.allBeanNamesByType : this.singletonBeanNamesByType);
 		String[] resolvedBeanNames = cache.get(type);
 		if (resolvedBeanNames != null) {
 			return resolvedBeanNames;
 		}
+		//如果缓存中没有获取到，那么就重新获取一遍，获取到后就将其缓存
 		resolvedBeanNames = doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, true);
 		if (ClassUtils.isCacheSafe(type, getBeanClassLoader())) {
 			cache.put(type, resolvedBeanNames);
@@ -502,17 +511,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 		List<String> result = new ArrayList<>();
 
-		// Check all bean definitions.
+		// 检查所有被加载到缓存中的 Bean 定义信息.
 		for (String beanName : this.beanDefinitionNames) {
-			// Only consider bean as eligible if the bean name is not defined as alias for some other bean.
+			//仅当 Bean 名称未定义为其他某个 Bean 的别名时，才将 Bean 视为合格。
 			if (!isAlias(beanName)) {
 				try {
+					//这里将根据bean名称将父子bean定义信息合并并将非RootBeanDefinition转为RootBeanDefinition
+					// 存入mergedLocalBeanDefinition缓存集合中并返回
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-					// Only check bean definition if it is complete.
+					// 仅检查 Bean 定义是否完整。
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
-						// In case of FactoryBean, match object created by FactoryBean.
+						// 如果是 FactoryBean，匹配对应的 FactoryBean 去创建的对象。
 						boolean isFactoryBean = isFactoryBean(beanName, mbd);
 						BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 						boolean matchFound =
@@ -522,7 +533,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 										(dbd != null ? mbd.isSingleton() : isSingleton(beanName))) &&
 								isTypeMatch(beanName, type);
 						if (!matchFound && isFactoryBean) {
-							// In case of FactoryBean, try to match FactoryBean instance itself next.
+							//如果是 FactoryBean，接下来尝试匹配 FactoryBean 派生的Bean实例本身。
 							beanName = FACTORY_BEAN_PREFIX + beanName;
 							matchFound = (includeNonSingletons || mbd.isSingleton()) && isTypeMatch(beanName, type);
 						}
@@ -557,26 +568,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
-		// Check manually registered singletons too.
+		// 也检查手动注册的Bean单例。
 		for (String beanName : this.manualSingletonNames) {
 			try {
-				// In case of FactoryBean, match object created by FactoryBean.
+				// 如果是 FactoryBean，请匹配 FactoryBean 创建的对象。
 				if (isFactoryBean(beanName)) {
 					if ((includeNonSingletons || isSingleton(beanName)) && isTypeMatch(beanName, type)) {
 						result.add(beanName);
-						// Match found for this bean: do not match FactoryBean itself anymore.
+						// 找到此 bean 的匹配项：不再匹配 FactoryBean 本身。
 						continue;
 					}
-					// In case of FactoryBean, try to match FactoryBean itself next.
+					// 如果是 FactoryBean，接下来尝试匹配 FactoryBean 本身。
 					beanName = FACTORY_BEAN_PREFIX + beanName;
 				}
-				// Match raw bean instance (might be raw FactoryBean).
+				// 匹配原始 Bean 实例（可能是原始 FactoryBean）。
 				if (isTypeMatch(beanName, type)) {
 					result.add(beanName);
 				}
 			}
 			catch (NoSuchBeanDefinitionException ex) {
-				// Shouldn't happen - probably a result of circular reference resolution...
+				// 不应该发生 - 可能是循环引用的结果......
 				if (logger.isTraceEnabled()) {
 					logger.trace("Failed to check manually registered singleton with name '" + beanName + "'", ex);
 				}
@@ -835,28 +846,27 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			logger.trace("Pre-instantiating singletons in " + this);
 		}
 
-		//1.获取容器中的所有Bean，依次对这些bean进行初始化和创建对象
+		//1.获取SpringBean工厂中之前通过loadBeanDefinition方法注入的所有Bean名称，依次对这些bean名称对应的BeanDefinition进行getBean这样的伪检索->初始化->创建bean对象
 		/*
 			beanDefinitionNames是BeanDefinition注册的最后的两个容器之一，
 		   	用于存放所有需要实例化的BeanDefinition的beanName
 	    */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
-		// 实例化所有非懒加载的单例Bean
+		// 实例化并初始化所有非懒加载的单例Bean
 		for (String beanName : beanNames) {
-			// 父子Bean定义信息的合并
-			/*
-				2.获取Bean的定义信息；RootBeanDefinition
-			*/
+			// 合并父子的Bean定义信息
+			//2.获取Bean的定义信息；RootBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			//3.非抽象的，单实例的，非懒加载的Bean
+			//3.如果是 非抽象的，单实例的，非懒加载的Bean
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				//如果是工厂Bean则需要用&+beanName的方式获取Bean
+				//如果是工厂Bean则需要用 &+beanName的方式获取Bean
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
+						//是否是一个只能的工厂Bean
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
@@ -866,6 +876,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
+						//如果factoryBean中要创建的bean渴望被初始化到一级缓存中-那么就先对factoryBean能生产的bean进行初始化，并放入一级缓存
 						if (isEagerInit) {
 							getBean(beanName);
 						}
@@ -873,15 +884,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					//核心方法————getBean
-					/*
-						3.2非工厂Bean。使用getBean(beanName) 创建对象
-					*/
+					//3.2非FactoryBean的普通bean。使用getBean(beanName) 创建对象
 					getBean(beanName);
 				}
 			}
 		}
 
-		// 循环所有的bean
+		// 循环所有的bean，将bean中有SmartInitializingSingleton能力的进行能力使用
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			//判断bean是否实现了SmartInitializingSingleton 接口如果是；就执行afterSingletonsInstantiated()；

@@ -373,10 +373,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Publish the given event to all listeners.
-	 * @param event the event to publish (may be an {@link ApplicationEvent}
-	 * or a payload object to be turned into a {@link PayloadApplicationEvent})
-	 * @param eventType the resolved event type, if known
+	 * 将给定事件发布到所有侦听器。
+	 * @param event 要发布的事件 (may be an {@link ApplicationEvent}
+	 * 或要转换为的有效负载对象 {@link PayloadApplicationEvent})
+	 * @param eventType 已解决事件类型（如果已知）
 	 * @since 4.2
 	 */
 	protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
@@ -397,7 +397,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
-		// Multicast right now if possible - or lazily once the multicaster is initialized
+		//-------------
 		//如果可能的话，现在进行多播 - 或者在初始化组播器后懒惰地进行多播
 		if (this.earlyApplicationEvents != null) {
 			this.earlyApplicationEvents.add(applicationEvent);
@@ -937,7 +937,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 2.根据类型从Spring上下文中的 bean工厂中 匹配到所有的ApplicationListener类型的bean名称
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
-			//2.1将每个监听器添加到事件派发器的监听器bean的集合中
+			//2.1将每个监听器添加到事件派发器的监听器bean的集合中   --要延迟发布的监听器
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
@@ -946,7 +946,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
 			for (ApplicationEvent earlyEvent : earlyEventsToProcess) {
-				//3.派发之前步骤产生的事件；
+				//3.派发之前步骤产生的事件   --将之前prepareRefresh()方法最后注册的earlyApplicationEvent发布出去
 				getApplicationEventMulticaster().multicastEvent(earlyEvent);
 			}
 		}
@@ -965,7 +965,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
-		// 1.2给容器添加值解析器,用来处理注解中的${xxx}
+		// 1.2给容器添加值解析器,用来处理注解中的${xxx}，如果没有自定义属性解析器，将会创建一个默认的解析器应用在bean工厂中
 		/*
 		   如果之前没有任何beanPostProcessor进行过注册，
 		   则注册一个默认的值解析器(这个Lambada表达式就是值解析器)：
@@ -975,19 +975,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
-		//1.3处理aop织入的东西
+		//1.3处理aop织入的东西，尽早初始化loadTimeWeaverAware，以便尽早注册他们的转换器
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
 		}
 
-		//1.4设置容器的临时类加载器
+		//1.4设置容器的临时类加载器，禁止使用临时类加载器进行类型匹配
 		beanFactory.setTempClassLoader(null);
 
-		//1.5锁定容器不会再修改的配置
+		//1.5锁定容器不会再修改的配置，冻结所有的额beanDefinition，因为底下要开始用这些bean的定义信息了，他们不能在被用的时候被修改了
 		beanFactory.freezeConfiguration();
 
-		// 2.初始化单例bean
+		// 2.实例化以及初始化 剩下 没有懒加载能力的单例bean
 		// 核心方法————实例化Bean
 		beanFactory.preInstantiateSingletons();
 	}

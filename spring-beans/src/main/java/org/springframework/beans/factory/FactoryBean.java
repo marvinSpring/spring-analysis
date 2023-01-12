@@ -19,6 +19,8 @@ package org.springframework.beans.factory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 本接口用于定义factoryBean<Bean>对象，可以派生对应的Bean对象
+ *
  * 由{@link BeanFactory}中使用的对象实现的接口，
  * 这些对象本身就是单个对象的工厂。如果Bean实现此接口，
  * 则它将用作对象生产的工厂，而不是直接将FactoryBean用作实例。

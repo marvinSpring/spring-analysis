@@ -99,6 +99,8 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// 根据类型从容器中获取到所有的BeanDefinitionRegistryPostProcessor
+			// ------>拥有这个BeanDefinitionRegistryPostProcessor能力的beanDefinition
+			// mergedLocalBeanDefinition第一次将在这里被初始化到
 			/* 首先，从beanFactory中找所有有BeanDefinitionRegistryPostProcessor能力的类*/
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
@@ -176,7 +178,7 @@ final class PostProcessorRegistrationDelegate {
 				currentRegistryProcessors.clear();
 			}
 
-			//使用上面层层获取到的BFPP能力
+			//使用上面 层层获取到的BFPP能力
 			/* 调用所有实现BeanDefinitionRegistryPostProcessor中的postProcessBeanFactory方法*/
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			//当前bean工厂支持 增删改查器的 使用外部入参的BFPP能力

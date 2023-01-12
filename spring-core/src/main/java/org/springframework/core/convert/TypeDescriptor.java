@@ -36,8 +36,9 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Contextual descriptor about a type to convert from or to.
- * Capable of representing arrays and generic collection types.
+ * 把基础类型、方法参数、属性、class等都进行封装描述
+ *
+ * 有关要从 中转换 或转换为的 类型的上下文描述符。能够表示 数组和泛型集合类型。
  *
  * @author Keith Donald
  * @author Andy Clement

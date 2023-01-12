@@ -38,13 +38,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base class for concrete, full-fledged {@link BeanDefinition} classes,
- * factoring out common properties of {@link GenericBeanDefinition},
- * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
+ * 具体的、成熟的 {@link BeanDefinition} 类的基类，
+ * 分解出 {@link GenericBeanDefinition}、
+ * {@link RootBeanDefinition} 和
+ * {@link ChildBeanDefinition} 的常见属性。
  *
- * <p>The autowire constants match the ones defined in the
- * {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory}
- * interface.
+ * <p>自动注入常量与 {@link org.springframework.beans.factory.config.AutowireCapableBeanFactory} 接口中定义的常量匹配。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -274,6 +273,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	/**
+	 * 从给定的 Bean 定义（可能是子定义）中覆盖此 Bean 定义中的设置（可能是从父子继承关系复制的父项）。
+	 *
 	 * Override settings in this bean definition (presumably a copied parent
 	 * from a parent-child inheritance relationship) from the given bean
 	 * definition (presumably the child).
@@ -470,8 +471,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this a <b>Singleton</b>, with a single shared instance
-	 * returned from all calls.
+	 * 返回这是否为<b>单例bean<b>，
+	 * 并从所有调用返回单个共享实例。
 	 * @see #SCOPE_SINGLETON
 	 */
 	@Override
@@ -500,8 +501,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean is "abstract", i.e. not meant to be instantiated
-	 * itself but rather just serving as parent for concrete child bean definitions.
+	 * 返回此 bean 是否是“抽象的”，即不打算实例化本身，
+	 * 而只是充当具体子 bean 定义的父级。
 	 */
 	@Override
 	public boolean isAbstract() {
@@ -519,8 +520,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean should be lazily initialized, i.e. not
-	 * eagerly instantiated on startup. Only applicable to a singleton bean.
+	 * 返回此 Bean 是否应该延迟初始化，即在Spring启动时不急切地实例化。
+	 * 仅适用于单例Bean对象，懒加载的bean对象将在使用的时候才会被注入一级缓存。
 	 * @return whether to apply lazy-init semantics ({@code false} by default)
 	 */
 	@Override
@@ -714,7 +715,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return a callback for creating an instance of the bean, if any.
+	 * 返回用于创建 Bean 实例的回调（如果有）。
 	 * @since 5.0
 	 */
 	@Nullable
@@ -967,8 +968,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this bean definition is 'synthetic', that is,
-	 * not defined by the application itself.
+	 * 返回此 Bean 定义是否为“终端用户自己创建的”，
+	 * 即不是由应用程序本身定义的。
 	 */
 	public boolean isSynthetic() {
 		return this.synthetic;
@@ -1077,25 +1078,26 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Validate and prepare the method overrides defined for this bean.
-	 * Checks for existence of a method with the specified name.
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 验证并准备为当前 Bean 定义的方法覆盖。
+	 * 检查是否存在具有指定名称的方法。
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exist and determine their overloaded status.
+		// 检查查找方法是否存在并确定其重载状态。
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
 	}
 
 	/**
-	 * Validate and prepare the given method override.
-	 * Checks for existence of a method with the specified name,
-	 * marking it as not overloaded if none found.
-	 * @param mo the MethodOverride object to validate
-	 * @throws BeanDefinitionValidationException in case of validation failure
+	 * 验证并准备给定的方法重写。
+	 * 检查是否存在具有指定名称的方法，
+	 * 如果未找到，则将其标记为未重载。
+	 * @param mo 要验证的方法重写对象
+	 * @throws BeanDefinitionValidationException 在验证失败的情况下
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		//获取
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
@@ -1103,7 +1105,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 					"' on class [" + getBeanClassName() + "]");
 		}
 		else if (count == 1) {
-			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			//将覆盖标记为未重载，以避免 arg 类型检查的开销
 			mo.setOverloaded(false);
 		}
 	}

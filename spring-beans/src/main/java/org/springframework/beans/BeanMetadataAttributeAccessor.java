@@ -20,9 +20,8 @@ import org.springframework.core.AttributeAccessorSupport;
 import org.springframework.lang.Nullable;
 
 /**
- * Extension of {@link org.springframework.core.AttributeAccessorSupport},
- * holding attributes as {@link BeanMetadataAttribute} objects in order
- * to keep track of the definition source.
+ * {@link org.springframework.core.AttributeAccessorSupport} 的扩展，
+ * 将属性保存为 {@link BeanMetadataAttribute} 对象，以便跟踪定义源。
  *
  * @author Juergen Hoeller
  * @since 2.5

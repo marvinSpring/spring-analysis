@@ -300,8 +300,8 @@ public class ConstructorArgumentValues {
 	}
 
 	/**
-	 * Return the list of generic argument values.
-	 * @return unmodifiable List of ValueHolders
+	 * 返回泛型参数值的列表。
+	 * @return 不可修改的 属性持有者 列表
 	 * @see ValueHolder
 	 */
 	public List<ValueHolder> getGenericArgumentValues() {
@@ -310,8 +310,7 @@ public class ConstructorArgumentValues {
 
 
 	/**
-	 * Look for an argument value that either corresponds to the given index
-	 * in the constructor argument list or generically matches by type.
+	 * 查找与构造函数参数列表中的给定索引相对应或按类型通常匹配的参数值。
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the parameter type to match
 	 * @return the ValueHolder for the argument, or {@code null} if none set

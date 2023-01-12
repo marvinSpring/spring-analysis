@@ -1183,11 +1183,11 @@ public abstract class ClassUtils {
 	}
 
 	/**
-	 * Return the number of methods with a given name (with any argument types),
-	 * for the given class and/or its superclasses. Includes non-public methods.
-	 * @param clazz	the clazz to check
-	 * @param methodName the name of the method
-	 * @return the number of methods with the given name
+	 * 返回给定类及其父类的具有给定名称（具有任何参数类型）的方法数。
+	 * 包括非公共方法。
+	 * @param clazz	要检查的class
+	 * @param methodName 方法的名称
+	 * @return 具有给定名称的方法的数量
 	 */
 	public static int getMethodCountForName(Class<?> clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
