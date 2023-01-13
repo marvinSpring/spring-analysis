@@ -98,7 +98,7 @@ public interface SingletonBeanRegistry {
 	boolean containsSingleton(String beanName);
 
 	/**
-	 * 返回在此注册中心中注册的单例bean的名称。
+	 * 返回在此注册中心中注册的单例bean的名称。 
 	 * <p>只检查已经实例化的单例;不返回尚未实例化的单例bean定义的名称。
 	 *
 	 * <p>这个方法的主要目的是检查手动注册的单例(@see {@link #registerSingleton})。
