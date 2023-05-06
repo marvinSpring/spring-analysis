@@ -24,9 +24,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
- * Base class for decorating ClassLoaders such as {@link OverridingClassLoader}
- * and {@link org.springframework.instrument.classloading.ShadowingClassLoader},
- * providing common handling of excluded packages and classes.
+ * 用于装饰 ClassLoader 的基类，
+ * 例如 {@link OverridingClassLoader} 和
+ * {@link org.springframework.instrument.classload.ShadowingClassLoader}，
+ * 提供对排除的包和类的常见处理
  *
  * @author Juergen Hoeller
  * @author Rod Johnson

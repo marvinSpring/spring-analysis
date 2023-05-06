@@ -471,15 +471,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//bean定义信息
 		RootBeanDefinition mbdToUse = mbd;
 
-		// 解析bean的类型
+		// 根据bean定义信息中的 beanClass 属性 和 beanName 将其解析为bean对象对应的Class类型
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+
+		//如果解析出来的Bean类型不为空
+		// 且当前bean对象所属的beanDefinition对象有beanClassName属性并且当前beanDefinition不拥有beanClass属性
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+
+			//给需要去使用的beanDefinition 赋值为 将当前beanDefinition包装成rootBeanDefinition
 			mbdToUse = new RootBeanDefinition(mbd);
+
+			//给需要去使用的beanDefinition 设置BeanClass属性为 上面解析到的类
 			mbdToUse.setBeanClass(resolvedClass);
+
 		}
 
 		try {
-			//预处理方法重载？？？
+			//验证 以及 准备覆盖 的 方法    lookup-method  replace-method
 			mbdToUse.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {

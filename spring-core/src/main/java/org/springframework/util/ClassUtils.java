@@ -243,6 +243,7 @@ public abstract class ClassUtils {
 
 		Assert.notNull(name, "Name must not be null");
 
+		//根据bean的类路径名称 解析到一个原始的Class类
 		Class<?> clazz = resolvePrimitiveClassName(name);
 		if (clazz == null) {
 			clazz = commonClassCache.get(name);

@@ -136,6 +136,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final String INFER_METHOD = "(inferred)";
 
 
+	//存放bean对象的全限定类路径、或者bean对象的Class类型
 	@Nullable
 	private volatile Object beanClass;
 
@@ -418,29 +419,33 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * Return whether this definition specifies a bean class.
+	 * 返回此定义是否指定了 Bean 类。
 	 * @see #getBeanClass()
 	 * @see #setBeanClass(Class)
 	 * @see #resolveBeanClass(ClassLoader)
 	 */
+	//判断当前beanDefinition的beanClass属性是否是Class类型的
 	public boolean hasBeanClass() {
 		return (this.beanClass instanceof Class);
 	}
 
 	/**
-	 * Determine the class of the wrapped bean, resolving it from a
-	 * specified class name if necessary. Will also reload a specified
-	 * Class from its name when called with the bean class already resolved.
-	 * @param classLoader the ClassLoader to use for resolving a (potential) class name
-	 * @return the resolved bean class
-	 * @throws ClassNotFoundException if the class name could be resolved
+	 * 确定包装的 Bean 的类，
+	 * 必要时从指定的类名解析它。
+	 * 当使用已解析的 Bean 类调用时，还将从其名称重新加载指定的类。
+	 * @param classLoader 用于解析（潜在）类名的类加载器
+	 * @return 解析的 Bean 类
+	 * @throws ClassNotFoundException 如果可以解析类名
 	 */
 	@Nullable
 	public Class<?> resolveBeanClass(@Nullable ClassLoader classLoader) throws ClassNotFoundException {
+		//获取当前beanClassName属性
 		String className = getBeanClassName();
+		//如果当前的bean类名称不存在，则直接返回null
 		if (className == null) {
 			return null;
 		}
+		//根据bean的beanClassName属性和类加载器获取解析完成的bean的类对象
 		Class<?> resolvedClass = ClassUtils.forName(className, classLoader);
 		this.beanClass = resolvedClass;
 		return resolvedClass;
