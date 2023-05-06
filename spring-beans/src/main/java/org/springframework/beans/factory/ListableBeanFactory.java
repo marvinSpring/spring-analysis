@@ -41,9 +41,7 @@ import org.springframework.lang.Nullable;
  * scenarios, all beans will be defined by external bean definitions anyway, so most
  * applications don't need to worry about this differentiation.
  *
- * <p><b>NOTE:</b> With the exception of {@code getBeanDefinitionCount}
- * and {@code containsBeanDefinition}, the methods in this interface
- * are not designed for frequent invocation. Implementations may be slow.
+ * <p><b>注意:<b>除了{@code getBeanDefinitionCount}和{@code containsBeanDefinition}之外，这个接口中的方法不是为频繁调用而设计的。实现可能很慢。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -55,60 +53,50 @@ import org.springframework.lang.Nullable;
 public interface ListableBeanFactory extends BeanFactory {
 
 	/**
-	 * Check if this bean factory contains a bean definition with the given name.
-	 * <p>Does not consider any hierarchy this factory may participate in,
-	 * and ignores any singleton beans that have been registered by
-	 * other means than bean definitions.
-	 * @param beanName the name of the bean to look for
-	 * @return if this bean factory contains a bean definition with the given name
+	 * 检查此bean工厂是否包含具有给定名称的bean定义。
+	 * <p>不考虑该工厂可能参与的任何层次结构，并忽略通过bean定义以外的其他方式注册的任何单例bean。
+	 * @param beanName 要查找的bean的名称
+	 * @return 如果此bean工厂包含具有给定名称的bean定义
 	 * @see #containsBean
 	 */
 	//是否包含BeanDefinition
 	boolean containsBeanDefinition(String beanName);
 
 	/**
-	 * Return the number of beans defined in the factory.
-	 * <p>Does not consider any hierarchy this factory may participate in,
-	 * and ignores any singleton beans that have been registered by
-	 * other means than bean definitions.
-	 * @return the number of beans defined in the factory
+	 * 返回在工厂中定义的bean的数量。
+	 * <p>不考虑此工厂可能参与的任何层次结构，
+	 * 并忽略通过bean定义以外的其他方式注册的任何单例bean。
+	 * @return 在工厂中定义的bean数量
 	 */
 	//获取Bean Definition的数量
 	int getBeanDefinitionCount();
 
 	/**
-	 * Return the names of all beans defined in this factory.
-	 * <p>Does not consider any hierarchy this factory may participate in,
-	 * and ignores any singleton beans that have been registered by
-	 * other means than bean definitions.
-	 * @return the names of all beans defined in this factory,
-	 * or an empty array if none defined
+	 * 返回此工厂中定义的所有bean的名称。
+	 * <p>不考虑此工厂可能参与的任何层次结构，
+	 * 并忽略通过bean定义以外的其他方式注册的任何单例bean。
+	 * @return 此工厂中定义的所有bean的名称，
+	 * 如果没有定义则为空数组
 	 */
 	//获取BeanDefinition的名称数组
 	String[] getBeanDefinitionNames();
 
 	/**
-	 * Return the names of beans matching the given type (including subclasses),
-	 * judging from either bean definitions or the value of {@code getObjectType}
-	 * in the case of FactoryBeans.
-	 * <p><b>NOTE: This method introspects top-level beans only.</b> It does <i>not</i>
-	 * check nested beans which might match the specified type as well.
-	 * <p>Does consider objects created by FactoryBeans, which means that FactoryBeans
-	 * will get initialized. If the object created by the FactoryBean doesn't match,
-	 * the raw FactoryBean itself will be matched against the type.
-	 * <p>Does not consider any hierarchy this factory may participate in.
-	 * Use BeanFactoryUtils' {@code beanNamesForTypeIncludingAncestors}
-	 * to include beans in ancestor factories too.
-	 * <p>Note: Does <i>not</i> ignore singleton beans that have been registered
-	 * by other means than bean definitions.
-	 * <p>This version of {@code getBeanNamesForType} matches all kinds of beans,
-	 * be it singletons, prototypes, or FactoryBeans. In most implementations, the
-	 * result will be the same as for {@code getBeanNamesForType(type, true, true)}.
-	 * <p>Bean names returned by this method should always return bean names <i>in the
-	 * order of definition</i> in the backend configuration, as far as possible.
-	 * @param type the generically typed class or interface to match
-	 * @return the names of beans (or objects created by FactoryBeans) matching
-	 * the given object type (including subclasses), or an empty array if none
+	 * 返回与给定类型(包括子类)匹配的bean名称，
+	 * 根据bean定义或{@code getObjectType}(对于FactoryBeans)的值判断。
+	 * <p><b>注意:此方法仅自查顶级bean。</b> 它也不检查可能匹配指定类型的嵌套bean。
+	 * <p>考虑由FactoryBeans创建的对象，
+	 * 这意味着FactoryBeans将被初始化。
+	 * 如果FactoryBean创建的对象不匹配，原始FactoryBean本身将根据类型进行匹配。
+	 * <p>不考虑此工厂可能参与的任何层次结构。
+	 * 使用BeanFactoryUtils的{@code beanNamesForTypeIncludingAncestors}也可以在祖先工厂中包含bean。
+	 * <p>注意:
+	 * 不忽略通过bean定义以外的其他方式注册的单例bean。
+	 * <p>{@code getBeanNamesForType}的这个版本匹配所有类型的bean，
+	 * 无论是单例bean、原型bean还是factoryBean。在大多数实现中，结果将与{@code getBeanNamesForType(type, true, true)}相同。
+	 * <p>此方法返回的Bean名称应该总是尽可能按照在后端配置中定义的顺序返回Bean名称。
+	 * @param type 要匹配的泛型类或接口
+	 * @return 匹配给定对象类型(包括子类)的bean(或由FactoryBeans创建的对象)的名称，如果没有则为空数组
 	 * @since 4.2
 	 * @see #isTypeMatch(String, ResolvableType)
 	 * @see FactoryBean#getObjectType

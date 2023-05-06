@@ -32,11 +32,12 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.lang.Nullable;
 
 /**
- * Support base class for singleton registries which need to handle
- * {@link org.springframework.beans.factory.FactoryBean} instances,
- * integrated with {@link DefaultSingletonBeanRegistry}'s singleton management.
+ * 本抽象类将
+ * 处理{@link org.springframework.beans.factory.FactoryBean} 派生的单例
+ * 增强派生后的bean对象的增删改查增强器
+ * 且拥有{@link DefaultSingletonBeanRegistry}的单例管理能力。
  *
- * <p>Serves as base class for {@link AbstractBeanFactory}.
+ * <p>作为{@link AbstractBeanFactory}的抽象基类。
  *
  * @author Juergen Hoeller
  * @since 2.5.1
